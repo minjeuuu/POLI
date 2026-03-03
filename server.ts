@@ -137,11 +137,9 @@ async function startServer() {
         const distPath = path.join(process.cwd(), 'dist');
         if (fs.existsSync(distPath)) {
             app.use(express.static(distPath));
-            // SPA fallback - send index.html for all non-API routes
-            app.get('*', (req, res) => {
-                if (!req.path.startsWith('/api/') && !req.path.startsWith('/uploads/')) {
-                    res.sendFile(path.join(distPath, 'index.html'));
-                }
+            // SPA fallback - send index.html for all non-API routes (Express v5 syntax)
+            app.get(/^(?!\/api|\/uploads).*$/, (req, res) => {
+                res.sendFile(path.join(distPath, 'index.html'));
             });
             console.log(`POLI serving production build from ${distPath}`);
         } else {
