@@ -1,5 +1,5 @@
 
-import { generateWithRetry, withCache, getLanguageInstruction, safeParse } from "./common";
+import { generateWithRetry, generateWithFallback, withCache, getLanguageInstruction, safeParse } from "./common";
 import { DailyContext, HighlightedEntity, HighlightDetail, DailyHistoryEvent } from "../types";
 import { FALLBACK_DAILY_CONTEXT } from "../data/homeData";
 import { generateMassiveHistory, getMassiveArchive } from "../data/archives/massiveHistory";
@@ -45,20 +45,16 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
                 ${getLanguageInstruction()}
                 `;
 
-        const attemptFetch = async (model: string) => {
-            return await generateWithRetry({
-                model: model,
+        try {
+            let response = await generateWithFallback({
+                model: 'gemini-3-pro-preview',
                 contents: contents,
-                config: { 
+                config: {
                     responseMimeType: "application/json",
-                    maxOutputTokens: 8192, 
-                    tools: [{googleSearch: {}}] 
+                    maxOutputTokens: 8192,
+                    tools: [{googleSearch: {}}]
                 }
             });
-        };
-
-        try {
-            let response = await attemptFetch('gemini-3-pro-preview');
             const parsed = safeParse(response.text || '{}', FALLBACK_DAILY_CONTEXT) as any;
             
             const proceduralEvents = generateMassiveHistory(date);
@@ -120,19 +116,15 @@ export const fetchHighlightDetail = async (highlight: HighlightedEntity): Promis
             Structure: { "title", "subtitle", "category", "summary", "historicalBackground", "significance", "keyConcepts": [{"concept", "definition"}], "modernConnections": [string], "sources": [{"title", "url"}] }
             `;
 
-        const attemptFetch = async (model: string) => {
-             return await generateWithRetry({
-                model: model,
+        try {
+            let response = await generateWithFallback({
+                model: 'gemini-3-flash-preview',
                 contents: contents,
-                config: { 
+                config: {
                     responseMimeType: "application/json",
                     maxOutputTokens: 4096
                 }
             });
-        };
-
-        try {
-            let response = await attemptFetch('gemini-3-flash-preview');
             const parsed = safeParse(response.text || '{}', {}) as any;
             return {
                 title: parsed.title || highlight.title,

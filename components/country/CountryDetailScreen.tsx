@@ -190,16 +190,52 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <IdentityNames native={data.identity.nativeName} demonym={data.identity.demonym} motto={data.identity.motto} />
                           <div>
-                            <AnthemCard 
-                                name={data.symbols?.anthem?.native || data.identity?.nationalAnthem?.name} 
-                                lyrics={data.symbols?.anthem?.translation || data.identity?.nationalAnthem?.lyrics} 
+                            <AnthemCard
+                                name={data.symbols?.anthem?.native || data.identity?.nationalAnthem?.name}
+                                lyrics={data.symbols?.anthem?.translation || data.identity?.nationalAnthem?.lyrics}
                             />
                             <div className="mt-4 p-4 border border-stone-200 dark:border-stone-700 rounded-lg">
                                 <h5 className="text-[10px] font-bold uppercase text-stone-400 mb-2">Coat of Arms</h5>
-                                <p className="text-sm font-serif">{data.symbols.coatOfArms?.description}</p>
+                                {((data.symbols as any)?.coatOfArms?.imageUrl || (data.identity as any)?.coatOfArms?.imageUrl) && (
+                                    <img
+                                        src={(data.symbols as any)?.coatOfArms?.imageUrl || (data.identity as any)?.coatOfArms?.imageUrl}
+                                        alt={`Coat of Arms of ${data.identity.commonName}`}
+                                        className="w-24 h-24 object-contain mx-auto mb-3"
+                                        referrerPolicy="no-referrer"
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                    />
+                                )}
+                                <p className="text-sm font-serif">{data.symbols?.coatOfArms?.description || data.identity?.coatOfArms?.description}</p>
                             </div>
                           </div>
                       </div>
+                  </div>
+
+                  {/* National Symbols Grid */}
+                  {data.symbols?.nationalSymbols && data.symbols.nationalSymbols.length > 0 && (
+                      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 mb-4">
+                          <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4">National Symbols</h4>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                              {data.symbols.nationalSymbols.map((sym, i) => (
+                                  <div key={i} className="p-3 border border-stone-100 dark:border-stone-800 rounded-lg">
+                                      <div className="text-[10px] font-bold uppercase text-academic-gold mb-1">{sym.type}</div>
+                                      <div className="text-sm font-serif text-academic-text dark:text-stone-200">{sym.name}</div>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+                  )}
+
+                  {/* Quick Identity Facts */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {data.identity.nationalAnimal && <div className="p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 rounded-lg"><div className="text-[10px] font-bold uppercase text-stone-400 mb-1">National Animal</div><div className="text-sm font-serif">{data.identity.nationalAnimal}</div></div>}
+                      {data.identity.nationalBird && <div className="p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 rounded-lg"><div className="text-[10px] font-bold uppercase text-stone-400 mb-1">National Bird</div><div className="text-sm font-serif">{data.identity.nationalBird}</div></div>}
+                      {data.identity.nationalFlower && <div className="p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 rounded-lg"><div className="text-[10px] font-bold uppercase text-stone-400 mb-1">National Flower</div><div className="text-sm font-serif">{data.identity.nationalFlower}</div></div>}
+                      {data.identity.nationalTree && <div className="p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 rounded-lg"><div className="text-[10px] font-bold uppercase text-stone-400 mb-1">National Tree</div><div className="text-sm font-serif">{data.identity.nationalTree}</div></div>}
+                      {data.identity.nationalDish && <div className="p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 rounded-lg"><div className="text-[10px] font-bold uppercase text-stone-400 mb-1">National Dish</div><div className="text-sm font-serif">{data.identity.nationalDish}</div></div>}
+                      {data.identity.currency?.name && <div className="p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 rounded-lg"><div className="text-[10px] font-bold uppercase text-stone-400 mb-1">Currency</div><div className="text-sm font-serif">{data.identity.currency.name} ({data.identity.currency.symbol})</div></div>}
+                      {data.identity.callingCode && <div className="p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 rounded-lg"><div className="text-[10px] font-bold uppercase text-stone-400 mb-1">Calling Code</div><div className="text-sm font-mono">{data.identity.callingCode}</div></div>}
+                      {data.identity.internetTLD && <div className="p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 rounded-lg"><div className="text-[10px] font-bold uppercase text-stone-400 mb-1">Internet TLD</div><div className="text-sm font-mono">{data.identity.internetTLD}</div></div>}
                   </div>
               </SectionWrapper>
 

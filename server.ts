@@ -1,7 +1,6 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { createServer as createViteServer } from 'vite';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -16,12 +15,13 @@ const io = new Server(httpServer, {
     }
 });
 
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Ensure uploads directory exists
 const uploadDir = path.join(process.cwd(), 'uploads');
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 // Configure Multer for file uploads
@@ -36,7 +36,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 app.use(cors());
 app.use('/uploads', express.static(uploadDir));
 
@@ -103,13 +103,17 @@ app.post('/api/posts/:id/comment', (req, res) => {
     }
 });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', mode: IS_PRODUCTION ? 'production' : 'development' });
+});
+
 // --- SOCKET.IO HANDLERS ---
 io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
+    console.log('User connected:', socket.id);
 
     socket.on('join_chat', (chatId) => {
         socket.join(chatId);
-        console.log(`User ${socket.id} joined chat ${chatId}`);
     });
 
     socket.on('send_message', (msg) => {
@@ -126,16 +130,37 @@ io.on('connection', (socket) => {
     });
 });
 
-// --- VITE MIDDLEWARE ---
+// --- SERVER START ---
 async function startServer() {
-    const vite = await createViteServer({
-        server: { middlewareMode: true },
-        appType: 'spa',
-    });
-    app.use(vite.middlewares);
+    if (IS_PRODUCTION) {
+        // Serve pre-built static files in production
+        const distPath = path.join(process.cwd(), 'dist');
+        if (fs.existsSync(distPath)) {
+            app.use(express.static(distPath));
+            // SPA fallback - send index.html for all non-API routes
+            app.get('*', (req, res) => {
+                if (!req.path.startsWith('/api/') && !req.path.startsWith('/uploads/')) {
+                    res.sendFile(path.join(distPath, 'index.html'));
+                }
+            });
+            console.log(`POLI serving production build from ${distPath}`);
+        } else {
+            console.warn('Production build not found. Run "npm run build" first.');
+            process.exit(1);
+        }
+    } else {
+        // Use Vite dev middleware in development
+        const { createServer: createViteServer } = await import('vite');
+        const vite = await createViteServer({
+            server: { middlewareMode: true },
+            appType: 'spa',
+        });
+        app.use(vite.middlewares);
+        console.log(`POLI running in development mode`);
+    }
 
     httpServer.listen(PORT, "0.0.0.0", () => {
-        console.log(`Server running on http://localhost:${PORT}`);
+        console.log(`POLI server running on http://localhost:${PORT}`);
     });
 }
 
