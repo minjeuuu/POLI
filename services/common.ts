@@ -2,10 +2,10 @@
 import { GoogleGenAI } from "@google/genai";
 
 // Centralized API Client Initialization
-const apiKey = process.env.API_KEY || '';
-if (!apiKey) console.warn("POLI Warning: API_KEY not detected in process.env");
+const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
+if (!apiKey) console.warn("POLI Warning: GEMINI_API_KEY not detected — Claude will be used as primary AI.");
 
-export const ai = new GoogleGenAI({ apiKey });
+export const ai = new GoogleGenAI({ apiKey: apiKey || 'placeholder' });
 
 export const GLOBAL_CACHE: Record<string, any> = {};
 
@@ -33,9 +33,9 @@ export const generateWithRetry = async (params: any, retries = 3) => {
             const isLast = i === retries;
             const msg = e.message || JSON.stringify(e);
             console.warn(`Gemini generation failed (Attempt ${i + 1}/${retries + 1}):`, msg);
-            
+
             if (isLast) throw e;
-            
+
             // Exponential backoff: 1s, 2s, 4s... plus random jitter
             const delay = 1000 * Math.pow(2, i) + (Math.random() * 1000);
             await new Promise(resolve => setTimeout(resolve, delay));
@@ -47,36 +47,45 @@ export const generateWithRetry = async (params: any, retries = 3) => {
 import { generateWithClaude } from "./claudeService";
 
 /**
- * High-Availability Wrapper: Tries Primary Model -> Falls back to Flash -> Falls back to Claude
- * This ensures the user ALWAYS gets data, even if the Pro model is overloaded.
+ * High-Availability Wrapper: Tries Primary Model -> Falls back to Flash -> Falls back to Claude.
+ * If no Gemini key is configured, routes directly to Claude as primary.
  */
-export const generateWithFallback = async (params: any, fallbackModel: string = 'gemini-3-flash-preview') => {
+export const generateWithFallback = async (params: any, fallbackModel: string = 'gemini-2.5-flash'): Promise<{ text: string }> => {
+    const hasGeminiKey = !!(process.env.API_KEY || process.env.GEMINI_API_KEY);
+
+    if (!hasGeminiKey) {
+        // No Gemini key — use Claude directly as primary
+        const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
+        const claudeResponse = await generateWithClaude(prompt);
+        if (claudeResponse) return { text: claudeResponse };
+        return { text: '{}' };
+    }
+
     try {
-        // Attempt Primary Request
+        // Attempt Primary Gemini Request
         return await generateWithRetry(params);
     } catch (e) {
         console.warn(`Primary model (${params.model}) failed. Auto-switching to fallback: ${fallbackModel}.`, e);
-        
+
         try {
-            // Retry with Fallback Model (Gemini Flash)
-            return await generateWithRetry({ 
-                ...params, 
+            // Retry with Gemini Flash
+            return await generateWithRetry({
+                ...params,
                 model: fallbackModel,
-                // Fallback often requires less strict config to ensure completion
-                config: { ...params.config, responseMimeType: "application/json" } 
+                config: { ...params.config, responseMimeType: "application/json" }
             });
         } catch (e2) {
             console.warn(`Gemini Flash fallback failed. Attempting Claude fallback.`, e2);
-            
-            // Retry with Claude
+
+            // Final fallback to Claude
             const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
             const claudeResponse = await generateWithClaude(prompt);
-            
+
             if (claudeResponse) {
                 return { text: claudeResponse };
             }
-            
-            throw e2; // If Claude fails too, throw original error
+
+            throw e2;
         }
     }
 };
@@ -95,7 +104,7 @@ export class JSONRepair {
         // 3. Find the outermost object or array
         const firstBrace = fixed.indexOf('{');
         const firstBracket = fixed.indexOf('[');
-        
+
         let startIndex = -1;
         let isArray = false;
 
@@ -106,7 +115,7 @@ export class JSONRepair {
             isArray = true;
         }
 
-        if (startIndex === -1) return "{}"; 
+        if (startIndex === -1) return "{}";
 
         fixed = fixed.substring(startIndex);
 
@@ -119,7 +128,7 @@ export class JSONRepair {
 
         // 5. Remove comments
         fixed = fixed.replace(/^\s*\/\/.*$/gm, "");
-        
+
         // 6. Fix trailing commas
         fixed = fixed.replace(/,\s*([\]}])/g, "$1");
 
@@ -146,7 +155,7 @@ export class JSONRepair {
             const closeBrackets = (cleaned.match(/]/g) || []).length;
 
             let repair = cleaned;
-            
+
             if ((repair.match(/"/g) || []).length % 2 !== 0) {
                 repair += '"';
             }
@@ -170,7 +179,7 @@ export const deepMerge = (target: any, source: any): any => {
   if (typeof source !== 'object' || source === null) return target;
 
   const output = { ...target };
-  
+
   Object.keys(source).forEach(key => {
     const sourceValue = source[key];
     const targetValue = target[key];
@@ -191,7 +200,7 @@ export const deepMerge = (target: any, source: any): any => {
       }
     }
   });
-  
+
   return output;
 };
 

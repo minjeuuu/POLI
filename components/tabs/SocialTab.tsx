@@ -36,6 +36,12 @@ const SocialTab: React.FC<SocialTabProps> = ({ onNavigate, user }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [postImagePreview, setPostImagePreview] = useState<string | null>(null);
+  const [postImageFile, setPostImageFile] = useState<File | null>(null);
+  const postImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Poll vote tracking
+  const [votedPolls, setVotedPolls] = useState<Record<string, number>>({});
   
   // Interaction State
   const [activeCommentsId, setActiveCommentsId] = useState<string | null>(null);
@@ -155,30 +161,53 @@ const SocialTab: React.FC<SocialTabProps> = ({ onNavigate, user }) => {
       setActiveReader({ title, author });
   };
 
+  const handlePostImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setPostImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (ev) => setPostImagePreview(ev.target?.result as string);
+      reader.readAsDataURL(file);
+  };
+
   const handleCreatePost = async () => {
       if (!newPostContent.trim()) return;
       playSFX('click');
       setIsUploading(true);
-      
+
+      let imageUrl: string | undefined;
+      if (postImageFile) {
+          try {
+              const formData = new FormData();
+              formData.append('file', postImageFile);
+              const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+              const uploadData = await uploadRes.json();
+              imageUrl = uploadData.url;
+          } catch {
+              // continue without image
+          }
+      }
+
       const newPost: SocialPost = {
           id: `new-${Date.now()}`,
           type: 'Analysis',
-          title: "Latest Field Report",
-          author: { 
+          title: newPostContent.split('.')[0].slice(0, 80) || 'Field Report',
+          author: {
               name: user?.displayName || 'Scholar',
               credential: 'Researcher',
               handle: user?.username ? `@${user.username}` : '@scholar',
-              avatar: 'ME',
-              verified: true
+              avatar: (user?.displayName || 'S').charAt(0).toUpperCase(),
+              verified: false
           },
-          timestamp: "Just now",
+          timestamp: 'Just now',
           content: newPostContent,
           fullContent: newPostContent,
-          discipline: "General",
+          discipline: 'General',
           citations: [],
           reactions: { valid: 0, disputed: 0, citationNeeded: 0, hearts: 0 },
           comments: [],
-          tags: []
+          tags: [],
+          ...(imageUrl ? { imageUrl } : {})
       };
 
       try {
@@ -187,17 +216,33 @@ const SocialTab: React.FC<SocialTabProps> = ({ onNavigate, user }) => {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(newPost)
           });
-          
           setNewPostContent('');
           setIsCreating(false);
+          setPostImagePreview(null);
+          setPostImageFile(null);
           playSFX('success');
-          showToast("Analysis Published");
+          showToast('Analysis Published');
       } catch (e) {
-          console.error("Post creation failed", e);
-          showToast("Failed to publish");
+          showToast('Failed to publish');
       } finally {
           setIsUploading(false);
       }
+  };
+
+  const handlePollVote = async (e: React.MouseEvent, postId: string, optionIndex: number) => {
+      e.stopPropagation();
+      if (votedPolls[postId] !== undefined) return;
+      playSFX('click');
+      setVotedPolls(prev => ({ ...prev, [postId]: optionIndex }));
+      setFeed(prev => prev.map(p => {
+          if (p.id === postId && p.poll) {
+              const newOptions = p.poll.options.map((opt, i) =>
+                  i === optionIndex ? { ...opt, votes: opt.votes + 1 } : opt
+              );
+              return { ...p, poll: { options: newOptions, totalVotes: p.poll.totalVotes + 1 } };
+          }
+          return p;
+      }));
   };
 
   const handleReaction = async (e: React.MouseEvent, id: string, type: 'hearts' | 'valid') => {
@@ -255,49 +300,91 @@ const SocialTab: React.FC<SocialTabProps> = ({ onNavigate, user }) => {
       }
   };
 
-  const renderSpotlight = () => null;
+  const renderSpotlight = () => {
+      const topPost = feed.reduce((best, p) => (p.reactions.hearts > (best?.reactions.hearts || 0) ? p : best), feed[0]);
+      if (!topPost) return null;
+      return (
+          <div className="bg-gradient-to-br from-academic-accent/10 to-stone-100 dark:from-stone-800 dark:to-stone-900 border border-academic-accent/20 dark:border-stone-700 rounded-2xl p-5 mb-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                  <TrendingUp className="w-4 h-4 text-academic-accent" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-academic-accent">Trending Now</span>
+              </div>
+              <h3 className="font-serif font-bold text-stone-900 dark:text-stone-100 text-lg leading-snug mb-2">{topPost.title}</h3>
+              <p className="text-sm text-stone-600 dark:text-stone-400 font-serif line-clamp-2 mb-3">{topPost.content}</p>
+              <div className="flex items-center justify-between">
+                  <span className="text-xs text-stone-500">{topPost.author.name} · {topPost.reactions.hearts} reactions</span>
+                  <button
+                      onClick={() => handlePostClick(topPost)}
+                      className="text-[10px] font-bold uppercase tracking-widest text-academic-accent hover:underline"
+                  >
+                      Read More
+                  </button>
+              </div>
+          </div>
+      );
+  };
 
   const renderCreatePost = () => (
-      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4 mb-8 shadow-sm relative overflow-hidden">
+      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4 mb-6 shadow-sm relative overflow-hidden">
           {isUploading && (
-              <div className="absolute inset-0 bg-white/90 dark:bg-stone-900/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center animate-in fade-in">
+              <div className="absolute inset-0 bg-white/90 dark:bg-stone-900/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center">
                   <div className="w-12 h-12 bg-academic-accent text-white rounded-full flex items-center justify-center mb-3 shadow-lg">
                       <ArrowRight className="w-6 h-6 animate-pulse" />
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-stone-600 dark:text-stone-300">Broadcasting to Network...</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-stone-600 dark:text-stone-300">Publishing...</span>
               </div>
           )}
-          
+
+          <input
+              type="file"
+              ref={postImageInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handlePostImageUpload}
+          />
+
           <div className="flex gap-3 mb-3">
-              <div className="w-10 h-10 rounded-full bg-academic-accent dark:bg-indigo-600 flex items-center justify-center text-white">
+              <div className="w-10 h-10 rounded-full bg-academic-accent dark:bg-indigo-600 flex items-center justify-center text-white flex-shrink-0">
                   <User className="w-5 h-5" />
               </div>
-              <div className="flex-1 relative">
-                <textarea 
-                    placeholder="Share an academic insight or observation..."
-                    className="w-full bg-transparent outline-none resize-none text-sm font-serif text-stone-700 dark:text-stone-200 placeholder-stone-400 py-2 h-20"
-                    value={newPostContent}
-                    onChange={(e) => setNewPostContent(e.target.value)}
-                    onFocus={() => setIsCreating(true)}
-                />
+              <div className="flex-1">
+                  <textarea
+                      placeholder="Share an academic insight or observation..."
+                      className="w-full bg-transparent outline-none resize-none text-sm font-serif text-stone-700 dark:text-stone-200 placeholder-stone-400 py-2 h-20"
+                      value={newPostContent}
+                      onChange={(e) => setNewPostContent(e.target.value)}
+                      onFocus={() => setIsCreating(true)}
+                  />
+                  {postImagePreview && (
+                      <div className="relative mt-2 inline-block">
+                          <img src={postImagePreview} alt="Preview" className="max-h-40 rounded-lg border border-stone-200 dark:border-stone-700" />
+                          <button
+                              onClick={() => { setPostImagePreview(null); setPostImageFile(null); }}
+                              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow"
+                          >
+                              <X className="w-3 h-3" />
+                          </button>
+                      </div>
+                  )}
               </div>
           </div>
           {isCreating && (
-              <div className="flex justify-between items-center pt-3 border-t border-stone-100 dark:border-stone-800 animate-in fade-in slide-in-from-top-1">
-                  <div className="flex gap-2 text-stone-400">
-                      <button className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider group">
+              <div className="flex justify-between items-center pt-3 border-t border-stone-100 dark:border-stone-800">
+                  <div className="flex gap-1 text-stone-400">
+                      <button
+                          onClick={() => postImageInputRef.current?.click()}
+                          className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors group"
+                          title="Add image"
+                      >
                           <ImageIcon className="w-4 h-4 group-hover:text-academic-accent" />
-                      </button>
-                      <button className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider group">
-                          <BarChart2 className="w-4 h-4 group-hover:text-academic-accent" />
                       </button>
                   </div>
                   <div className="flex gap-2">
-                      <button onClick={() => setIsCreating(false)} className="px-4 py-1.5 text-stone-400 text-xs font-bold uppercase tracking-widest hover:text-stone-600 transition-colors">Cancel</button>
-                      <button 
-                        onClick={handleCreatePost}
-                        disabled={!newPostContent.trim()}
-                        className="px-6 py-1.5 bg-academic-accent dark:bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest rounded-full hover:bg-stone-700 dark:hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2 shadow-sm"
+                      <button onClick={() => { setIsCreating(false); setPostImagePreview(null); setPostImageFile(null); }} className="px-4 py-1.5 text-stone-400 text-xs font-bold uppercase tracking-widest hover:text-stone-600 transition-colors">Cancel</button>
+                      <button
+                          onClick={handleCreatePost}
+                          disabled={!newPostContent.trim()}
+                          className="px-6 py-1.5 bg-academic-accent dark:bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest rounded-full hover:bg-stone-700 dark:hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2 shadow-sm"
                       >
                           Post <Send className="w-3 h-3" />
                       </button>
@@ -463,6 +550,63 @@ const SocialTab: React.FC<SocialTabProps> = ({ onNavigate, user }) => {
                                 </div>
 
                                 {post.type === 'Video' && renderVideoPlayer(post)}
+
+                                {(post as any).imageUrl && post.type !== 'Video' && (
+                                    <div className="px-6 pb-4">
+                                        <img
+                                            src={(post as any).imageUrl}
+                                            alt={post.title}
+                                            className="w-full rounded-lg object-cover max-h-64"
+                                        />
+                                    </div>
+                                )}
+
+                                {post.type === 'Poll' && (post as any).poll && (
+                                    <div className="px-6 pb-4" onClick={(e) => e.stopPropagation()}>
+                                        <div className="space-y-2">
+                                            {(post as any).poll.options.map((opt: any, idx: number) => {
+                                                const voted = votedPolls[post.id] !== undefined;
+                                                const isMyVote = votedPolls[post.id] === idx;
+                                                const pct = voted && (post as any).poll.totalVotes > 0
+                                                    ? Math.round((opt.votes / (post as any).poll.totalVotes) * 100)
+                                                    : 0;
+                                                return (
+                                                    <button
+                                                        key={idx}
+                                                        onClick={(e) => handlePollVote(e, post.id, idx)}
+                                                        disabled={voted}
+                                                        className={`w-full text-left rounded-lg border transition-all overflow-hidden relative ${
+                                                            isMyVote
+                                                                ? 'border-academic-accent dark:border-indigo-500'
+                                                                : 'border-stone-200 dark:border-stone-700 hover:border-academic-accent/50'
+                                                        } ${voted ? 'cursor-default' : 'hover:bg-stone-50 dark:hover:bg-stone-800'}`}
+                                                    >
+                                                        {voted && (
+                                                            <div
+                                                                className={`absolute inset-0 ${isMyVote ? 'bg-academic-accent/10 dark:bg-indigo-500/10' : 'bg-stone-100/50 dark:bg-stone-800/50'}`}
+                                                                style={{ width: `${pct}%` }}
+                                                            />
+                                                        )}
+                                                        <div className="relative px-4 py-2.5 flex justify-between items-center">
+                                                            <span className={`text-sm font-serif ${isMyVote ? 'font-bold text-academic-accent dark:text-indigo-400' : 'text-stone-700 dark:text-stone-300'}`}>
+                                                                {opt.text}
+                                                            </span>
+                                                            {voted && (
+                                                                <span className={`text-xs font-bold ${isMyVote ? 'text-academic-accent dark:text-indigo-400' : 'text-stone-400'}`}>
+                                                                    {pct}%
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <p className="text-[10px] text-stone-400 mt-2 text-right">
+                                            {(post as any).poll.totalVotes.toLocaleString()} votes
+                                            {votedPolls[post.id] === undefined ? ' · Tap to vote' : ''}
+                                        </p>
+                                    </div>
+                                )}
 
                                 <div className="px-6 py-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between bg-stone-50/50 dark:bg-stone-900/50">
                                     <div className="flex gap-4">
