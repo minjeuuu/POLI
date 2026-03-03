@@ -1,0 +1,267 @@
+
+import React, { useState, useEffect } from 'react';
+import { UserProfile, SavedItem, ThemeScope, UserPreferences, DetailedStats, SpecialTheme } from '../../types';
+import { Settings, BarChart2, Edit3, Bookmark, LogOut } from 'lucide-react';
+import { ProfileHeader } from '../profile/ProfileHeader';
+import { ProfileStats } from '../profile/ProfileStats';
+import { EditProfileForm } from '../profile/EditProfileForm';
+import { SettingsView } from '../profile/SettingsView';
+import { InventoryList } from '../profile/InventoryList';
+import { playSFX } from '../../services/soundService';
+
+interface ProfileTabProps {
+    onNavigate: (type: string, payload: any) => void;
+    onAddToCompare: (name: string, type: string) => void;
+    onToggleSave: (item: SavedItem) => void;
+    isSaved: (title: string, type: string) => boolean;
+    appLang: string;
+    setAppLang: (lang: string) => void;
+    savedItems: SavedItem[];
+    onDeleteSaved: (id: string) => void;
+    updateThemeScope: (scope: ThemeScope, country?: string) => void;
+    setGlobalTheme: (theme: SpecialTheme) => void; // New prop for global theme
+    currentTheme: SpecialTheme;
+    user: UserProfile | null;
+}
+
+const DEFAULT_STATS: DetailedStats = {
+    totalXp: 15400,
+    currentLevel: 42,
+    nextLevelThreshold: 16000,
+    streakDays: 15,
+    longestStreak: 45,
+    articlesRead: 342,
+    booksArchived: 12,
+    simulationsRun: 89,
+    debatesWon: 14,
+    pollsVoted: 156,
+    quizzesTaken: 60,
+    quizzesPerfect: 22,
+    flashcardsReviewed: 2500,
+    accuracyRate: 88,
+    postsCreated: 45,
+    commentsWritten: 320,
+    likesReceived: 1205,
+    citationsReceived: 45
+};
+
+// Initial prefs to seed state
+const DEFAULT_PREFS: UserPreferences = {
+    language: 'English',
+    secondaryLanguage: 'None',
+    timezone: 'UTC',
+    dateFormat: 'YYYY-MM-DD',
+    timeFormat: '24h',
+    startOfWeek: 'Monday',
+    currency: 'USD',
+    measurementSystem: 'Metric',
+    themeMode: 'Default',
+    themeScope: 'None',
+    density: 'Comfortable',
+    fontSize: 16,
+    fontFamily: 'Serif',
+    reduceMotion: false,
+    highContrast: false,
+    saturation: 100,
+    blurEffects: true,
+    showGridLines: false,
+    borderRadius: 'Medium',
+    emailDigest: 'Weekly',
+    emailMarketing: false,
+    emailSecurity: true,
+    pushAlerts: true,
+    pushMentions: true,
+    pushReplies: true,
+    pushTrending: false,
+    pushSystem: true,
+    pushNewContent: true,
+    soundEffects: true,
+    hapticFeedback: true,
+    publicProfile: true,
+    showOnlineStatus: true,
+    showActivityLog: true,
+    allowIndexing: false,
+    shareAnalytics: true,
+    allowPersonalization: true,
+    dataRetentionPeriod: '1 Year',
+    readerTypeface: 'Serif',
+    readerLineHeight: 1.6,
+    readerWidth: 'Standard',
+    autoBookmark: true,
+    highlightStyle: 'Yellow',
+    showCitationOnCopy: true,
+    citationStyle: 'APA',
+    textToSpeechVoice: 'Kore',
+    textToSpeechSpeed: 1.0,
+    autoPlayMedia: false,
+    backgroundAudio: false,
+    developerMode: false,
+    betaFeatures: false,
+    offlineMode: true,
+    dataSaver: false,
+    cacheSize: 124,
+    apiEndpoint: 'https://api.poli.ai/v1',
+    debugLogging: false
+};
+
+const ProfileTab: React.FC<ProfileTabProps> = ({ 
+    onNavigate, 
+    appLang, 
+    setAppLang, 
+    savedItems, 
+    onDeleteSaved, 
+    updateThemeScope,
+    setGlobalTheme,
+    currentTheme,
+    user
+}) => {
+    // --- STATE ---
+    const [view, setView] = useState<'Overview' | 'Edit' | 'Settings' | 'Inventory'>('Overview');
+    
+    // Ensure the profile reflects the current global theme on mount/update
+    const [profile, setProfile] = useState<UserProfile>(user || {
+        id: 'u1',
+        username: 'Scholar_Prime',
+        email: 'scholar@poli.ai',
+        displayName: 'Dr. Aurelius',
+        bio: 'Political Scientist specializing in Comparative Governance and Digital Democracy. Researching the intersection of AI and Statecraft.',
+        country: 'Global Citizen',
+        city: 'Metropolis',
+        title: 'Master Archivist',
+        joinedDate: '2023-01-01',
+        lastActive: 'Now',
+        level: 42,
+        xp: 15400,
+        coins: 5000,
+        stats: DEFAULT_STATS,
+        preferences: { ...DEFAULT_PREFS, themeMode: currentTheme },
+        achievements: [],
+        savedItems: savedItems,
+        
+        socials: {
+            website: 'https://poli.ai',
+            twitter: '@scholar_prime',
+            linkedin: 'linkedin.com/in/scholar'
+        },
+        academic: {
+            institution: 'University of POLI',
+            department: 'Political Science',
+            degree: 'PhD',
+            specializations: ['International Relations', 'Political Theory', 'Digital Governance']
+        }
+    });
+
+    useEffect(() => {
+        if (user) {
+            setProfile(user);
+        }
+    }, [user]);
+
+    // --- HANDLERS ---
+    
+    const handleUpdateProfile = (updated: UserProfile) => {
+        setProfile(updated);
+        setView('Overview');
+        playSFX('success');
+    };
+
+    const handleUpdatePrefs = (newPrefs: UserPreferences) => {
+        setProfile(prev => ({ ...prev, preferences: newPrefs }));
+        
+        // Critical: Update Global State via Props
+        setGlobalTheme(newPrefs.themeMode);
+        updateThemeScope(newPrefs.themeScope, profile.country);
+        setAppLang(newPrefs.language);
+        
+        playSFX('click');
+    };
+
+    const navItems = [
+        { id: 'Overview', label: 'Dashboard', icon: BarChart2 },
+        { id: 'Inventory', label: 'Archives', icon: Bookmark },
+        { id: 'Settings', label: 'Settings', icon: Settings },
+    ];
+
+    return (
+        <div className="h-full flex flex-col bg-stone-50/50 dark:bg-black/20 overflow-hidden">
+            
+            {/* 1. VIEW SWITCHER (Sub-nav) */}
+            <div className="flex-none bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-2 sticky top-0 z-30 flex justify-between items-center">
+                 <div className="flex gap-2">
+                     {navItems.map(item => (
+                         <button
+                            key={item.id}
+                            onClick={() => { setView(item.id as any); playSFX('click'); }}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all
+                            ${view === item.id 
+                                ? 'bg-academic-bg dark:bg-stone-800 text-academic-accent dark:text-indigo-400 shadow-sm' 
+                                : 'text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 hover:text-stone-600'}`}
+                         >
+                             <item.icon className="w-4 h-4" /> {item.label}
+                         </button>
+                     ))}
+                 </div>
+                 
+                 {view === 'Overview' && (
+                     <button 
+                        onClick={() => setView('Edit')} 
+                        className="p-2 text-stone-400 hover:text-academic-accent transition-colors rounded-full hover:bg-stone-100 dark:hover:bg-stone-800"
+                        title="Edit Profile"
+                     >
+                         <Edit3 className="w-4 h-4" />
+                     </button>
+                 )}
+            </div>
+
+            {/* 2. MAIN SCROLL AREA */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-12 scroll-smooth pb-32">
+                <div className="max-w-6xl mx-auto">
+                    
+                    {view === 'Overview' && (
+                        <div className="space-y-8 animate-in fade-in duration-500">
+                            <ProfileHeader profile={profile} onEdit={() => setView('Edit')} />
+                            <ProfileStats stats={profile.stats} />
+                        </div>
+                    )}
+
+                    {view === 'Edit' && (
+                        <EditProfileForm 
+                            profile={profile} 
+                            onSave={handleUpdateProfile} 
+                            onCancel={() => setView('Overview')} 
+                        />
+                    )}
+
+                    {view === 'Settings' && (
+                        <div className="animate-in fade-in slide-in-from-right duration-500">
+                             <div className="mb-8">
+                                 <h1 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100 mb-2">System Configuration</h1>
+                                 <p className="text-stone-500 font-serif italic">Manage your POLI experience protocol.</p>
+                             </div>
+                             <SettingsView prefs={profile.preferences} onUpdate={handleUpdatePrefs} />
+                             
+                             <div className="mt-12 pt-8 border-t border-stone-200 dark:border-stone-800">
+                                 <button className="flex items-center gap-2 text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-widest transition-colors">
+                                     <LogOut className="w-4 h-4" /> Sign Out of All Devices
+                                 </button>
+                             </div>
+                        </div>
+                    )}
+
+                    {view === 'Inventory' && (
+                        <div className="animate-in fade-in slide-in-from-bottom duration-500">
+                            <InventoryList 
+                                items={savedItems} 
+                                onNavigate={onNavigate} 
+                                onDelete={onDeleteSaved} 
+                            />
+                        </div>
+                    )}
+
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ProfileTab;

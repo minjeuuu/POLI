@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POLI - Political Science Foundation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Merriweather', 'serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              academic: {
+                bg: '#FDFBF7', // Warm paper-like off-white
+                paper: '#FFFFFF',
+                text: '#1C1917', // Stone 900
+                muted: '#57534E', // Stone 500
+                line: '#E7E5E4', // Stone 200
+                accent: '#0F172A', // Deep Blue
+                gold: '#B45309', // Muted Gold
+              }
+            },
+            transitionDuration: {
+                '400': '400ms',
+                '600': '600ms',
+                '800': '800ms',
+                '2000': '2000ms',
+            },
+            transitionTimingFunction: {
+                'flow': 'cubic-bezier(0.19, 1, 0.22, 1)', // Expo Out - Extremely smooth
+                'elastic': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        /* Custom Smooth Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.5); border-radius: 20px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(75, 85, 99, 0.5); }
+        
+        /* Global Animation Smoothing */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Force hardware acceleration on animateable elements for smoothness */
+        .animate-in, .animate-out, .transition-all {
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+        }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1?deps=react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client?deps=react@18.3.1",
+    "@google/genai": "https://esm.sh/@google/genai",
+    "lucide-react": "https://esm.sh/lucide-react@0.469.0?deps=react@18.3.1",
+    "react-confetti": "https://esm.sh/react-confetti@6.1.0?deps=react@18.3.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-academic-bg text-academic-text antialiased selection:bg-stone-200 dark:bg-stone-950 dark:text-stone-100 dark:selection:bg-indigo-900 transition-colors duration-700 ease-flow">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
