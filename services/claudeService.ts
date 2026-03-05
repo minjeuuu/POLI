@@ -1,11 +1,14 @@
 
 import { safeParse } from "./common";
 
-const CLAUDE_API_KEY = (process.env as any).VITE_CLAUDE_API_KEY || (import.meta as any).env?.VITE_CLAUDE_API_KEY || '';
+const CLAUDE_API_KEY =
+    (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_CLAUDE_API_KEY) ||
+    (typeof process !== 'undefined' && (process.env as any).VITE_CLAUDE_API_KEY) ||
+    '';
 
 const CLAUDE_BASE_URL = "https://api.anthropic.com/v1/messages";
 const CLAUDE_MODEL = "claude-sonnet-4-6";
-const CLAUDE_MAX_TOKENS = 16384;
+const CLAUDE_MAX_TOKENS = 16000;
 
 export const generateWithClaude = async (prompt: string, system?: string, maxTokens?: number): Promise<string | null> => {
     if (!CLAUDE_API_KEY) {
@@ -25,7 +28,7 @@ export const generateWithClaude = async (prompt: string, system?: string, maxTok
             body: JSON.stringify({
                 model: CLAUDE_MODEL,
                 max_tokens: maxTokens || CLAUDE_MAX_TOKENS,
-                system: system || "You are POLI, an expert political science research assistant. You provide detailed, accurate, and comprehensive information. Return only valid JSON when asked for JSON. No markdown fences, no preamble.",
+                system: system || "You are POLI, an expert encyclopedic political science, geopolitics, history, culture, and global knowledge AI. Provide exhaustive, accurate, real-world data. When asked for JSON, return ONLY valid JSON — no markdown fences, no preamble, no commentary. Start directly with { or [. Fill every field with specific, detailed information.",
                 messages: [{ role: "user", content: prompt }]
             })
         });

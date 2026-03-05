@@ -2,9 +2,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { generateWithOllama } from "./ollamaService";
 
-// Centralized API Client Initialization
+// Centralized API Client Initialization (Gemini kept for legacy compatibility only)
 const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
-if (!apiKey) console.warn("POLI Warning: GEMINI_API_KEY not detected — Ollama/Claude will be used as primary AI.");
 
 export const ai = new GoogleGenAI({ apiKey: apiKey || 'placeholder' });
 
@@ -48,53 +47,25 @@ export const generateWithRetry = async (params: any, retries = 3) => {
 import { generateWithClaude } from "./claudeService";
 
 /**
- * High-Availability Wrapper: Tries Primary → Fallback chain.
- * Priority (no Gemini key): Ollama → Claude → empty JSON.
- * Priority (Gemini key): Gemini Pro → Gemini Flash → Ollama → Claude → empty JSON.
+ * High-Availability Wrapper — Priority chain: Claude → Ollama → empty JSON.
+ * Claude is always the primary AI. Ollama (local) is the fallback.
+ * Gemini is no longer in the chain.
  */
-export const generateWithFallback = async (params: any, fallbackModel: string = 'gemini-2.5-flash'): Promise<{ text: string }> => {
-    const hasGeminiKey = !!(process.env.API_KEY || process.env.GEMINI_API_KEY);
+export const generateWithFallback = async (params: any, _fallbackModel?: string): Promise<{ text: string }> => {
     const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
 
-    if (!hasGeminiKey) {
-        // No Gemini key — try Ollama first, then Claude
-        console.log("POLI: No Gemini key. Routing to Ollama...");
-        const ollamaResponse = await generateWithOllama(prompt);
-        if (ollamaResponse) return { text: ollamaResponse };
+    // 1. Try Claude (primary)
+    const claudeResponse = await generateWithClaude(prompt);
+    if (claudeResponse) return { text: claudeResponse };
 
-        console.warn("POLI: Ollama unavailable. Falling back to Claude...");
-        const claudeResponse = await generateWithClaude(prompt);
-        if (claudeResponse) return { text: claudeResponse };
-        return { text: '{}' };
-    }
+    // 2. Fallback to Ollama (local)
+    console.warn("POLI: Claude unavailable or key missing — falling back to Ollama.");
+    const ollamaResponse = await generateWithOllama(prompt);
+    if (ollamaResponse) return { text: ollamaResponse };
 
-    try {
-        // Attempt Primary Gemini Request
-        return await generateWithRetry(params);
-    } catch (e) {
-        console.warn(`Primary model (${params.model}) failed. Auto-switching to fallback: ${fallbackModel}.`, e);
-
-        try {
-            // Retry with Gemini Flash
-            return await generateWithRetry({
-                ...params,
-                model: fallbackModel,
-                config: { ...params.config, responseMimeType: "application/json" }
-            });
-        } catch (e2) {
-            console.warn(`Gemini Flash fallback failed. Attempting Ollama fallback.`, e2);
-
-            // Try Ollama
-            const ollamaResponse = await generateWithOllama(prompt);
-            if (ollamaResponse) return { text: ollamaResponse };
-
-            // Final fallback to Claude
-            const claudeResponse = await generateWithClaude(prompt);
-            if (claudeResponse) return { text: claudeResponse };
-
-            throw e2;
-        }
-    }
+    // 3. All AI services unavailable
+    console.error("POLI: All AI services unavailable. Returning empty JSON.");
+    return { text: '{}' };
 };
 
 export class JSONRepair {
