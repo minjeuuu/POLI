@@ -146,16 +146,27 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
       <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth bg-stone-50/30 dark:bg-black/20 relative w-full">
           
           {/* MOBILE NAV */}
-          <div className="lg:hidden sticky top-0 z-30 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 overflow-x-auto no-scrollbar flex items-center gap-2 p-2 shadow-sm">
-              {SECTIONS.map(s => (
-                  <button
-                      key={s.id}
-                      onClick={() => scrollTo(s.id)}
-                      className={`flex-none px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${activeSection === s.id ? 'bg-academic-accent text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}`}
-                  >
-                      {s.id}
-                  </button>
-              ))}
+          <div className="lg:hidden sticky top-0 z-30 bg-white/95 dark:bg-stone-900/95 backdrop-blur-sm border-b border-stone-200 dark:border-stone-800 shadow-sm">
+              <div className="overflow-x-auto no-scrollbar flex items-center gap-1.5 px-3 py-2">
+                  {SECTIONS.map(s => {
+                      const Icon = s.icon;
+                      const isActive = activeSection === s.id;
+                      return (
+                          <button
+                              key={s.id}
+                              onClick={() => scrollTo(s.id)}
+                              className={`flex-none flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-200 ${
+                                  isActive
+                                      ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md scale-105'
+                                      : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'
+                              }`}
+                          >
+                              <Icon className="w-3 h-3 flex-none" />
+                              <span>{s.id}</span>
+                          </button>
+                      );
+                  })}
+              </div>
           </div>
 
           <CountryHero data={data} onBack={onClose} />

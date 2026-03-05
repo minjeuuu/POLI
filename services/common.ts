@@ -1,9 +1,10 @@
 
 import { GoogleGenAI } from "@google/genai";
+import { generateWithOllama } from "./ollamaService";
 
 // Centralized API Client Initialization
 const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
-if (!apiKey) console.warn("POLI Warning: GEMINI_API_KEY not detected — Claude will be used as primary AI.");
+if (!apiKey) console.warn("POLI Warning: GEMINI_API_KEY not detected — Ollama/Claude will be used as primary AI.");
 
 export const ai = new GoogleGenAI({ apiKey: apiKey || 'placeholder' });
 
@@ -47,15 +48,21 @@ export const generateWithRetry = async (params: any, retries = 3) => {
 import { generateWithClaude } from "./claudeService";
 
 /**
- * High-Availability Wrapper: Tries Primary Model -> Falls back to Flash -> Falls back to Claude.
- * If no Gemini key is configured, routes directly to Claude as primary.
+ * High-Availability Wrapper: Tries Primary → Fallback chain.
+ * Priority (no Gemini key): Ollama → Claude → empty JSON.
+ * Priority (Gemini key): Gemini Pro → Gemini Flash → Ollama → Claude → empty JSON.
  */
 export const generateWithFallback = async (params: any, fallbackModel: string = 'gemini-2.5-flash'): Promise<{ text: string }> => {
     const hasGeminiKey = !!(process.env.API_KEY || process.env.GEMINI_API_KEY);
+    const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
 
     if (!hasGeminiKey) {
-        // No Gemini key — use Claude directly as primary
-        const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
+        // No Gemini key — try Ollama first, then Claude
+        console.log("POLI: No Gemini key. Routing to Ollama...");
+        const ollamaResponse = await generateWithOllama(prompt);
+        if (ollamaResponse) return { text: ollamaResponse };
+
+        console.warn("POLI: Ollama unavailable. Falling back to Claude...");
         const claudeResponse = await generateWithClaude(prompt);
         if (claudeResponse) return { text: claudeResponse };
         return { text: '{}' };
@@ -75,15 +82,15 @@ export const generateWithFallback = async (params: any, fallbackModel: string = 
                 config: { ...params.config, responseMimeType: "application/json" }
             });
         } catch (e2) {
-            console.warn(`Gemini Flash fallback failed. Attempting Claude fallback.`, e2);
+            console.warn(`Gemini Flash fallback failed. Attempting Ollama fallback.`, e2);
+
+            // Try Ollama
+            const ollamaResponse = await generateWithOllama(prompt);
+            if (ollamaResponse) return { text: ollamaResponse };
 
             // Final fallback to Claude
-            const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
             const claudeResponse = await generateWithClaude(prompt);
-
-            if (claudeResponse) {
-                return { text: claudeResponse };
-            }
+            if (claudeResponse) return { text: claudeResponse };
 
             throw e2;
         }
