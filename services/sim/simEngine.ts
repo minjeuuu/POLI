@@ -1,7 +1,6 @@
 
-import { generateWithRetry, safeParse, getLanguageInstruction } from "../common";
+import { generateWithFallback, safeParse, getLanguageInstruction } from "../common";
 import { SimulationState } from "../../types";
-import { Type } from "@google/genai";
 import { calculateEconomy } from "./simEconomy";
 import { resolveConflict } from "./simWarfare";
 
@@ -39,14 +38,7 @@ export const simulateNationTurn = async (currentState: SimulationState, action?:
         ${getLanguageInstruction()}
         `;
         
-        const res = await generateWithRetry({
-            model: 'gemini-3-pro-preview',
-            contents: prompt,
-            config: { 
-                responseMimeType: "application/json",
-                thinkingConfig: { thinkingBudget: 2048 }
-            }
-        });
+        const res = await generateWithFallback({ contents: prompt });
         
         const aiResult = safeParse(res.text || '{}', {}) as any;
         

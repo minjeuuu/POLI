@@ -1,5 +1,5 @@
 
-import { generateWithRetry, safeParse, getLanguageInstruction } from "../common";
+import { generateWithFallback, safeParse, getLanguageInstruction } from "../common";
 
 export interface DebateTurn {
     speaker: 'User' | 'Opponent';
@@ -24,11 +24,7 @@ export const generateDebateOpening = async (topic: string): Promise<string> => {
     `;
 
     try {
-        const res = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
-            contents: prompt,
-            config: { responseMimeType: "text/plain" }
-        });
+        const res = await generateWithFallback({ contents: prompt });
         return res.text || "I am ready to debate this topic.";
     } catch (e) {
         return "Let us discuss this topic. What is your position?";
@@ -49,11 +45,7 @@ export const generateRebuttal = async (topic: string, history: DebateTurn[]): Pr
     `;
 
     try {
-        const res = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
-            contents: prompt,
-            config: { responseMimeType: "text/plain" }
-        });
+        const res = await generateWithFallback({ contents: prompt });
         return res.text || "That is an interesting point, but consider the alternative.";
     } catch (e) {
         return "I see your point, but I disagree.";
@@ -78,11 +70,7 @@ export const evaluateDebate = async (topic: string, history: DebateTurn[]): Prom
     `;
 
     try {
-        const res = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
-            contents: prompt,
-            config: { responseMimeType: "application/json" }
-        });
+        const res = await generateWithFallback({ contents: prompt });
         return safeParse(res.text || '{}', { score: 50, feedback: "Debate concluded.", winner: "Draw" });
     } catch (e) {
         return { score: 50, feedback: "Evaluation unavailable.", winner: "Draw" };

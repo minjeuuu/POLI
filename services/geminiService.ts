@@ -20,79 +20,18 @@ import {
   HighlightedEntity
 } from "../types";
 import { FALLBACK_DAILY_CONTEXT, FALLBACK_DISCIPLINE_DETAIL } from "../data/homeData";
-import { setAppLanguage, getLanguageInstruction, cleanJson, safeParse, withCache, generateWithRetry, ai } from "./common";
+import { setAppLanguage, getLanguageInstruction, cleanJson, safeParse, withCache, generateWithRetry, generateWithFallback, ai } from "./common";
+import { streamWithClaude } from "./claudeService";
 
 // --- API Functions ---
 
 export const fetchPoliticalRecord = async (query: string): Promise<PoliticalRecord | null> => {
     return withCache(`record_v3_${query}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Generate a structured political record for "${query}".
-                If it is a Country, Person, Ideology, or Event, provide details.
-                ${getLanguageInstruction()}`,
-                config: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            entity: {
-                                type: Type.OBJECT,
-                                properties: {
-                                    id: {type: Type.STRING},
-                                    name: {type: Type.STRING},
-                                    officialName: {type: Type.STRING},
-                                    type: {type: Type.STRING, enum: ['Country', 'Organization', 'Institution', 'Treaty', 'Person', 'Ideology', 'Event']},
-                                    jurisdiction: {type: Type.STRING},
-                                    establishedDate: {type: Type.STRING},
-                                    status: {type: Type.STRING},
-                                    description: {type: Type.STRING},
-                                }
-                            },
-                            historicalContext: {type: Type.STRING},
-                            timeline: {
-                                type: Type.ARRAY,
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        id: {type: Type.STRING},
-                                        date: {type: Type.STRING},
-                                        title: {type: Type.STRING},
-                                        type: {type: Type.STRING},
-                                        description: {type: Type.STRING},
-                                        outcome: {type: Type.STRING},
-                                        citations: {
-                                            type: Type.ARRAY, 
-                                            items: {
-                                                type: Type.OBJECT, 
-                                                properties: {
-                                                    id:{type:Type.STRING}, 
-                                                    source:{type:Type.STRING}, 
-                                                    year:{type:Type.INTEGER}, 
-                                                    authorOrBody:{type:Type.STRING}
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            relatedDisciplines: {type: Type.ARRAY, items: {type: Type.STRING}},
-                            primarySources: {
-                                type: Type.ARRAY, 
-                                items: {
-                                    type: Type.OBJECT, 
-                                    properties: {
-                                        id:{type:Type.STRING}, 
-                                        source:{type:Type.STRING}, 
-                                        year:{type:Type.INTEGER}, 
-                                        authorOrBody:{type:Type.STRING}
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            const response = await generateWithFallback({
+                contents: `Generate a structured political record for "${query}". If it is a Country, Person, Ideology, or Event, provide details.
+Return JSON: { "entity": { "id", "name", "officialName", "type", "jurisdiction", "establishedDate", "status", "description" }, "historicalContext": string, "timeline": [{ "id", "date", "title", "type", "description", "outcome", "citations": [{ "id", "source", "year", "authorOrBody" }] }], "relatedDisciplines": [string], "primarySources": [{ "id", "source", "year", "authorOrBody" }] }
+${getLanguageInstruction()}`
             });
             return safeParse(response.text || '{}', null) as PoliticalRecord;
         } catch (e) {
@@ -105,71 +44,13 @@ export const fetchPoliticalRecord = async (query: string): Promise<PoliticalReco
 export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
     return withCache(`daily_v16_schema_${date.toDateString()}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+            const response = await generateWithFallback({
                 contents: `Generate a daily political context briefing for ${date.toDateString()}.
-                Include a quote, a few news items, highlights for person, country, ideology, org, discipline.
-                Fact, Trivia, Historical Events.
-                ${getLanguageInstruction()}`,
-                config: { 
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            synthesis: { type: Type.STRING },
-                            quote: {
-                                type: Type.OBJECT,
-                                properties: {
-                                    text: { type: Type.STRING },
-                                    author: { type: Type.STRING },
-                                    year: { type: Type.STRING },
-                                    region: { type: Type.STRING }
-                                }
-                            },
-                            news: {
-                                type: Type.ARRAY,
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        headline: { type: Type.STRING },
-                                        summary: { type: Type.STRING },
-                                        sources: {
-                                            type: Type.ARRAY,
-                                            items: {
-                                                type: Type.OBJECT,
-                                                properties: {
-                                                    title: { type: Type.STRING },
-                                                    uri: { type: Type.STRING }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            highlightedPerson: { type: Type.OBJECT, properties: { category: {type: Type.STRING}, title: {type: Type.STRING}, subtitle: {type: Type.STRING}, meta: {type: Type.STRING} } },
-                            highlightedCountry: { type: Type.OBJECT, properties: { category: {type: Type.STRING}, title: {type: Type.STRING}, subtitle: {type: Type.STRING}, meta: {type: Type.STRING} } },
-                            highlightedIdeology: { type: Type.OBJECT, properties: { category: {type: Type.STRING}, title: {type: Type.STRING}, subtitle: {type: Type.STRING}, meta: {type: Type.STRING} } },
-                            highlightedDiscipline: { type: Type.OBJECT, properties: { category: {type: Type.STRING}, title: {type: Type.STRING}, subtitle: {type: Type.STRING}, meta: {type: Type.STRING} } },
-                            highlightedOrg: { type: Type.OBJECT, properties: { category: {type: Type.STRING}, title: {type: Type.STRING}, subtitle: {type: Type.STRING}, meta: {type: Type.STRING} } },
-                            dailyFact: { type: Type.OBJECT, properties: { content: {type: Type.STRING}, source: {type: Type.STRING}, type: {type: Type.STRING} } },
-                            dailyTrivia: { type: Type.OBJECT, properties: { content: {type: Type.STRING}, source: {type: Type.STRING}, type: {type: Type.STRING} } },
-                            historicalEvents: {
-                                type: Type.ARRAY,
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        year: { type: Type.STRING },
-                                        event: { type: Type.STRING },
-                                        location: { type: Type.STRING },
-                                        description: { type: Type.STRING }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+Include a political quote, 6 major global news items (with real source names and accurate URLs to real news organizations), highlights for a notable person/country/ideology/org/discipline, a daily fact, trivia, and 10 historical events.
+Return JSON: { "synthesis": string, "quote": { "text", "author", "year", "region" }, "news": [{ "headline", "summary", "source", "date", "url" }], "highlightedPerson": { "category":"Person", "title", "subtitle", "meta" }, "highlightedCountry": { "category":"Country", "title", "subtitle", "meta" }, "highlightedIdeology": { "category":"Ideology", "title", "subtitle", "meta" }, "highlightedDiscipline": { "category":"Discipline", "title", "subtitle", "meta" }, "highlightedOrg": { "category":"Organization", "title", "subtitle", "meta" }, "dailyFact": { "content", "source", "type":"Fact" }, "dailyTrivia": { "content", "source", "type":"Trivia" }, "historicalEvents": [{ "year", "event", "location", "description" }] }
+For news URLs: only use real domains like bbc.com, reuters.com, apnews.com, theguardian.com, nytimes.com, ft.com. If uncertain about a specific article URL, use the homepage of the source (e.g. https://www.bbc.com/news).
+${getLanguageInstruction()}`
             });
-            
             const data = safeParse(response.text || '{}', FALLBACK_DAILY_CONTEXT);
             return { ...FALLBACK_DAILY_CONTEXT, ...data, date: date.toDateString() };
         } catch (e) {
@@ -180,99 +61,12 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
 };
 
 export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDetail> => {
-     return withCache(`discipline_v4_schema_${name}`, async () => {
+    return withCache(`discipline_v4_schema_${name}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+            const response = await generateWithFallback({
                 contents: `Detailed academic overview of the political science discipline: ${name}.
-                ${getLanguageInstruction()}`,
-                config: { 
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            name: { type: Type.STRING },
-                            overview: { 
-                                type: Type.OBJECT, 
-                                properties: { 
-                                    definition: { type: Type.STRING }, 
-                                    scope: { type: Type.STRING }, 
-                                    importance: { type: Type.STRING }, 
-                                    keyQuestions: { type: Type.ARRAY, items: { type: Type.STRING } } 
-                                } 
-                            },
-                            historyNarrative: { type: Type.STRING },
-                            history: { 
-                                type: Type.ARRAY, 
-                                items: { 
-                                    type: Type.OBJECT, 
-                                    properties: { 
-                                        year: { type: Type.STRING }, 
-                                        event: { type: Type.STRING }, 
-                                        impact: { type: Type.STRING } 
-                                    } 
-                                } 
-                            },
-                            subDisciplines: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            coreTheories: { 
-                                type: Type.ARRAY, 
-                                items: { 
-                                    type: Type.OBJECT, 
-                                    properties: { 
-                                        name: { type: Type.STRING }, 
-                                        year: { type: Type.STRING }, 
-                                        summary: { type: Type.STRING } 
-                                    } 
-                                } 
-                            },
-                            methods: { 
-                                type: Type.ARRAY, 
-                                items: { 
-                                    type: Type.OBJECT, 
-                                    properties: { 
-                                        name: { type: Type.STRING }, 
-                                        description: { type: Type.STRING }, 
-                                        example: { type: Type.STRING } 
-                                    } 
-                                } 
-                            },
-                            scholars: { 
-                                type: Type.ARRAY, 
-                                items: { 
-                                    type: Type.OBJECT, 
-                                    properties: { 
-                                        name: { type: Type.STRING }, 
-                                        country: { type: Type.STRING }, 
-                                        period: { type: Type.STRING }, 
-                                        contribution: { type: Type.STRING } 
-                                    } 
-                                } 
-                            },
-                            foundationalWorks: { 
-                                type: Type.ARRAY, 
-                                items: { 
-                                    type: Type.OBJECT, 
-                                    properties: { 
-                                        title: { type: Type.STRING }, 
-                                        author: { type: Type.STRING }, 
-                                        year: { type: Type.STRING } 
-                                    } 
-                                } 
-                            },
-                            regionalFocus: { 
-                                type: Type.ARRAY, 
-                                items: { 
-                                    type: Type.OBJECT, 
-                                    properties: { 
-                                        region: { type: Type.STRING }, 
-                                        description: { type: Type.STRING } 
-                                    } 
-                                } 
-                            },
-                            relatedDisciplines: { type: Type.ARRAY, items: { type: Type.STRING } }
-                        }
-                    }
-                }
+Return JSON: { "name", "overview": { "definition", "scope", "importance", "keyQuestions": [string] }, "historyNarrative": string, "history": [{ "year", "event", "impact" }], "subDisciplines": [string], "coreTheories": [{ "name", "year", "summary" }], "methods": [{ "name", "description", "example" }], "scholars": [{ "name", "country", "period", "contribution" }], "foundationalWorks": [{ "title", "author", "year" }], "regionalFocus": [{ "region", "description" }], "relatedDisciplines": [string] }
+${getLanguageInstruction()}`
             });
             const parsed = safeParse(response.text || '{}', FALLBACK_DISCIPLINE_DETAIL);
             if (!parsed.name) parsed.name = name;
@@ -284,10 +78,8 @@ export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDet
 export const fetchBookStructure = async (title: string, author: string): Promise<BookStructure> => {
     return withCache(`book_${title}_v2`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Table of contents for "${title}" by ${author}. JSON: { "title": string, "author": string, "chapters": string[] }.`,
-                config: { responseMimeType: "application/json" }
+            const response = await generateWithFallback({
+                contents: `Generate a detailed table of contents for "${title}" by ${author}. Return JSON: { "title": string, "author": string, "chapters": string[] }.`
             });
             return safeParse(response.text || '{}', { title, author, chapters: [] }) as BookStructure;
         } catch (e) { return { title, author, chapters: [] }; }
@@ -295,21 +87,14 @@ export const fetchBookStructure = async (title: string, author: string): Promise
 };
 
 export async function* streamChapterContent(title: string, author: string, chapter: string, summary: boolean) {
-    const prompt = `Write the content for chapter "${chapter}" of "${title}" by ${author}. ${summary ? "Summarize key points." : "Provide full text or detailed summary."} ${getLanguageInstruction()}`;
-    const response = await ai.models.generateContentStream({
-        model: 'gemini-3-flash-preview',
-        contents: prompt
-    });
-    for await (const chunk of response) {
-        yield chunk.text;
-    }
+    const prompt = `Write the content for chapter "${chapter}" of "${title}" by ${author}. ${summary ? "Summarize the key points comprehensively." : "Provide a full, detailed summary of the content."} ${getLanguageInstruction()}`;
+    yield* streamWithClaude(prompt);
 }
 
 export const askReaderQuestion = async (context: string, query: string, type: string): Promise<string> => {
     try {
-        const response = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
-            contents: `Context: ${context}\n\nTask: ${type}. ${query ? "Question: " + query : ""} \nAnswer:`
+        const response = await generateWithFallback({
+            contents: `Context: ${context}\n\nTask: ${type}. ${query ? "Question: " + query : ""}\nAnswer:`
         });
         return response.text || "";
     } catch (e) { return "Error analyzing text."; }
@@ -318,16 +103,9 @@ export const askReaderQuestion = async (context: string, query: string, type: st
 export const fetchQuiz = async (topic: string): Promise<QuizQuestion[]> => {
     return withCache(`quiz_v5_50_${topic}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: `Generate 50 distinct multiple choice questions about ${topic}. 
-                Ensure questions vary in difficulty from introductory to expert.
-                Cover history, key figures, theories, and modern applications.
-                JSON Array of objects with question, options (string[]), correctAnswer (index number), explanation. ${getLanguageInstruction()}`,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 32768
-                }
+            const response = await generateWithFallback({
+                contents: `Generate 50 distinct multiple choice questions about ${topic}. Vary difficulty from introductory to expert. Cover history, key figures, theories, and modern applications.
+Return a JSON array: [{ "question": string, "options": string[], "correctAnswer": number, "explanation": string }]. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '[]', []) as QuizQuestion[];
         } catch (e) { return []; }
@@ -337,15 +115,9 @@ export const fetchQuiz = async (topic: string): Promise<QuizQuestion[]> => {
 export const fetchFlashcards = async (topic: string): Promise<Flashcard[]> => {
     return withCache(`flashcards_v5_50_${topic}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: `Generate 50 comprehensive flashcards for ${topic}. 
-                Cover definitions, key dates, important figures, and core concepts.
-                JSON Array of objects with front, back, category. ${getLanguageInstruction()}`,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 32768
-                }
+            const response = await generateWithFallback({
+                contents: `Generate 50 comprehensive flashcards for ${topic}. Cover definitions, key dates, important figures, and core concepts.
+Return a JSON array: [{ "front": string, "back": string, "category": string }]. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '[]', []) as Flashcard[];
         } catch (e) { return []; }
@@ -355,22 +127,9 @@ export const fetchFlashcards = async (topic: string): Promise<Flashcard[]> => {
 export const fetchRegionalDetail = async (region: string, discipline: string): Promise<RegionalDetail> => {
     return withCache(`region_v3_${region}_${discipline}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Political analysis of region: ${region} from perspective of ${discipline}. ${getLanguageInstruction()}`,
-                config: { 
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            region: { type: Type.STRING },
-                            summary: { type: Type.STRING },
-                            keyCountries: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            politicalThemes: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            challenges: { type: Type.ARRAY, items: { type: Type.STRING } }
-                        }
-                    }
-                }
+            const response = await generateWithFallback({
+                contents: `Political analysis of region: ${region} from the perspective of ${discipline}.
+Return JSON: { "region": string, "summary": string, "keyCountries": string[], "politicalThemes": string[], "challenges": string[] }. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '{}', {}) as RegionalDetail;
         } catch (e) { return {} as RegionalDetail; }
@@ -380,32 +139,9 @@ export const fetchRegionalDetail = async (region: string, discipline: string): P
 export const fetchOrganizationDetail = async (name: string): Promise<OrganizationDetail> => {
     return withCache(`org_v3_${name}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Detailed profile of organization: ${name}. ${getLanguageInstruction()}`,
-                config: { 
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            name: { type: Type.STRING },
-                            abbr: { type: Type.STRING },
-                            type: { type: Type.STRING },
-                            headquarters: { type: Type.STRING },
-                            founded: { type: Type.STRING },
-                            secretaryGeneral: { type: Type.STRING },
-                            mission: { type: Type.STRING },
-                            members: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            history: { type: Type.STRING },
-                            keyOrgans: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, function: { type: Type.STRING } } } },
-                            majorTreaties: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            budget: { type: Type.STRING },
-                            ideologicalParadigm: { type: Type.STRING },
-                            governanceModel: { type: Type.STRING },
-                            satelliteOffices: { type: Type.ARRAY, items: { type: Type.STRING } }
-                        }
-                    }
-                }
+            const response = await generateWithFallback({
+                contents: `Detailed profile of international organization: ${name}.
+Return JSON: { "name", "abbr", "type", "headquarters", "founded", "secretaryGeneral", "mission", "members": string[], "history", "keyOrgans": [{"name","function"}], "majorTreaties": string[], "budget", "ideologicalParadigm", "governanceModel", "satelliteOffices": string[] }. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '{}', {}) as OrganizationDetail;
         } catch (e) { return {} as OrganizationDetail; }
@@ -415,10 +151,8 @@ export const fetchOrganizationDetail = async (name: string): Promise<Organizatio
 export const fetchPartyDetail = async (name: string, country: string): Promise<PoliticalPartyDetail> => {
     return withCache(`party_v2_${name}_${country}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Profile of political party: ${name} in ${country}. ${getLanguageInstruction()}`,
-                config: { responseMimeType: "application/json" }
+            const response = await generateWithFallback({
+                contents: `Comprehensive profile of political party: ${name} in ${country}. Include founding, ideology, leadership, electoral history, key policies, and current status. Return detailed JSON. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '{}', {}) as PoliticalPartyDetail;
         } catch (e) { return {} as PoliticalPartyDetail; }
@@ -428,10 +162,8 @@ export const fetchPartyDetail = async (name: string, country: string): Promise<P
 export const fetchPersonDetail = async (name: string): Promise<PersonDetail> => {
     return withCache(`person_v2_${name}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Political profile of ${name}. ${getLanguageInstruction()}`,
-                config: { responseMimeType: "application/json" }
+            const response = await generateWithFallback({
+                contents: `Comprehensive political profile of ${name}. Include biography, political career, ideology, key decisions, legacy, and impact. Return detailed JSON. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '{}', {}) as PersonDetail;
         } catch (e) { return {} as PersonDetail; }
@@ -441,10 +173,8 @@ export const fetchPersonDetail = async (name: string): Promise<PersonDetail> => 
 export const fetchEventDetail = async (name: string): Promise<EventDetail> => {
     return withCache(`event_v2_${name}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Detailed political event dossier: ${name}. ${getLanguageInstruction()}`,
-                config: { responseMimeType: "application/json" }
+            const response = await generateWithFallback({
+                contents: `Detailed political event dossier for: ${name}. Include causes, key actors, timeline, outcomes, and historical significance. Return detailed JSON. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '{}', {}) as EventDetail;
         } catch (e) { return {} as EventDetail; }
@@ -454,10 +184,8 @@ export const fetchEventDetail = async (name: string): Promise<EventDetail> => {
 export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail> => {
     return withCache(`ideology_v2_${name}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Detailed analysis of political ideology: ${name}. ${getLanguageInstruction()}`,
-                config: { responseMimeType: "application/json" }
+            const response = await generateWithFallback({
+                contents: `Detailed analysis of political ideology: ${name}. Include origins, core tenets, key thinkers, historical movements, variants, criticisms, and modern manifestations. Return detailed JSON. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '{}', {}) as IdeologyDetail;
         } catch (e) { return {} as IdeologyDetail; }
@@ -467,11 +195,9 @@ export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail>
 export const fetchConceptDetail = async (term: string, context: string): Promise<ConceptDetail> => {
     return withCache(`concept_v2_${term}_${context}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Define political concept: "${term}" in context of "${context}".
-                JSON with definition, context, examples (string[]), history. ${getLanguageInstruction()}`,
-                config: { responseMimeType: "application/json" }
+            const response = await generateWithFallback({
+                contents: `Define political concept: "${term}" in the context of "${context}".
+Return JSON: { "term": string, "definition": string, "context": string, "examples": string[], "history": string }. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '{}', { term, definition: "Definition unavailable.", context, examples: [], history: "" }) as ConceptDetail;
         } catch (e) { return { term, definition: "Definition unavailable.", context, examples: [], history: "" }; }
@@ -481,45 +207,9 @@ export const fetchConceptDetail = async (term: string, context: string): Promise
 export const fetchHighlightDetail = async (highlight: HighlightedEntity): Promise<HighlightDetail> => {
     return withCache(`highlight_v7_${highlight.title}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Provide details for the highlighted entity: ${highlight.title} (${highlight.category}).
-                ${getLanguageInstruction()}`,
-                config: { 
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            title: { type: Type.STRING },
-                            subtitle: { type: Type.STRING },
-                            category: { type: Type.STRING },
-                            summary: { type: Type.STRING },
-                            historicalBackground: { type: Type.STRING },
-                            significance: { type: Type.STRING },
-                            keyConcepts: { 
-                                type: Type.ARRAY,
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        concept: { type: Type.STRING },
-                                        definition: { type: Type.STRING }
-                                    }
-                                }
-                            },
-                            modernConnections: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            sources: { 
-                                type: Type.ARRAY,
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        title: { type: Type.STRING },
-                                        url: { type: Type.STRING }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            const response = await generateWithFallback({
+                contents: `Provide detailed information for: ${highlight.title} (${highlight.category}).
+Return JSON: { "title", "subtitle", "category", "summary", "historicalBackground", "significance", "keyConcepts": [{"concept","definition"}], "modernConnections": string[], "sources": [{"title","url"}] }. ${getLanguageInstruction()}`
             });
             const parsed = safeParse(response.text || '{}', {}) as any;
             return {
@@ -533,32 +223,23 @@ export const fetchHighlightDetail = async (highlight: HighlightedEntity): Promis
                 modernConnections: parsed.modernConnections || [],
                 sources: parsed.sources || []
             };
-        } catch (e) { 
+        } catch (e) {
             return {
-                title: highlight.title,
-                subtitle: highlight.subtitle,
-                category: highlight.category,
-                summary: "Details currently unavailable.",
-                historicalBackground: "",
-                significance: "",
-                keyConcepts: [],
-                modernConnections: [],
-                sources: []
-            }; 
+                title: highlight.title, subtitle: highlight.subtitle, category: highlight.category,
+                summary: "Details currently unavailable.", historicalBackground: "", significance: "",
+                keyConcepts: [], modernConnections: [], sources: []
+            };
         }
     });
 };
 
 export const fetchExchangeRates = async (): Promise<ExchangeRate[]> => {
-    return withCache(`rates_v2_${new Date().getHours()}`, async () => { 
-         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Generate a JSON array of major exchange rates relative to USD.
-                JSON: [{currencyCode: string, currencyName: string, rate: number, symbol: string, category: 'Fiat' | 'Crypto' | 'Historical' | 'Fictional'}].
-                Include major fiat, top 5 crypto.
-                Note: This is a simulation.`,
-                config: { responseMimeType: "application/json" }
+    return withCache(`rates_v2_${new Date().getHours()}`, async () => {
+        try {
+            const response = await generateWithFallback({
+                contents: `Generate realistic major currency exchange rates relative to USD as of today.
+Return JSON array: [{ "currencyCode": string, "currencyName": string, "rate": number, "symbol": string, "category": "Fiat"|"Crypto"|"Historical"|"Fictional" }].
+Include 20 major fiat currencies and top 5 cryptocurrencies. Use realistic approximate rates.`
             });
             return safeParse(response.text || '[]', []) as ExchangeRate[];
         } catch (e) { return []; }
@@ -568,10 +249,9 @@ export const fetchExchangeRates = async (): Promise<ExchangeRate[]> => {
 export const fetchCurrencyAnalysis = async (currency: string): Promise<{history: string, economics: string}> => {
     return withCache(`currency_analysis_v2_${currency}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
-                contents: `Analyze currency: ${currency}. Provide brief history and economic profile. JSON: {history: string, economics: string}. ${getLanguageInstruction()}`,
-                config: { responseMimeType: "application/json" }
+            const response = await generateWithFallback({
+                contents: `Analyze currency: ${currency}. Provide detailed history and economic profile.
+Return JSON: { "history": string, "economics": string }. ${getLanguageInstruction()}`
             });
             return safeParse(response.text || '{}', { history: "Unavailable", economics: "Unavailable" });
         } catch (e) { return { history: "Unavailable", economics: "Unavailable" }; }

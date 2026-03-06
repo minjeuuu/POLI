@@ -115,16 +115,17 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onNav
         
       </main>
 
-      <nav className={`flex-none border-t pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-colors duration-500 
-          ${['War', 'Steampunk', 'Volcanic', 'Coffee'].includes(themeMode) ? 'bg-stone-900 border-red-900' : 
-            ['Tech', 'Matrix', 'Cyberpunk', 'Neon'].includes(themeMode) ? 'bg-slate-950 border-cyan-900' : 
+      <nav className={`flex-none border-t pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-colors duration-500
+          ${['War', 'Steampunk', 'Volcanic', 'Coffee'].includes(themeMode) ? 'bg-stone-900 border-red-900' :
+            ['Tech', 'Matrix', 'Cyberpunk', 'Neon'].includes(themeMode) ? 'bg-slate-950 border-cyan-900' :
             'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}`}>
-        <div className="flex justify-start items-center h-16 px-2 overflow-x-auto no-scrollbar gap-2">
+        {/* Mobile: icon-only compact bar with scroll; Desktop: icon + label */}
+        <div className="flex justify-start items-center sm:h-16 h-[56px] px-1 sm:px-2 overflow-x-auto no-scrollbar gap-0.5 sm:gap-2">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             let activeColorClass = 'text-academic-accent dark:text-indigo-400';
             let activeBgClass = 'bg-academic-accent/10 dark:bg-indigo-500/20';
-            
+
             if (themeMode === 'War') { activeColorClass = 'text-red-500'; activeBgClass = 'bg-red-900/30'; }
             if (themeMode === 'Tech') { activeColorClass = 'text-cyan-400'; activeBgClass = 'bg-cyan-900/30'; }
             if (themeMode === 'Christmas') { activeColorClass = 'text-red-600 dark:text-red-400'; activeBgClass = 'bg-green-100 dark:bg-green-900/30'; }
@@ -135,14 +136,21 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onNav
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className={`flex flex-col items-center justify-center min-w-[68px] h-full transition-all duration-300 group
+                aria-label={item.label}
+                className={`flex flex-col items-center justify-center
+                  min-w-[44px] sm:min-w-[68px]
+                  min-h-[44px] sm:h-full
+                  px-1 sm:px-2
+                  flex-shrink-0
+                  transition-all duration-300 group rounded-lg
                   ${isActive ? activeColorClass : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'}
                 `}
               >
-                <div className={`p-1.5 rounded-xl transition-all duration-300 mb-1 ${isActive ? `${activeBgClass} translate-y-[-2px]` : 'group-hover:bg-stone-50 dark:group-hover:bg-stone-800'}`}>
+                <div className={`p-1.5 rounded-xl transition-all duration-300 sm:mb-1 ${isActive ? `${activeBgClass} sm:translate-y-[-2px]` : 'group-hover:bg-stone-50 dark:group-hover:bg-stone-800'}`}>
                   <item.icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
                 </div>
-                <span className="text-[9px] font-bold uppercase tracking-widest opacity-80">{item.label}</span>
+                {/* Label: hidden on mobile, visible on sm+ */}
+                <span className="hidden sm:block text-[9px] font-bold uppercase tracking-widest opacity-80 leading-none">{item.label}</span>
               </button>
             );
           })}

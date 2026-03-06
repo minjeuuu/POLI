@@ -1,5 +1,5 @@
 
-import { generateWithRetry, safeParse, getLanguageInstruction } from "../common";
+import { generateWithFallback, safeParse, getLanguageInstruction } from "../common";
 
 export interface Certificate {
     id: string;
@@ -29,11 +29,7 @@ export const generateCertificate = async (username: string, course: string): Pro
     ${getLanguageInstruction()}
     `;
 
-    const res = await generateWithRetry({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-        config: { responseMimeType: "application/json" }
-    });
+    const res = await generateWithFallback({ contents: prompt });
     
     const data = safeParse(res.text || '{}', { description: "Awarded for excellence.", signature: "The Archivist" });
     

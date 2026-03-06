@@ -1,7 +1,6 @@
 
-import { generateWithRetry, safeParse, withCache } from "./common";
+import { generateWithFallback, safeParse, withCache } from "./common";
 import { TranslationResult } from "../types";
-import { Type } from "@google/genai";
 
 /**
  * BABEL PROTOCOL: UNIVERSAL TRANSLATION ENGINE
@@ -13,12 +12,10 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     
     return withCache(cacheKey, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: `
+            const response = await generateWithFallback({ contents: `
                 ACT AS: UNIVERSAL TRANSLATOR & POLITICAL LINGUIST.
                 TASK: Translate the following text into ${targetLanguage}.
-                
+
                 SOURCE TEXT: "${text}"
 
                 REQUIREMENTS:
@@ -34,22 +31,7 @@ export const translateText = async (text: string, targetLanguage: string): Promi
                     "targetLanguage": string,
                     "nuanceAnalysis": string (Detailed paragraph explaining context)
                 }
-                `,
-                config: { 
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            original: {type: Type.STRING},
-                            translated: {type: Type.STRING},
-                            sourceLanguage: {type: Type.STRING},
-                            targetLanguage: {type: Type.STRING},
-                            nuanceAnalysis: {type: Type.STRING}
-                        }
-                    },
-                    thinkingConfig: { thinkingBudget: 2048 } 
-                }
-            });
+                ` });
             return safeParse(response.text || '{}', {
                 original: text,
                 translated: "Translation unavailable.",

@@ -165,6 +165,113 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', mode: IS_PRODUCTION ? 'production' : 'development' });
 });
 
+// --- CLAUDE AI PROXY ---
+// Keeps the API key server-side (never exposed in the browser bundle).
+// Browser calls POST /api/ai/generate instead of Anthropic directly.
+const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || process.env.VITE_CLAUDE_API_KEY || '';
+const CLAUDE_BASE_URL = 'https://api.anthropic.com/v1/messages';
+const CLAUDE_MODEL = 'claude-sonnet-4-6';
+const CLAUDE_MAX_TOKENS = 16000;
+const CLAUDE_SYSTEM = "You are POLI, an expert encyclopedic political science, geopolitics, history, culture, and global knowledge AI. Provide exhaustive, accurate, real-world data. When asked for JSON, return ONLY valid JSON — no markdown fences, no preamble, no commentary. Start directly with { or [. Fill every field with specific, detailed information.";
+
+app.post('/api/ai/generate', async (req: any, res: any) => {
+    if (!CLAUDE_API_KEY) {
+        return res.status(503).json({ error: 'Claude API key not configured on server.' });
+    }
+    const { prompt, system, maxTokens } = req.body || {};
+    if (!prompt) return res.status(400).json({ error: 'prompt is required' });
+
+    try {
+        const upstream = await fetch(CLAUDE_BASE_URL, {
+            method: 'POST',
+            headers: {
+                'x-api-key': CLAUDE_API_KEY,
+                'anthropic-version': '2023-06-01',
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: CLAUDE_MODEL,
+                max_tokens: maxTokens || CLAUDE_MAX_TOKENS,
+                system: system || CLAUDE_SYSTEM,
+                messages: [{ role: 'user', content: prompt }],
+            }),
+        });
+
+        const data = await upstream.json() as any;
+        if (!upstream.ok) {
+            console.error('Claude upstream error:', data);
+            return res.status(upstream.status).json({ error: data?.error?.message || 'Claude API error' });
+        }
+        res.json({ text: data.content?.[0]?.text || '' });
+    } catch (e: any) {
+        console.error('Claude proxy error:', e);
+        res.status(500).json({ error: e.message || 'Internal proxy error' });
+    }
+});
+
+// Streaming variant — returns Server-Sent Events from Claude
+app.post('/api/ai/stream', async (req: any, res: any) => {
+    if (!CLAUDE_API_KEY) {
+        res.status(503).json({ error: 'Claude API key not configured on server.' });
+        return;
+    }
+    const { prompt, system } = req.body || {};
+    if (!prompt) { res.status(400).json({ error: 'prompt is required' }); return; }
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    try {
+        const upstream = await fetch(CLAUDE_BASE_URL, {
+            method: 'POST',
+            headers: {
+                'x-api-key': CLAUDE_API_KEY,
+                'anthropic-version': '2023-06-01',
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: CLAUDE_MODEL,
+                max_tokens: CLAUDE_MAX_TOKENS,
+                stream: true,
+                system: system || CLAUDE_SYSTEM,
+                messages: [{ role: 'user', content: prompt }],
+            }),
+        });
+
+        if (!upstream.ok || !upstream.body) {
+            res.write('data: [ERROR]\n\n');
+            res.end();
+            return;
+        }
+
+        const reader = (upstream.body as any).getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n').filter((l: string) => l.startsWith('data: '));
+            for (const line of lines) {
+                const raw = line.slice(6);
+                if (raw === '[DONE]') { res.write('data: [DONE]\n\n'); res.end(); return; }
+                try {
+                    const parsed = JSON.parse(raw);
+                    const text = parsed.delta?.text;
+                    if (text) res.write(`data: ${JSON.stringify({ text })}\n\n`);
+                } catch { /* skip malformed */ }
+            }
+        }
+        res.write('data: [DONE]\n\n');
+        res.end();
+    } catch (e: any) {
+        console.error('Claude stream proxy error:', e);
+        res.write('data: [ERROR]\n\n');
+        res.end();
+    }
+});
+
 // --- SOCKET.IO HANDLERS ---
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);

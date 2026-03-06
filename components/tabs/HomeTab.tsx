@@ -233,7 +233,7 @@ const HomeTab: React.FC<HomeTabProps> = ({
 
   // Standard View
   return (
-    <div className="h-full overflow-y-auto bg-academic-bg dark:bg-stone-950 transition-colors p-4 md:p-8">
+    <div className="h-full overflow-y-auto bg-academic-bg dark:bg-stone-950 transition-colors p-3 sm:p-4 md:p-8">
       {/* TOAST */}
       <div 
         className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[70] flex items-center gap-3 px-6 py-3 bg-academic-accent dark:bg-indigo-600 text-white rounded-full shadow-xl transition-all duration-500 ease-out pointer-events-none
@@ -243,12 +243,12 @@ const HomeTab: React.FC<HomeTabProps> = ({
       </div>
 
       <div className="flex items-center justify-between mb-6 px-1">
-          <button onClick={handlePrevDay} className="p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"><ChevronLeft className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
+          <button onClick={handlePrevDay} className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"><ChevronLeft className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
           <div className="flex flex-col items-center cursor-pointer group" onClick={() => onDateChange(new Date())}>
                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors">{isLoading ? 'Loading...' : 'Daily Briefing'}</span>
-               <h2 className="font-serif text-lg font-bold text-academic-text dark:text-stone-100">{currentDate.toLocaleDateString(undefined, {month:'long', day:'numeric'})}</h2>
+               <h2 className="font-serif text-base sm:text-lg font-bold text-academic-text dark:text-stone-100">{currentDate.toLocaleDateString(undefined, {month:'long', day:'numeric'})}</h2>
           </div>
-          <button onClick={handleNextDay} className="p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"><ChevronRight className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
+          <button onClick={handleNextDay} className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"><ChevronRight className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
       </div>
 
       <div className="sticky top-0 bg-academic-bg dark:bg-stone-950 z-10 pt-2 pb-4 -mx-4 px-4 border-b border-stone-100 dark:border-stone-800 mb-6 flex gap-2 overflow-x-auto no-scrollbar backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 transition-all duration-300">
