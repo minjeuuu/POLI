@@ -4,6 +4,7 @@ import { HighlightedEntity, HighlightDetail } from '../types';
 import { fetchHighlightDetail } from '../services/homeService';
 import { ArrowLeft, BookOpen, Link as LinkIcon, Share2, Bookmark, Check } from 'lucide-react';
 import { ExportButton } from './shared/ExportButton';
+import { ShareButton } from './shared/ShareButton';
 import { simpleExportData } from '../utils/exportUtils';
 
 interface HighlightDetailScreenProps {
@@ -241,12 +242,7 @@ const HighlightDetailScreen: React.FC<HighlightDetailScreenProps> = ({ highlight
          </button>
          <div className="flex gap-2 items-center">
              <ExportButton compact data={simpleExportData(highlight.title, 'Highlight', detail?.summary || highlight.subtitle || '', highlight.subtitle)} />
-             <button
-               onClick={handleShare}
-               className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400 hover:text-academic-accent transition-colors"
-             >
-                 <Share2 className="w-4 h-4" /> Share
-             </button>
+             <ShareButton compact title={highlight.title} text={`POLI Highlight: ${highlight.title} — ${highlight.subtitle}`} />
          </div>
       </div>
     </div>

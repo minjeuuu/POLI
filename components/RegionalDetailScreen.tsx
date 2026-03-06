@@ -4,6 +4,9 @@ import { ArrowLeft, Globe, Flag, AlertTriangle, Lightbulb } from 'lucide-react';
 import { RegionalDetail } from '../types';
 import { fetchRegionalDetail } from '../services/geminiService';
 import LoadingScreen from './LoadingScreen';
+import { ExportButton } from './shared/ExportButton';
+import { ShareButton } from './shared/ShareButton';
+import { simpleExportData } from '../utils/exportUtils';
 
 interface RegionalDetailScreenProps {
   region: string;
@@ -46,9 +49,13 @@ const RegionalDetailScreen: React.FC<RegionalDetailScreenProps> = ({ region, dis
           <button onClick={onClose} className="p-2 -ml-2 text-stone-500 hover:text-academic-accent transition-colors">
               <ArrowLeft className="w-6 h-6" />
           </button>
-          <div>
+          <div className="flex-1">
               <h2 className="font-serif font-bold text-lg text-academic-text">{region}</h2>
               <span className="text-[10px] font-mono text-academic-gold uppercase tracking-widest">{disciplineContext}</span>
+          </div>
+          <div className="flex gap-2">
+              <ExportButton compact data={simpleExportData(region, 'Regional Profile', data.summary || '', disciplineContext)} />
+              <ShareButton compact title={region} text={`Regional Profile: ${region} — ${disciplineContext}`} />
           </div>
       </div>
 
