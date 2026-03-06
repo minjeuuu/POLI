@@ -69,15 +69,7 @@ export const fetchOrganizationDetail = async (name: string): Promise<Organizatio
             }
             `;
 
-            const response = await generateWithFallback({
-                model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 8192,
-                    tools: [{googleSearch: {}}] 
-                }
-            });
+            const response = await generateWithFallback({ contents: prompt });
             const aiData = safeParse(response.text || '{}', {}) as OrganizationDetail;
             const merged = deepMerge(FALLBACK_ORG, aiData);
             return { ...merged, name }; 

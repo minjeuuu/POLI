@@ -1,5 +1,5 @@
 
-import { generateWithRetry, cleanJson } from "../common";
+import { generateWithFallback, cleanJson } from "../common";
 import { QuizQuestion } from "../../types";
 
 export const generateAdaptiveQuiz = async (topic: string, difficulty: 'Easy' | 'Medium' | 'Hard'): Promise<QuizQuestion[]> => {
@@ -16,11 +16,7 @@ export const generateAdaptiveQuiz = async (topic: string, difficulty: 'Easy' | '
     `;
     
     try {
-        const res = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
-            contents: prompt,
-            config: { responseMimeType: "application/json" }
-        });
+        const res = await generateWithFallback({ contents: prompt });
         return JSON.parse(cleanJson(res.text || '[]'));
     } catch (e) {
         return [];

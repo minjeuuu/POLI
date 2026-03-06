@@ -1,7 +1,6 @@
 
-import { generateWithRetry, safeParse, withCache, getLanguageInstruction } from "./common";
+import { generateWithFallback, safeParse, withCache, getLanguageInstruction } from "./common";
 import { ComparisonResult } from "../types";
-import { Type } from "@google/genai";
 
 export const fetchComparison = async (item1: {name: string, type: string}, item2: {name: string, type: string}): Promise<ComparisonResult> => {
     // Cache key includes model version implication to invalidate old non-thinking results
@@ -50,15 +49,7 @@ export const fetchComparison = async (item1: {name: string, type: string}, item2
             }
             `;
 
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    thinkingConfig: { thinkingBudget: 8192 },
-                    maxOutputTokens: 8192
-                }
-            });
+            const response = await generateWithFallback({ contents: prompt });
             
             return safeParse(response.text || '{}', {}) as ComparisonResult;
         } catch (e) { throw e; }

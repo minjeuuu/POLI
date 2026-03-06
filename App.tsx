@@ -39,6 +39,7 @@ import ReaderView from './components/ReaderView';
 import ConceptDetailModal from './components/ConceptDetailModal';
 import DisciplineDetailScreen from './components/DisciplineDetailScreen';
 import GenericKnowledgeScreen from './components/GenericKnowledgeScreen';
+import PWAInstallButton from './components/PWAInstallButton';
 
 type OverlayItem = { type: string; payload: any; id: string };
 
@@ -391,6 +392,7 @@ export default function App() {
             />
         </div>
       </div>
+      <PWAInstallButton />
     </Layout>
   );
 }

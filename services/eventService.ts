@@ -55,15 +55,7 @@ export const fetchEventDetail = async (name: string): Promise<EventDetail> => {
             }
             `;
 
-            const response = await generateWithFallback({
-                model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 8192,
-                    tools: [{googleSearch: {}}]
-                }
-            });
+            const response = await generateWithFallback({ contents: prompt });
             const aiData = safeParse(response.text || '{}', {}) as any;
             const merged = deepMerge(FALLBACK_EVENT, aiData);
 

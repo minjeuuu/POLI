@@ -5,10 +5,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import { DisciplineDetail, DisciplineWork } from '../types';
 import { fetchDisciplineDetail } from '../services/geminiService';
 import { IconRenderer } from './IconMap';
-import { 
-  ArrowLeft, Bookmark, Share2, Library, Download, Map, 
-  BarChart2, Brain, ChevronRight, BookOpen, Clock, Users, Globe, LayoutGrid, Check, X, FileText, Search, Printer, Activity 
+import {
+  ArrowLeft, Bookmark, Share2, Library, Download, Map,
+  BarChart2, Brain, ChevronRight, BookOpen, Clock, Users, Globe, LayoutGrid, Check, X, FileText, Search, Printer, Activity
 } from 'lucide-react';
+import { ExportButton } from './shared/ExportButton';
+import { ShareButton } from './shared/ShareButton';
+import { simpleExportData } from '../utils/exportUtils';
 import LoadingScreen from './LoadingScreen';
 import ReaderView from './ReaderView';
 import QuizView from './QuizView';
@@ -183,7 +186,8 @@ ${data.foundationalWorks?.map(w => `- "${w.title}" by ${w.author} (${w.year})`).
              </div>
           </div>
           <div className="flex items-center gap-2">
-             <button onClick={handlePrint} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
+             <ExportButton compact data={simpleExportData(data.name, 'Academic Discipline', data.overview?.definition || '', data.overview?.scope)} />
+             <ShareButton compact title={data.name} text={`Academic Discipline: ${data.name}`} />
              <button onClick={onToggleSave} className={`p-2 rounded-full transition-colors ${isSaved ? 'text-academic-gold bg-stone-50 dark:bg-stone-800' : 'text-stone-400 hover:text-academic-accent hover:bg-stone-100 dark:hover:bg-stone-800'}`}><Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} /></button>
           </div>
       </div>

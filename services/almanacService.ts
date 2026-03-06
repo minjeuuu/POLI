@@ -1,7 +1,6 @@
 
-import { generateWithRetry, safeParse, withCache, getLanguageInstruction } from "./common";
+import { generateWithFallback, safeParse, withCache, getLanguageInstruction } from "./common";
 import { AlmanacData, PoliticalCalendarEvent } from "../types";
-import { Type } from "@google/genai";
 
 const FALLBACK_ALMANAC: AlmanacData = {
     date: "Unknown",
@@ -62,14 +61,7 @@ export const fetchDailyAlmanac = async (date: Date): Promise<AlmanacData> => {
             ${getLanguageInstruction()}
             `;
 
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 8192
-                }
-            });
+            const response = await generateWithFallback({ contents: prompt });
 
             const parsed = safeParse(response.text || '{}', FALLBACK_ALMANAC) as AlmanacData;
             return { ...parsed, date: dateStr };
@@ -83,20 +75,16 @@ export const fetchDailyAlmanac = async (date: Date): Promise<AlmanacData> => {
 export const fetchUpcomingCalendar = async (): Promise<PoliticalCalendarEvent[]> => {
     return withCache('global_calendar_upcoming_poli_v1', async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: `
+            const response = await generateWithFallback({ contents: `
                 Generate a list of 25 major upcoming global political events for the next 12 months (relative to now).
                 Include:
                 - Presidential/Parliamentary Elections
                 - Major Summits (G7, G20, UNGA, NATO)
                 - Treaty Expirations
                 - Legislative Sessions of global importance
-                
+
                 JSON Array: [{ "date": "YYYY-MM-DD", "type": "Election"|"Summit"|"Legislative"|"Treaty", "title": "string", "country": "string", "description": "string" }]
-                `,
-                config: { responseMimeType: "application/json" }
-            });
+                ` });
             return safeParse(response.text || '[]', []) as PoliticalCalendarEvent[];
         } catch (e) { return []; }
     });

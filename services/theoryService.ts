@@ -1,8 +1,7 @@
 
-import { generateWithRetry, safeParse, withCache, getLanguageInstruction } from "./common";
+import { generateWithFallback, safeParse, withCache, getLanguageInstruction } from "./common";
 import { IdeologyDetail, DisciplineDetail, ConceptDetail, RegionalDetail } from "../types";
 import { FALLBACK_DISCIPLINE_DETAIL } from "../data/homeData";
-import { Type } from "@google/genai";
 
 const FALLBACK_IDEOLOGY: IdeologyDetail = {
     name: "Political Ideology",
@@ -45,14 +44,7 @@ export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail>
             }
             `;
 
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 8192
-                }
-            });
+            const response = await generateWithFallback({ contents: prompt });
             const parsed = safeParse(response.text || '{}', FALLBACK_IDEOLOGY) as IdeologyDetail;
             return { ...FALLBACK_IDEOLOGY, ...parsed, name };
         } catch (e) { return { ...FALLBACK_IDEOLOGY, name }; }
@@ -85,14 +77,7 @@ export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDet
             }
             `;
 
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 8192
-                }
-            });
+            const response = await generateWithFallback({ contents: prompt });
             const parsed = safeParse(response.text || '{}', FALLBACK_DISCIPLINE_DETAIL) as DisciplineDetail;
             return { ...FALLBACK_DISCIPLINE_DETAIL, ...parsed, name };
         } catch (e) { return { ...FALLBACK_DISCIPLINE_DETAIL, name }; }
@@ -110,14 +95,7 @@ export const fetchConceptDetail = async (term: string, context: string): Promise
             RETURN JSON: { "term": "${term}", "definition": "...", "context": "...", "examples": [], "history": "..." }
             `;
 
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 2048
-                }
-            });
+            const response = await generateWithFallback({ contents: prompt });
             return safeParse(response.text || '{}', { term, definition: "Unavailable", context, examples: [], history: "" }) as ConceptDetail;
         } catch (e) { return { term, definition: "Definition unavailable.", context, examples: [], history: "" }; }
     });
@@ -134,14 +112,7 @@ export const fetchRegionalDetail = async (region: string, discipline: string): P
             RETURN JSON: { "region": "${region}", "summary": "...", "keyCountries": [], "politicalThemes": [], "challenges": [] }
             `;
 
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 4096
-                }
-            });
+            const response = await generateWithFallback({ contents: prompt });
             return safeParse(response.text || '{}', {}) as RegionalDetail;
         } catch (e) { return {} as RegionalDetail; }
     });

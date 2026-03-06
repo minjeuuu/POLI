@@ -5,6 +5,9 @@ import { PoliticalPartyDetail } from '../types';
 import { fetchPartyDetail } from '../services/partyService';
 import LoadingScreen from './LoadingScreen';
 import { playSFX } from '../services/soundService';
+import { ExportButton } from './shared/ExportButton';
+import { ShareButton } from './shared/ShareButton';
+import { simpleExportData } from '../utils/exportUtils';
 
 interface PartyDetailScreenProps {
   partyName: string;
@@ -94,7 +97,8 @@ const PartyDetailScreen: React.FC<PartyDetailScreenProps> = ({ partyName, countr
             </div>
           </div>
           <div className="flex items-center gap-2">
-             <button onClick={handlePrint} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
+             <ExportButton compact data={simpleExportData(data.name, 'Political Party', data.platform || '', `${data.ideology} — ${country}`)} />
+             <ShareButton compact title={data.name} text={`Political Party: ${data.name} (${country})`} />
           </div>
       </div>
 

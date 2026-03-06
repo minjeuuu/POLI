@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
-import { 
-    Globe, MessageCircle, Flag, Map as MapIcon, Users, Crown, Vote, Gavel, Coins, Truck, 
+import {
+    Globe, MessageCircle, Flag, Map as MapIcon, Users, Crown, Vote, Gavel, Coins, Truck,
     Shield, History, Brain, Image as ImageIcon, BookOpen, Layers, GraduationCap,
     Leaf, Cpu, Music, Plane, Palette, Heart
 } from 'lucide-react';
@@ -9,6 +9,9 @@ import { fetchCountryDeepDive } from '../../services/countryService';
 import { CountryDeepDive, CountryMapData, DetailedTimelineEvent } from '../../types';
 import LoadingScreen from '../LoadingScreen';
 import { playSFX } from '../../services/soundService';
+import { ExportButton } from '../shared/ExportButton';
+import { ShareButton } from '../shared/ShareButton';
+import { simpleExportData } from '../../utils/exportUtils';
 
 // Layout & Shared
 import { SectionWrapper } from './shared/SectionWrapper';
@@ -137,6 +140,10 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
               ))}
           </div>
           <div className="p-4 border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+              <div className="flex gap-2 mb-2">
+                  <ExportButton compact data={simpleExportData(countryName, 'Country Profile', data.politicalScience?.detailedAnalysis?.politicalCulture || data.history?.politicalHistory?.[0] || '', `Capital: ${data.geography?.capitals?.[0]?.name || ''}`)} className="flex-1" />
+                  <ShareButton compact title={countryName} text={`Country Profile: ${countryName}`} className="flex-1" />
+              </div>
               <button onClick={() => { playSFX('click'); onAddToCompare(countryName, 'Country'); }} className="w-full py-2 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 rounded-lg text-xs font-bold uppercase tracking-wider mb-2 hover:border-academic-accent dark:hover:border-indigo-500 transition-colors">Compare</button>
               <button onClick={onToggleSave} className={`w-full py-2 border rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${isSaved ? 'bg-academic-gold text-white border-academic-gold' : 'bg-transparent border-stone-200 dark:border-stone-700 text-stone-500 hover:border-academic-gold'}`}>{isSaved ? 'Saved' : 'Save Dossier'}</button>
           </div>
@@ -146,16 +153,27 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
       <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth bg-stone-50/30 dark:bg-black/20 relative w-full">
           
           {/* MOBILE NAV */}
-          <div className="lg:hidden sticky top-0 z-30 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 overflow-x-auto no-scrollbar flex items-center gap-2 p-2 shadow-sm">
-              {SECTIONS.map(s => (
-                  <button
-                      key={s.id}
-                      onClick={() => scrollTo(s.id)}
-                      className={`flex-none px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${activeSection === s.id ? 'bg-academic-accent text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}`}
-                  >
-                      {s.id}
-                  </button>
-              ))}
+          <div className="lg:hidden sticky top-0 z-30 bg-white/95 dark:bg-stone-900/95 backdrop-blur-sm border-b border-stone-200 dark:border-stone-800 shadow-sm">
+              <div className="overflow-x-auto no-scrollbar flex items-center gap-1.5 px-3 py-2">
+                  {SECTIONS.map(s => {
+                      const Icon = s.icon;
+                      const isActive = activeSection === s.id;
+                      return (
+                          <button
+                              key={s.id}
+                              onClick={() => scrollTo(s.id)}
+                              className={`flex-none flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-200 ${
+                                  isActive
+                                      ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md scale-105'
+                                      : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'
+                              }`}
+                          >
+                              <Icon className="w-3 h-3 flex-none" />
+                              <span>{s.id}</span>
+                          </button>
+                      );
+                  })}
+              </div>
           </div>
 
           <CountryHero data={data} onBack={onClose} />

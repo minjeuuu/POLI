@@ -1,7 +1,6 @@
 
-import { generateWithRetry, safeParse, getLanguageInstruction } from "./common";
+import { generateWithFallback, safeParse, getLanguageInstruction } from "./common";
 import { SimulationState } from "../types";
-import { Type } from "@google/genai";
 
 /**
  * GENESIS: GEOPOLITICAL SIMULATION ENGINE
@@ -68,33 +67,7 @@ export const simulateNationTurn = async (currentState: SimulationState, action?:
         ${getLanguageInstruction()}
         `;
         
-        const res = await generateWithRetry({
-            model: 'gemini-3-pro-preview',
-            contents: prompt,
-            config: { 
-                responseMimeType: "application/json",
-                // Enable Deep Reasoning for complex simulation logic
-                thinkingConfig: { thinkingBudget: 4096 }, 
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        turn: {type: Type.INTEGER},
-                        nationName: {type: Type.STRING},
-                        leaderName: {type: Type.STRING},
-                        ideology: {type: Type.STRING},
-                        stats: { type: Type.OBJECT, properties: { stability: {type: Type.NUMBER}, wealth: {type: Type.NUMBER}, military: {type: Type.NUMBER}, liberty: {type: Type.NUMBER} } },
-                        history: { type: Type.ARRAY, items: { type: Type.STRING } },
-                        currentEvent: { type: Type.OBJECT, properties: {
-                            title: {type: Type.STRING},
-                            description: {type: Type.STRING},
-                            choices: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { text: {type: Type.STRING}, impact: {type: Type.STRING}, aiPrompt: {type: Type.STRING} } } }
-                        }},
-                        warMap: {type: Type.STRING},
-                        marketShare: {type: Type.NUMBER}
-                    }
-                }
-            }
-        });
+        const res = await generateWithFallback({ contents: prompt });
         
         const result = safeParse(res.text || '{}', currentState) as any;
         

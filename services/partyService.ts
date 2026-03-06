@@ -1,5 +1,5 @@
 
-import { generateWithRetry, safeParse, withCache, getLanguageInstruction, deepMerge } from "./common";
+import { generateWithFallback, safeParse, withCache, getLanguageInstruction, deepMerge } from "./common";
 import { PoliticalPartyDetail } from "../types";
 
 const FALLBACK_PARTY: PoliticalPartyDetail = {
@@ -47,15 +47,7 @@ export const fetchPartyDetail = async (name: string, country: string): Promise<P
             }
             `;
 
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 8192,
-                    tools: [{googleSearch: {}}]
-                }
-            });
+            const response = await generateWithFallback({ contents: prompt });
             const aiData = safeParse(response.text || '{}', {}) as PoliticalPartyDetail;
             const merged = deepMerge(FALLBACK_PARTY, aiData);
             return { ...merged, name };

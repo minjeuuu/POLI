@@ -7,6 +7,9 @@ import LoadingScreen from './LoadingScreen';
 import ReaderView from './ReaderView';
 import { playSFX } from '../services/soundService';
 import { IconRenderer } from './IconMap';
+import { ExportButton } from './shared/ExportButton';
+import { ShareButton } from './shared/ShareButton';
+import { simpleExportData } from '../utils/exportUtils';
 
 interface PersonDetailScreenProps {
   personName: string;
@@ -95,6 +98,8 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                 </div>
             </div>
             <div className="flex items-center gap-2">
+                 <ExportButton compact data={simpleExportData(data.name, 'Political Figure', data.bio || '', data.role)} />
+                 <ShareButton compact title={data.name} text={`Political Figure: ${data.name} — ${data.role}`} />
                  <button onClick={handleWebSearch} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Search Images"><Search className="w-5 h-5" /></button>
                  <button onClick={onToggleSave} className={`p-2 rounded-full transition-colors ${isSaved ? 'text-academic-gold' : 'text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400'}`}>
                     <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />

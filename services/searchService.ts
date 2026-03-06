@@ -1,24 +1,16 @@
 
-import { generateWithRetry, cleanJson, withCache, getLanguageInstruction, safeParse } from "./common";
+import { generateWithFallback, cleanJson, withCache, getLanguageInstruction, safeParse } from "./common";
 import { PoliticalRecord } from "../types";
-import { Type } from "@google/genai";
 
 export const fetchPoliticalRecord = async (query: string): Promise<PoliticalRecord | null> => {
     return withCache(`record_poli_v1_${query}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: `Generate a structured political record for "${query}".
+            const response = await generateWithFallback({ contents: `Generate a structured political record for "${query}".
                 If it is a Country, Person, Ideology, or Event, provide details.
                 PROTOCOL: POLI ARCHIVE V1.
                 Return RAW JSON ONLY.
                 Structure: { "entity": { "name", "type", "description" ... }, "historicalContext", "timeline": [], "relatedDisciplines": [] }
-                ${getLanguageInstruction()}`,
-                config: {
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 8192
-                }
-            });
+                ${getLanguageInstruction()}` });
             return safeParse(response.text || '{}', null) as PoliticalRecord;
         } catch (e) {
             console.error(e);
@@ -30,18 +22,16 @@ export const fetchPoliticalRecord = async (query: string): Promise<PoliticalReco
 export const fetchGenericTopic = async (query: string): Promise<any> => {
     return withCache(`generic_dossier_poli_v1_${query}`, async () => {
         try {
-            const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
-                contents: `
+            const response = await generateWithFallback({ contents: `
                 ACT AS: POLI, THE POLITICAL SCIENCE OMNIPEDIA.
                 TOPIC: "${query}"
                 TASK: Generate an EXHAUSTIVE, ACADEMIC-LEVEL dossier.
                 PROTOCOL: POLI ARCHIVE V1.
-                
+
                 REQUIREMENTS:
                 1. **DEPTH**: Do not summarize. Explain. (1000+ words total).
                 2. **BREADTH**: Cover history, theory, practice, criticism, and data.
-                
+
                 OUTPUT: RAW JSON ONLY. No Markdown.
                 {
                     "title": "string",
@@ -57,9 +47,7 @@ export const fetchGenericTopic = async (query: string): Promise<any> => {
                     "notableQuote": { "text": "string", "author": "string" }
                 }
                 ${getLanguageInstruction()}
-                `,
-                config: { responseMimeType: "application/json", maxOutputTokens: 8192 }
-            });
+                ` });
             return safeParse(response.text || '{}', {
                 title: query,
                 overview: "Analysis currently unavailable.",

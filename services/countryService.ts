@@ -31,11 +31,27 @@ import { fetchCultureProfile } from "./country/countryCultureService";
 import { fetchHealthProfile } from "./country/countryHealthService";
 import { fetchEducationProfile } from "./country/countryEducationService";
 
+const fetchRestCountriesData = async (countryName: string): Promise<{ coatOfArmsUrl?: string; flagUrl?: string; alpha2?: string }> => {
+    try {
+        const res = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}?fields=coatOfArms,flags,cca2`, { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) return {};
+        const data = await res.json();
+        const c = Array.isArray(data) ? data[0] : data;
+        return {
+            coatOfArmsUrl: c?.coatOfArms?.png || c?.coatOfArms?.svg || '',
+            flagUrl: c?.flags?.png || c?.flags?.svg || '',
+            alpha2: c?.cca2?.toLowerCase() || ''
+        };
+    } catch {
+        return {};
+    }
+};
+
 export const fetchCountryDeepDive = async (countryName: string): Promise<CountryDeepDive> => {
     if (STATIC_COUNTRIES[countryName]) return STATIC_COUNTRIES[countryName];
-    
-    const cacheKey = `country_poli_v1_full_${countryName.replace(/\s+/g, '_')}`;
-    
+
+    const cacheKey = `country_poli_v2_full_${countryName.replace(/\s+/g, '_')}`;
+
     return withCache(cacheKey, async () => {
         try {
             const defaultData = generateDefaultCountry(countryName);
@@ -49,8 +65,8 @@ export const fetchCountryDeepDive = async (countryName: string): Promise<Country
                 academicData,
                 infraData,
                 globalData,
-                newsData, 
-                mapsData, 
+                newsData,
+                mapsData,
                 imagesData,
                 analysisData,
                 demographicsData,
@@ -65,7 +81,8 @@ export const fetchCountryDeepDive = async (countryName: string): Promise<Country
                 tourismData,
                 cultureData,
                 healthData,
-                educationData
+                educationData,
+                restData
             ] = await Promise.all([
                 fetchCountryIdentity(countryName),
                 fetchCountryGovernment(countryName),
@@ -89,7 +106,8 @@ export const fetchCountryDeepDive = async (countryName: string): Promise<Country
                 fetchTourismProfile(countryName),
                 fetchCultureProfile(countryName),
                 fetchHealthProfile(countryName),
-                fetchEducationProfile(countryName)
+                fetchEducationProfile(countryName),
+                fetchRestCountriesData(countryName)
             ]);
 
             // Base Merge
@@ -122,6 +140,28 @@ export const fetchCountryDeepDive = async (countryName: string): Promise<Country
             (merged as any).culture = cultureData;
             (merged as any).health = healthData;
             (merged as any).education = educationData;
+
+            // Enrich with REST Countries data (coat of arms, reliable flag fallback)
+            if (restData.coatOfArmsUrl) {
+                if (!merged.identity) (merged as any).identity = {};
+                if (!(merged.identity as any).coatOfArms) (merged.identity as any).coatOfArms = {};
+                if (!(merged.identity as any).coatOfArms.imageUrl) {
+                    (merged.identity as any).coatOfArms.imageUrl = restData.coatOfArmsUrl;
+                }
+                if (merged.symbols?.coatOfArms && !(merged.symbols.coatOfArms as any).imageUrl) {
+                    (merged.symbols.coatOfArms as any).imageUrl = restData.coatOfArmsUrl;
+                }
+            }
+            if (restData.alpha2 && merged.identity) {
+                if (!merged.identity.isoCodes) (merged.identity as any).isoCodes = {};
+                if (!merged.identity.isoCodes.alpha2) {
+                    (merged.identity.isoCodes as any).alpha2 = restData.alpha2.toUpperCase();
+                }
+                const a2 = (merged.identity.isoCodes.alpha2 || restData.alpha2).toLowerCase();
+                if (merged.identity.flag) {
+                    merged.identity.flag.imageUrl = `https://flagcdn.com/w320/${a2}.png`;
+                }
+            }
 
             return merged as CountryDeepDive;
         } catch (e) { 

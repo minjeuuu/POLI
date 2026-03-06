@@ -1,9 +1,8 @@
 
-import { generateWithRetry, generateWithFallback, withCache, getLanguageInstruction, safeParse } from "./common";
+import { generateWithFallback, withCache, getLanguageInstruction, safeParse } from "./common";
 import { DailyContext, HighlightedEntity, HighlightDetail, DailyHistoryEvent } from "../types";
 import { FALLBACK_DAILY_CONTEXT } from "../data/homeData";
 import { generateMassiveHistory, getMassiveArchive } from "../data/archives/massiveHistory";
-import { Type } from "@google/genai";
 
 // Helper to parse year strings like "3200 BCE", "1945", "c. 500" into numbers
 const parseYear = (yearStr: string): number => {
@@ -46,15 +45,7 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
                 `;
 
         try {
-            let response = await generateWithFallback({
-                model: 'gemini-3-pro-preview',
-                contents: contents,
-                config: {
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 8192,
-                    tools: [{googleSearch: {}}]
-                }
-            });
+            let response = await generateWithFallback({ contents: contents });
             const parsed = safeParse(response.text || '{}', FALLBACK_DAILY_CONTEXT) as any;
             
             const proceduralEvents = generateMassiveHistory(date);
@@ -117,14 +108,7 @@ export const fetchHighlightDetail = async (highlight: HighlightedEntity): Promis
             `;
 
         try {
-            let response = await generateWithFallback({
-                model: 'gemini-3-flash-preview',
-                contents: contents,
-                config: {
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 4096
-                }
-            });
+            let response = await generateWithFallback({ contents: contents });
             const parsed = safeParse(response.text || '{}', {}) as any;
             return {
                 title: parsed.title || highlight.title,
