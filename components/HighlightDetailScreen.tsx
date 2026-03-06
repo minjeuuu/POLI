@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { HighlightedEntity, HighlightDetail } from '../types';
 import { fetchHighlightDetail } from '../services/homeService';
 import { ArrowLeft, BookOpen, Link as LinkIcon, Share2, Bookmark, Check } from 'lucide-react';
+import { ExportButton } from './shared/ExportButton';
+import { simpleExportData } from '../utils/exportUtils';
 
 interface HighlightDetailScreenProps {
   highlight: HighlightedEntity;
@@ -237,12 +239,15 @@ const HighlightDetailScreen: React.FC<HighlightDetailScreenProps> = ({ highlight
              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-academic-gold' : ''}`} />
              {isSaved ? 'Saved' : 'Save Highlight'}
          </button>
-         <button 
-           onClick={handleShare}
-           className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400 hover:text-academic-accent transition-colors"
-         >
-             <Share2 className="w-4 h-4" /> Share
-         </button>
+         <div className="flex gap-2 items-center">
+             <ExportButton compact data={simpleExportData(highlight.title, 'Highlight', detail?.summary || highlight.subtitle || '', highlight.subtitle)} />
+             <button
+               onClick={handleShare}
+               className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400 hover:text-academic-accent transition-colors"
+             >
+                 <Share2 className="w-4 h-4" /> Share
+             </button>
+         </div>
       </div>
     </div>
   );

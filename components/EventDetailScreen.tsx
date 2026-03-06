@@ -6,6 +6,9 @@ import { fetchEventDetail } from '../services/eventService';
 import LoadingScreen from './LoadingScreen';
 import PersonDetailScreen from './PersonDetailScreen';
 import { playSFX } from '../services/soundService';
+import { ExportButton } from './shared/ExportButton';
+import { ShareButton } from './shared/ShareButton';
+import { simpleExportData } from '../utils/exportUtils';
 
 interface EventDetailScreenProps {
   eventName: string;
@@ -85,6 +88,8 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
                 </div>
             </div>
             <div className="flex items-center gap-2">
+                <ExportButton compact data={simpleExportData(data.title, 'Historical Event', data.context || '', `${data.date} — ${data.location}`)} />
+                <ShareButton compact title={data.title} text={`Historical Event: ${data.title} (${data.date})`} />
                 <button onClick={handleWebSearch} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Visual Evidence"><ImageIcon className="w-5 h-5" /></button>
                 <button onClick={onToggleSave} className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors ${isSaved ? 'text-academic-gold' : 'text-stone-400 dark:text-stone-500'}`}><Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} /></button>
             </div>

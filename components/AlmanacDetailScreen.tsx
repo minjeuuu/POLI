@@ -4,6 +4,9 @@ import { ArrowLeft, Clock, Globe, BookOpen, Layers } from 'lucide-react';
 import { fetchPoliticalRecord } from '../services/searchService';
 import LoadingScreen from './LoadingScreen';
 import Timeline from './Timeline';
+import { ExportButton } from './shared/ExportButton';
+import { ShareButton } from './shared/ShareButton';
+import { simpleExportData } from '../utils/exportUtils';
 
 interface AlmanacDetailScreenProps {
   mode: 'Year' | 'Era' | 'Date';
@@ -44,9 +47,13 @@ const AlmanacDetailScreen: React.FC<AlmanacDetailScreenProps> = ({ mode, title, 
             <button onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors text-stone-500">
                 <ArrowLeft className="w-6 h-6" />
             </button>
-            <div>
+            <div className="flex-1">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-academic-gold">{mode} Record</span>
                 <h1 className="text-xl font-serif font-bold text-academic-text dark:text-stone-100">{title}</h1>
+            </div>
+            <div className="flex gap-2">
+                <ExportButton compact data={simpleExportData(title, 'Almanac Entry', data?.historicalContext || data?.entity?.description || '', title)} />
+                <ShareButton compact title={title} text={`Almanac Entry: ${title}`} />
             </div>
         </div>
 

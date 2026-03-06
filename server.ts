@@ -218,9 +218,16 @@ app.post('/api/ai/stream', async (req: any, res: any) => {
     const { prompt, system } = req.body || {};
     if (!prompt) { res.status(400).json({ error: 'prompt is required' }); return; }
 
+    // SSE headers — must be set and flushed before any streaming begins
     res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // disable nginx buffering
+    res.flushHeaders();
+
+    const flush = () => { if (typeof (res as any).flush === 'function') (res as any).flush(); };
+
+    const write = (msg: string) => { res.write(msg); flush(); };
 
     try {
         const upstream = await fetch(CLAUDE_BASE_URL, {
@@ -240,34 +247,37 @@ app.post('/api/ai/stream', async (req: any, res: any) => {
         });
 
         if (!upstream.ok || !upstream.body) {
-            res.write('data: [ERROR]\n\n');
+            const errBody = await upstream.text().catch(() => 'unknown error');
+            console.error('Claude stream upstream error:', upstream.status, errBody);
+            write('data: [ERROR]\n\n');
             res.end();
             return;
         }
 
-        const reader = (upstream.body as any).getReader();
         const decoder = new TextDecoder();
+        let buffer = '';
 
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split('\n').filter((l: string) => l.startsWith('data: '));
+        // Use async iteration (Node.js 18+ ReadableStream is AsyncIterable)
+        for await (const chunk of upstream.body as any) {
+            buffer += decoder.decode(chunk instanceof Uint8Array ? chunk : Buffer.from(chunk), { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() ?? ''; // keep incomplete last line in buffer
             for (const line of lines) {
-                const raw = line.slice(6);
-                if (raw === '[DONE]') { res.write('data: [DONE]\n\n'); res.end(); return; }
+                if (!line.startsWith('data: ')) continue;
+                const raw = line.slice(6).trim();
+                if (raw === '[DONE]') { write('data: [DONE]\n\n'); res.end(); return; }
                 try {
                     const parsed = JSON.parse(raw);
                     const text = parsed.delta?.text;
-                    if (text) res.write(`data: ${JSON.stringify({ text })}\n\n`);
-                } catch { /* skip malformed */ }
+                    if (text) write(`data: ${JSON.stringify({ text })}\n\n`);
+                } catch { /* skip malformed chunks */ }
             }
         }
-        res.write('data: [DONE]\n\n');
+        write('data: [DONE]\n\n');
         res.end();
     } catch (e: any) {
         console.error('Claude stream proxy error:', e);
-        res.write('data: [ERROR]\n\n');
+        write('data: [ERROR]\n\n');
         res.end();
     }
 });

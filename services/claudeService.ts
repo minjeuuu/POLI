@@ -15,26 +15,43 @@ const CLAUDE_SYSTEM = "You are POLI, an expert encyclopedic political science, g
 
 const isBrowser = typeof window !== 'undefined';
 
-export const generateWithClaude = async (prompt: string, system?: string, maxTokens?: number): Promise<string | null> => {
+export const generateWithClaude = async (prompt: string, system?: string, maxTokens?: number, _retries = 3): Promise<string | null> => {
     if (isBrowser) {
         // Route through server proxy — API key stays on server
-        try {
-            const response = await fetch('/api/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt, system, maxTokens }),
-            });
-            if (!response.ok) {
-                const err = await response.json().catch(() => ({})) as any;
-                console.error('Claude proxy error:', err?.error || response.status);
+        for (let attempt = 0; attempt <= _retries; attempt++) {
+            try {
+                const response = await fetch('/api/ai/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, system, maxTokens }),
+                    signal: AbortSignal.timeout(60000),
+                });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({})) as any;
+                    const status = response.status;
+                    // Don't retry on auth errors or missing key
+                    if (status === 401 || status === 403 || status === 503) {
+                        console.error('Claude proxy error (no retry):', status, err?.error);
+                        return null;
+                    }
+                    if (attempt < _retries) {
+                        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
+                        continue;
+                    }
+                    return null;
+                }
+                const data = await response.json() as any;
+                return data.text || null;
+            } catch (e: any) {
+                if (attempt < _retries) {
+                    await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
+                    continue;
+                }
+                console.error('Claude proxy fetch failed after retries:', e?.message || e);
                 return null;
             }
-            const data = await response.json() as any;
-            return data.text || null;
-        } catch (e) {
-            console.error('Claude proxy fetch failed:', e);
-            return null;
         }
+        return null;
     }
 
     // Server-side: call Anthropic directly
@@ -81,40 +98,58 @@ export const generateJsonWithClaude = async <T>(prompt: string, fallback: T, sys
 
 export async function* streamWithClaude(prompt: string, system?: string): AsyncGenerator<string> {
     if (isBrowser) {
-        // Route through server SSE proxy
-        try {
-            const response = await fetch('/api/ai/stream', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt, system }),
-            });
+        // Route through server SSE proxy, with one retry on error
+        for (let attempt = 0; attempt <= 1; attempt++) {
+            let didYield = false;
+            try {
+                const response = await fetch('/api/ai/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, system }),
+                    signal: AbortSignal.timeout(120000),
+                });
 
-            if (!response.ok || !response.body) {
-                yield "Stream error.";
+                if (!response.ok || !response.body) {
+                    if (attempt === 0) { await new Promise(r => setTimeout(r, 1000)); continue; }
+                    yield "Stream unavailable.";
+                    return;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() ?? '';
+                    for (const line of lines) {
+                        if (!line.startsWith('data: ')) continue;
+                        const raw = line.slice(6).trim();
+                        if (raw === '[DONE]') return;
+                        if (raw === '[ERROR]') {
+                            if (!didYield && attempt === 0) {
+                                await new Promise(r => setTimeout(r, 1000));
+                                break; // retry outer loop
+                            }
+                            return;
+                        }
+                        try {
+                            const parsed = JSON.parse(raw);
+                            if (parsed.text) { didYield = true; yield parsed.text; }
+                        } catch { /* skip malformed */ }
+                    }
+                    if (buffer === '[ERROR]' && !didYield && attempt === 0) break;
+                }
+                if (didYield) return; // success
+            } catch (e) {
+                if (attempt === 0) { await new Promise(r => setTimeout(r, 1000)); continue; }
+                console.error("Claude stream proxy failed:", e);
+                yield "Stream error occurred.";
                 return;
             }
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                const chunk = decoder.decode(value, { stream: true });
-                const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
-                for (const line of lines) {
-                    const raw = line.slice(6);
-                    if (raw === '[DONE]') return;
-                    if (raw === '[ERROR]') { yield "Stream error occurred."; return; }
-                    try {
-                        const parsed = JSON.parse(raw);
-                        if (parsed.text) yield parsed.text;
-                    } catch { /* skip */ }
-                }
-            }
-        } catch (e) {
-            console.error("Claude stream proxy failed:", e);
-            yield "Stream error occurred.";
         }
         return;
     }
