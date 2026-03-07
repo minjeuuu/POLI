@@ -23,12 +23,6 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
-    {
-      "src": "https://flagcdn.com/w160/un.png",
-      "sizes": "160x160",
-      "type": "image/png",
-      "purpose": "any"
-    }
   ],
   "shortcuts": [
     {

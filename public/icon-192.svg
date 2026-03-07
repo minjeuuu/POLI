@@ -1,25 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0F172A"/>
-      <stop offset="100%" style="stop-color:#1E3A5F"/>
-    </linearGradient>
-  </defs>
-  <!-- Background -->
-  <rect width="192" height="192" rx="38" fill="url(#bg)"/>
-  <!-- Landmark icon (3 columns, entablature, base) in gold/cream -->
-  <!-- Base platform -->
-  <rect x="34" y="142" width="124" height="10" rx="2" fill="#D97706"/>
-  <!-- Step -->
-  <rect x="42" y="134" width="108" height="10" rx="2" fill="#D97706"/>
-  <!-- Column 1 -->
-  <rect x="44" y="72" width="22" height="64" rx="2" fill="#D97706"/>
-  <!-- Column 2 -->
-  <rect x="85" y="72" width="22" height="64" rx="2" fill="#D97706"/>
-  <!-- Column 3 -->
-  <rect x="126" y="72" width="22" height="64" rx="2" fill="#D97706"/>
-  <!-- Entablature body -->
-  <rect x="36" y="56" width="120" height="18" rx="2" fill="#D97706"/>
-  <!-- Pediment / roof cap -->
-  <rect x="28" y="46" width="136" height="12" rx="3" fill="#B45309"/>
+  <rect width="192" height="192" fill="white"/>
+  <!-- Top cap (gray, 50% opacity) -->
+  <rect x="48" y="29" width="96" height="9" fill="black" opacity="0.5"/>
+  <!-- Entablature outline -->
+  <rect x="38" y="38" width="116" height="19" stroke="black" stroke-width="6" fill="none"/>
+  <!-- 3 Pillars -->
+  <rect x="54" y="57" width="16" height="96" fill="black"/>
+  <rect x="88" y="57" width="16" height="96" fill="black"/>
+  <rect x="122" y="57" width="16" height="96" fill="black"/>
+  <!-- Base line -->
+  <path d="M38 153 L154 153" stroke="black" stroke-width="7" stroke-linecap="round"/>
 </svg>

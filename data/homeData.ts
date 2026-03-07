@@ -152,7 +152,10 @@ const HISTORICAL_EVENTS_ARCHIVE: DailyHistoryEvent[] = [
 export const FALLBACK_DAILY_CONTEXT: DailyContext = {
     date: new Date().toLocaleDateString(),
     quote: { text: "Man is by nature a political animal.", author: "Aristotle", year: "4th Century BCE", region: "Greece" },
-    news: [],
+    news: [
+        { headline: "Connecting to global news network…", summary: "Live briefing will appear once a connection is established. Historical archive and research tools are fully available offline.", source: "POLI Archive", date: "Today" },
+        { headline: "Research tools available offline", summary: "Country profiles, political theory library, persons database, and historical timeline are all accessible without an internet connection.", source: "POLI Archive", date: "Today" },
+    ],
     highlightedPerson: { category: 'Thinker', title: 'Plato', subtitle: 'Philosopher', meta: 'Greece' },
     highlightedCountry: { category: 'Country', title: 'Greece', subtitle: 'Birthplace of Democracy', meta: 'Europe' },
     highlightedIdeology: { category: 'Ideology', title: 'Democracy', subtitle: 'Rule by the People', meta: 'Political System' },
