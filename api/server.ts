@@ -132,7 +132,7 @@ const CLAUDE_SYSTEM =
     'You are POLI, an expert encyclopedic political science, geopolitics, history, culture, and global knowledge AI. Provide exhaustive, accurate, real-world data. When asked for JSON, return ONLY valid JSON — no markdown fences, no preamble, no commentary. Start directly with { or [. Fill every field with specific, detailed information.';
 
 // Read key per-request so Vercel environment variables are always current
-const getApiKey = () => process.env.CLAUDE_API_KEY || process.env.VITE_CLAUDE_API_KEY || '';
+const getApiKey = () => process.env.CLAUDE_API_KEY || process.env.VITE_CLAUDE_API_KEY || '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';
 
 app.post('/api/ai/generate', async (req: any, res: any) => {
     const CLAUDE_API_KEY = getApiKey();
