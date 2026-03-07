@@ -43,12 +43,18 @@ import PWAInstallButton from './components/PWAInstallButton';
 
 type OverlayItem = { type: string; payload: any; id: string };
 
+const LS_LAUNCHED = 'poli_launched';
+const LS_AUTH = 'poli_auth';
+const LS_INTRO = 'poli_intro_shown';
+const LS_USER = 'poli_user';
+const LS_PREFS = 'poli_prefs';
+
 export default function App() {
-  // Lifecycle State
-  const [hasLaunched, setHasLaunched] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showIntro, setShowIntro] = useState(true);
-  
+  // Lifecycle State — persisted so users don't repeat onboarding every reload
+  const [hasLaunched, setHasLaunched] = useState(() => localStorage.getItem(LS_LAUNCHED) === 'true');
+  const [isAuthenticated, setIsAuthenticated] = useState(() => localStorage.getItem(LS_AUTH) === 'true');
+  const [showIntro, setShowIntro] = useState(() => localStorage.getItem(LS_INTRO) !== 'true');
+
   // App State
   const [activeTab, setActiveTab] = useState<MainTab>('home');
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -56,13 +62,21 @@ export default function App() {
   const [isDailyLoading, setIsDailyLoading] = useState(true);
   const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [appLang, setAppLang] = useState('English');
-  const [user, setUser] = useState<UserProfile | null>(null);
-  
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    try { const s = localStorage.getItem(LS_USER); return s ? JSON.parse(s) : null; } catch { return null; }
+  });
+
   // THEME STATE (Source of Truth)
-  const [themeMode, setThemeMode] = useState<SpecialTheme>('Default');
-  const [themeScope, setThemeScope] = useState<ThemeScope>('None');
-  const [myCountry, setMyCountry] = useState<string>('Global Citizen');
-  
+  const [themeMode, setThemeMode] = useState<SpecialTheme>(() => {
+    try { const p = localStorage.getItem(LS_PREFS); return p ? JSON.parse(p).themeMode || 'Default' : 'Default'; } catch { return 'Default'; }
+  });
+  const [themeScope, setThemeScope] = useState<ThemeScope>(() => {
+    try { const p = localStorage.getItem(LS_PREFS); return p ? JSON.parse(p).themeScope || 'None' : 'None'; } catch { return 'None'; }
+  });
+  const [myCountry, setMyCountry] = useState<string>(() => {
+    try { const p = localStorage.getItem(LS_PREFS); return p ? JSON.parse(p).myCountry || 'Global Citizen' : 'Global Citizen'; } catch { return 'Global Citizen'; }
+  });
+
   // Global Navigation Stack
   const [overlayStack, setOverlayStack] = useState<OverlayItem[]>([]);
 
@@ -121,6 +135,8 @@ export default function App() {
   const handleLogin = (userData: any) => {
     setUser(userData);
     setIsAuthenticated(true);
+    localStorage.setItem(LS_AUTH, 'true');
+    localStorage.setItem(LS_USER, JSON.stringify(userData));
     if (userData.preferences) {
         if (userData.preferences.themeMode) setThemeMode(userData.preferences.themeMode);
         if (userData.preferences.themeScope) setThemeScope(userData.preferences.themeScope);
@@ -132,6 +148,7 @@ export default function App() {
       if (user) {
           const updatedUser = { ...user, preferences: newPrefs };
           setUser(updatedUser);
+          localStorage.setItem(LS_USER, JSON.stringify(updatedUser));
           await db.execute("UPDATE users", [updatedUser]);
       }
   };
@@ -141,6 +158,8 @@ export default function App() {
     setIsAuthenticated(false);
     setHasLaunched(false);
     setShowIntro(true);
+    localStorage.removeItem(LS_AUTH);
+    localStorage.removeItem(LS_USER);
   };
 
   const handleNavigate = (type: string, payload: any) => {
@@ -304,9 +323,9 @@ export default function App() {
       }
   };
 
-  if (!hasLaunched) return <LaunchScreen onComplete={() => setHasLaunched(true)} />;
-  if (!isAuthenticated) return <AuthScreen onLogin={handleLogin} onGuest={() => setIsAuthenticated(true)} />;
-  if (showIntro) return <IntroScreen onContinue={() => setShowIntro(false)} />;
+  if (!hasLaunched) return <LaunchScreen onComplete={() => { setHasLaunched(true); localStorage.setItem(LS_LAUNCHED, 'true'); }} />;
+  if (!isAuthenticated) return <AuthScreen onLogin={handleLogin} onGuest={() => { setIsAuthenticated(true); localStorage.setItem(LS_AUTH, 'true'); }} />;
+  if (showIntro) return <IntroScreen onContinue={() => { setShowIntro(false); localStorage.setItem(LS_INTRO, 'true'); }} />;
 
   const commonTabProps = { 
     onNavigate: handleNavigate,
@@ -379,13 +398,17 @@ export default function App() {
                 }} 
                 savedItems={savedItems} 
                 onDeleteSaved={handleDeleteSaved} 
-                updateThemeScope={(s, c) => { 
-                    setThemeScope(s); 
-                    if(c) setMyCountry(c); 
+                updateThemeScope={(s, c) => {
+                    setThemeScope(s);
+                    if(c) setMyCountry(c);
+                    const prefs = JSON.parse(localStorage.getItem(LS_PREFS) || '{}');
+                    localStorage.setItem(LS_PREFS, JSON.stringify({ ...prefs, themeScope: s, myCountry: c || myCountry }));
                     if (user) handleUpdatePreferences({ ...user.preferences, themeScope: s } as UserPreferences);
                 }}
                 setGlobalTheme={(t) => {
                     setThemeMode(t);
+                    const prefs = JSON.parse(localStorage.getItem(LS_PREFS) || '{}');
+                    localStorage.setItem(LS_PREFS, JSON.stringify({ ...prefs, themeMode: t }));
                     if (user) handleUpdatePreferences({ ...user.preferences, themeMode: t } as UserPreferences);
                 }}
                 currentTheme={themeMode}

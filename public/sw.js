@@ -1,5 +1,5 @@
 // POLI Service Worker — PWA Offline Cache
-const CACHE_NAME = 'poli-v1';
+const CACHE_NAME = 'poli-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
