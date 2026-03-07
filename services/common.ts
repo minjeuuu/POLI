@@ -1,7 +1,5 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { generateWithOllama } from "./ollamaService";
-
 // Centralized API Client Initialization (Gemini kept for legacy compatibility only)
 const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
 
@@ -47,24 +45,17 @@ export const generateWithRetry = async (params: any, retries = 3) => {
 import { generateWithClaude } from "./claudeService";
 
 /**
- * High-Availability Wrapper — Priority chain: Claude → Ollama → empty JSON.
- * Claude is always the primary AI. Ollama (local) is the fallback.
- * Gemini is no longer in the chain.
+ * High-Availability Wrapper — Claude is the sole AI provider.
+ * All requests route through /api/ai/generate in the browser (key stays server-side)
+ * or call Anthropic directly on the server.
  */
 export const generateWithFallback = async (params: any, _fallbackModel?: string): Promise<{ text: string }> => {
     const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
 
-    // 1. Try Claude (primary)
     const claudeResponse = await generateWithClaude(prompt);
     if (claudeResponse) return { text: claudeResponse };
 
-    // 2. Fallback to Ollama (local)
-    console.warn("POLI: Claude unavailable or key missing — falling back to Ollama.");
-    const ollamaResponse = await generateWithOllama(prompt);
-    if (ollamaResponse) return { text: ollamaResponse };
-
-    // 3. All AI services unavailable
-    console.error("POLI: All AI services unavailable. Returning empty JSON.");
+    console.error("POLI: Claude unavailable. Check CLAUDE_API_KEY environment variable.");
     return { text: '{}' };
 };
 

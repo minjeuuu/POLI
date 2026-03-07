@@ -125,15 +125,18 @@ app.get('/api/health', (_req: any, res: any) => {
 });
 
 // --- CLAUDE AI PROXY ---
-const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || process.env.VITE_CLAUDE_API_KEY || '';
 const CLAUDE_BASE_URL = 'https://api.anthropic.com/v1/messages';
 const CLAUDE_MODEL = 'claude-sonnet-4-6';
 const CLAUDE_MAX_TOKENS = 16000;
 const CLAUDE_SYSTEM =
     'You are POLI, an expert encyclopedic political science, geopolitics, history, culture, and global knowledge AI. Provide exhaustive, accurate, real-world data. When asked for JSON, return ONLY valid JSON — no markdown fences, no preamble, no commentary. Start directly with { or [. Fill every field with specific, detailed information.';
 
+// Read key per-request so Vercel environment variables are always current
+const getApiKey = () => process.env.CLAUDE_API_KEY || process.env.VITE_CLAUDE_API_KEY || '';
+
 app.post('/api/ai/generate', async (req: any, res: any) => {
-    if (!CLAUDE_API_KEY) return res.status(503).json({ error: 'Claude API key not configured on server.' });
+    const CLAUDE_API_KEY = getApiKey();
+    if (!CLAUDE_API_KEY) return res.status(503).json({ error: 'CLAUDE_API_KEY environment variable is not set. Add it in Vercel project settings → Environment Variables.' });
     const { prompt, system, maxTokens } = req.body || {};
     if (!prompt) return res.status(400).json({ error: 'prompt is required' });
     try {
@@ -156,7 +159,8 @@ app.post('/api/ai/generate', async (req: any, res: any) => {
 });
 
 app.post('/api/ai/stream', async (req: any, res: any) => {
-    if (!CLAUDE_API_KEY) { res.status(503).json({ error: 'Claude API key not configured on server.' }); return; }
+    const CLAUDE_API_KEY = getApiKey();
+    if (!CLAUDE_API_KEY) { res.status(503).json({ error: 'CLAUDE_API_KEY environment variable is not set. Add it in Vercel project settings → Environment Variables.' }); return; }
     const { prompt, system } = req.body || {};
     if (!prompt) { res.status(400).json({ error: 'prompt is required' }); return; }
 
