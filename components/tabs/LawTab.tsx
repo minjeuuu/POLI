@@ -84,7 +84,7 @@ const LawTab: React.FC = () => {
   }
 
   return (
-    <div className="h-full flex flex-col pb-24">
+    <div className="h-full flex flex-col overflow-y-auto pb-24 px-4 md:px-6">
         
         {/* ROOT TABS (Only visible at root level) */}
         {navStack.length === 0 && (

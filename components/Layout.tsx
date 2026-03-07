@@ -104,7 +104,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onNav
       
       <GlobalHeader toggleTheme={toggleTheme} isDark={isDark} onNavigate={onNavigate} />
 
-      <main className="flex-1 overflow-hidden relative pt-16">
+      <main className="flex-1 overflow-hidden relative pt-16 min-h-0">
         {(themeMode === 'War' || themeMode === 'Steampunk') && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>}
         {themeMode === 'Christmas' && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/snow.png')]"></div>}
         {(themeMode === 'Tech' || themeMode === 'Matrix' || themeMode === 'Cyberpunk') && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/circuit-board.png')]"></div>}

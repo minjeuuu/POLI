@@ -135,7 +135,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ toggleTheme, isDark, onNavi
                 </button>
 
                 {showNotifications && (
-                    <div className="absolute right-0 top-14 w-80 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl shadow-2xl animate-in zoom-in-95 origin-top-right overflow-hidden z-50">
+                    <div className="absolute right-0 top-14 w-80 max-w-[calc(100vw-1rem)] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl shadow-2xl animate-in zoom-in-95 origin-top-right overflow-hidden z-50">
                         <div className="p-3 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center bg-stone-50 dark:bg-stone-950">
                             <span className="text-[10px] font-bold uppercase tracking-widest text-stone-500">System Alerts</span>
                             <button onClick={() => setShowNotifications(false)}><X className="w-4 h-4 text-stone-400 hover:text-red-500" /></button>
