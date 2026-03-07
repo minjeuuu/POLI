@@ -40,6 +40,7 @@ import ConceptDetailModal from './components/ConceptDetailModal';
 import DisciplineDetailScreen from './components/DisciplineDetailScreen';
 import GenericKnowledgeScreen from './components/GenericKnowledgeScreen';
 import PWAInstallButton from './components/PWAInstallButton';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 type OverlayItem = { type: string; payload: any; id: string };
 
@@ -393,6 +394,7 @@ export default function App() {
         </div>
       </div>
       <PWAInstallButton />
+      <SpeedInsights />
     </Layout>
   );
 }
