@@ -53,7 +53,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<MainTab>('home');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dailyData, setDailyData] = useState<DailyContext>(FALLBACK_DAILY_CONTEXT);
-  const [isDailyLoading, setIsDailyLoading] = useState(false);
+  const [isDailyLoading, setIsDailyLoading] = useState(true);
   const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [appLang, setAppLang] = useState('English');
   const [user, setUser] = useState<UserProfile | null>(null);
