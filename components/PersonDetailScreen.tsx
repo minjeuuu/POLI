@@ -123,7 +123,13 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                   <div className="md:col-span-1">
                       <div className="aspect-[3/4] bg-stone-200 dark:bg-stone-800 rounded-2xl overflow-hidden shadow-lg border border-stone-200 dark:border-stone-700 relative group">
                           {data.imageUrl ? (
-                              <img src={data.imageUrl} alt={data.name} className="w-full h-full object-cover" />
+                              <img
+                                  src={data.imageUrl}
+                                  alt={data.name}
+                                  className="w-full h-full object-cover"
+                                  referrerPolicy="no-referrer"
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                              />
                           ) : (
                               <div className="w-full h-full flex flex-col items-center justify-center text-stone-400">
                                   <User className="w-20 h-20 mb-4" />

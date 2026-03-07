@@ -35,7 +35,7 @@ export const fetchLegalProfile = async (countryName: string): Promise<LegalProfi
 export const fetchSpecificLaw = async (countryName: string, query: string): Promise<string> => {
     const prompt = `
     TASK: ANALYZE SPECIFIC LAW/CODE: "${query}" in the jurisdiction of ${countryName}.
-    USE GOOGLE SEARCH to find the exact text or authoritative summaries.
+    Use your comprehensive legal knowledge to provide accurate details about this law.
     
     PROVIDE A DETAILED MEMO COVERING:
     1. Official Title & Year of Enactment (if applicable).

@@ -22,13 +22,12 @@ export const fetchOrganizationDetail = async (name: string): Promise<Organizatio
     return withCache(cacheKey, async () => {
         try {
             const prompt = `
-            SYSTEM OVERRIDE: POLI ARCHIVE V1 (LIVE WEB INTELLIGENCE).
-            ORGANIZATION: ${name}.
-            
+            POLI ARCHIVE — ORGANIZATION: ${name}.
+
             ${getLanguageInstruction()}
 
             **DIRECTIVES:**
-            1. **USE GOOGLE SEARCH**: Ensure the Secretary General/Leader is CURRENT. Ensure the member list is UP TO DATE.
+            1. **ACCURACY**: Provide the most current Secretary General/Leader and member list based on your knowledge.
             2. **ROSTER INTEGRITY**: List **ALL** members.
                - If it is the United Nations, list all 193 member states.
                - If it is NATO, list all member states.
