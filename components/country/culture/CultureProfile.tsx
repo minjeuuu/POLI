@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Music, Palette, Utensils, Calendar, Film, BookOpen, Trophy, Theater, Sparkles, Star, Users } from 'lucide-react';
+import { Music, Palette, Utensils, Calendar, Film, BookOpen, Trophy, Theater, Sparkles, Star, Users, Globe } from 'lucide-react';
 
 const Sec: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode }> = ({ title, icon, children }) => (
     <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden">
