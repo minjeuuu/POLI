@@ -1,9 +1,24 @@
 
 import { GoogleGenAI } from "@google/genai";
-// Centralized API Client Initialization (Gemini kept for legacy compatibility only)
-const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
 
-export const ai = new GoogleGenAI({ apiKey: apiKey || 'placeholder' });
+// Lazy-initialize GoogleGenAI to avoid constructor crash in browser (key is server-side only)
+let _ai: GoogleGenAI | null = null;
+const _getAI = (): GoogleGenAI => {
+    if (!_ai) {
+        const apiKey = (typeof process !== 'undefined' && process.env?.API_KEY) ||
+                       (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) || '';
+        try {
+            _ai = new GoogleGenAI({ apiKey: apiKey || 'no-key' });
+        } catch {
+            // Fallback stub so callers get a runtime error instead of a load-time crash
+            _ai = new GoogleGenAI({ apiKey: 'no-key' });
+        }
+    }
+    return _ai;
+};
+export const ai: GoogleGenAI = new Proxy({} as GoogleGenAI, {
+    get(_, prop) { return (_getAI() as any)[prop]; },
+});
 
 export const GLOBAL_CACHE: Record<string, any> = {};
 
