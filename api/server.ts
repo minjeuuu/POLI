@@ -137,9 +137,16 @@ const getApiKey = () => process.env.CLAUDE_API_KEY || process.env.VITE_CLAUDE_AP
 app.post('/api/ai/generate', async (req: any, res: any) => {
     const CLAUDE_API_KEY = getApiKey();
     if (!CLAUDE_API_KEY) return res.status(503).json({ error: 'CLAUDE_API_KEY environment variable is not set. Add it in Vercel project settings → Environment Variables.' });
-    const { prompt, system, maxTokens } = req.body || {};
+    const { prompt, system, maxTokens, image, imageMimeType } = req.body || {};
     if (!prompt) return res.status(400).json({ error: 'prompt is required' });
     try {
+        // Build message content — optionally include an image for vision requests
+        const userContent: any[] = [];
+        if (image) {
+            userContent.push({ type: 'image', source: { type: 'base64', media_type: imageMimeType || 'image/png', data: image } });
+        }
+        userContent.push({ type: 'text', text: prompt });
+
         const upstream = await fetch(CLAUDE_BASE_URL, {
             method: 'POST',
             headers: { 'x-api-key': CLAUDE_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
@@ -147,7 +154,7 @@ app.post('/api/ai/generate', async (req: any, res: any) => {
                 model: CLAUDE_MODEL,
                 max_tokens: maxTokens || CLAUDE_MAX_TOKENS,
                 system: system || CLAUDE_SYSTEM,
-                messages: [{ role: 'user', content: prompt }],
+                messages: [{ role: 'user', content: userContent }],
             }),
         });
         const data = (await upstream.json()) as any;

@@ -1,5 +1,5 @@
-
-import { ai, generateWithFallback, cleanJson, withCache, getLanguageInstruction } from "./common";
+import { generateWithFallback, cleanJson, withCache, getLanguageInstruction } from "./common";
+import { streamWithClaude } from "./claudeService";
 import { BookStructure } from "../types";
 
 export const fetchBookStructure = async (title: string, author: string): Promise<BookStructure> => {
@@ -22,37 +22,25 @@ export const fetchBookStructure = async (title: string, author: string): Promise
 };
 
 export async function* streamChapterContent(title: string, author: string, chapter: string) {
-    // Note: Streaming cannot easily use retry logic without complex buffer management.
-    // We rely on the robustness of the Pro model here.
     const prompt = `
-    ROLE: You are a high-fidelity book digitizer and archivist.
-    TASK: Output the COMPLETE, UNABRIDGED text for chapter "${chapter}" of "${title}" by ${author}.
-    
-    SPECIAL HANDLING FOR SONGS/ANTHEMS:
-    - If "${chapter}" is "Full Lyrics", output the lyrics clearly formatted with line breaks.
+ROLE: You are a high-fidelity book digitizer and archivist.
+TASK: Output the COMPLETE, UNABRIDGED text for chapter "${chapter}" of "${title}" by ${author}.
 
-    CRITICAL FORMATTING RULES:
-    1. **USE MARKDOWN FOR EMPHASIS**: Use **bold** for key terms/names and *italics* for emphasis or foreign words.
-    2. **NO HEADERS**: Do NOT use hashtags (#) for headers. The UI handles titles. Start directly with body text.
-    3. **NO ARTIFACTS**: Do NOT output JSON, code blocks, citations like [1], or meta-commentary.
-    4. **NO FILLER**: Do NOT say "Here is the text". Just output the content.
-    5. **PARAGRAPHS**: Separate paragraphs with exactly two newlines.
-    
-    ${getLanguageInstruction()}
-    
-    BEGIN TEXT:
+SPECIAL HANDLING FOR SONGS/ANTHEMS:
+- If "${chapter}" is "Full Lyrics", output the lyrics clearly formatted with line breaks.
+
+CRITICAL FORMATTING RULES:
+1. **USE MARKDOWN FOR EMPHASIS**: Use **bold** for key terms/names and *italics* for emphasis or foreign words.
+2. **NO HEADERS**: Do NOT use hashtags (#) for headers. The UI handles titles. Start directly with body text.
+3. **NO ARTIFACTS**: Do NOT output JSON, code blocks, citations like [1], or meta-commentary.
+4. **NO FILLER**: Do NOT say "Here is the text". Just output the content.
+5. **PARAGRAPHS**: Separate paragraphs with exactly two newlines.
+
+${getLanguageInstruction()}
+
+BEGIN TEXT:
     `;
-    
-    const response = await ai.models.generateContentStream({
-        model: 'gemini-3-pro-preview', // Pro model for longer, higher quality context
-        contents: prompt,
-        config: {
-            maxOutputTokens: 8192 // Ensure maximum length for chapters
-        }
-    });
-    for await (const chunk of response) {
-        yield chunk.text;
-    }
+    yield* streamWithClaude(prompt);
 }
 
 export const askReaderQuestion = async (context: string, query: string, type: string): Promise<string> => {

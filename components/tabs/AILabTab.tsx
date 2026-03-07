@@ -18,20 +18,20 @@ const AILabTab: React.FC = () => {
 
     const tools = [
         { id: 'claude-chat', label: 'Claude Chat', icon: Bot, desc: 'Streaming political analysis with Claude', badge: 'Claude' },
-        { id: 'think', label: 'Deep Thinker', icon: Brain, desc: 'Complex reasoning & analysis', badge: 'Gemini' },
-        { id: 'search', label: 'Grounded Search', icon: Search, desc: 'Google Search grounded AI', badge: 'Gemini' },
-        { id: 'veo', label: 'Veo Studio', icon: Video, desc: 'Generate videos from text & images', badge: 'Gemini' },
-        { id: 'nano', label: 'Nano Banana', icon: Wand2, desc: 'Edit images with natural language', badge: 'Gemini' },
-        { id: 'pro-image', label: 'Pro Image Lab', icon: ImageIcon, desc: 'High-fidelity image generation', badge: 'Gemini' },
-        { id: 'live', label: 'Live Debate', icon: Mic, desc: 'Real-time voice conversation', badge: 'Gemini' },
-        { id: 'analyst', label: 'Media Analyst', icon: ScanEye, desc: 'Analyze images & videos', badge: 'Gemini' },
-        { id: 'transcribe', label: 'Transcriber', icon: Mic, desc: 'Audio to text', badge: 'Gemini' },
-        { id: 'tts', label: 'TTS Studio', icon: FileAudio, desc: 'Text-to-Speech synthesis', badge: 'Gemini' },
-        { id: 'maps', label: 'Grounded Maps', icon: MapIcon, desc: 'Location-aware AI', badge: 'Gemini' },
+        { id: 'think', label: 'Deep Thinker', icon: Brain, desc: 'Complex reasoning & analysis', badge: 'Claude' },
+        { id: 'search', label: 'Knowledge Search', icon: Search, desc: 'Claude-powered knowledge retrieval', badge: 'Claude' },
+        { id: 'veo', label: 'Veo Studio', icon: Video, desc: 'Generate videos from text & images', badge: 'Claude' },
+        { id: 'nano', label: 'Image Editor', icon: Wand2, desc: 'Edit images with natural language', badge: 'Claude' },
+        { id: 'pro-image', label: 'Image Lab', icon: ImageIcon, desc: 'AI image generation', badge: 'Claude' },
+        { id: 'live', label: 'Live Debate', icon: Mic, desc: 'Real-time voice conversation', badge: 'Claude' },
+        { id: 'analyst', label: 'Media Analyst', icon: ScanEye, desc: 'Analyze images with Claude vision', badge: 'Claude' },
+        { id: 'transcribe', label: 'Transcriber', icon: Mic, desc: 'Audio to text', badge: 'Claude' },
+        { id: 'tts', label: 'TTS Studio', icon: FileAudio, desc: 'Text-to-Speech synthesis', badge: 'Claude' },
+        { id: 'maps', label: 'Geo Intelligence', icon: MapIcon, desc: 'Geographic & political AI', badge: 'Claude' },
     ];
 
-    const badgeColor = (badge: string) =>
-        badge === 'Claude' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+    const badgeColor = (_badge: string) =>
+        'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
 
     return (
         <div className="h-full flex flex-col bg-stone-50 dark:bg-stone-950 overflow-hidden">
@@ -42,7 +42,7 @@ const AILabTab: React.FC = () => {
                         <Sparkles className="w-6 h-6 text-indigo-500" />
                         AI Lab
                     </h1>
-                    <p className="text-stone-500 dark:text-stone-400 text-sm">Powered by Claude (Anthropic) and Gemini (Google DeepMind)</p>
+                    <p className="text-stone-500 dark:text-stone-400 text-sm">Powered by Claude (Anthropic)</p>
                 </div>
             </div>
 
