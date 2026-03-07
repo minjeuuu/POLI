@@ -137,6 +137,42 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
       return 'text-stone-500 bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700';
   };
 
+  // Avatar color based on name hash for visual variety
+  const getAvatarGradient = (name: string, era?: string) => {
+      const eraColors: Record<string, string> = {
+          'Ancient': 'from-amber-600 to-yellow-500',
+          'Medieval': 'from-stone-600 to-stone-500',
+          'Modern': 'from-blue-600 to-indigo-500',
+          'Contemporary': 'from-emerald-600 to-teal-500',
+          '1900s': 'from-slate-600 to-slate-500',
+          '1950s': 'from-blue-700 to-blue-500',
+          '1960s': 'from-violet-600 to-purple-500',
+          '1970s': 'from-orange-600 to-amber-500',
+          '1980s': 'from-pink-600 to-rose-500',
+          '1990s': 'from-cyan-600 to-teal-500',
+          '2000s': 'from-green-600 to-emerald-500',
+          '2010s': 'from-indigo-600 to-blue-500',
+          '20th Century': 'from-slate-700 to-slate-500',
+          '19th Century': 'from-stone-700 to-stone-500',
+      };
+      if (era && eraColors[era]) return eraColors[era];
+      // Hash name for consistent color
+      const hash = name.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+      const palettes = [
+          'from-red-500 to-rose-400',
+          'from-orange-500 to-amber-400',
+          'from-yellow-500 to-lime-400',
+          'from-emerald-500 to-green-400',
+          'from-teal-500 to-cyan-400',
+          'from-blue-500 to-indigo-400',
+          'from-violet-500 to-purple-400',
+          'from-pink-500 to-rose-400',
+          'from-stone-600 to-stone-500',
+          'from-slate-600 to-slate-500',
+      ];
+      return palettes[hash % palettes.length];
+  };
+
   const renderMenu = (item: PersonNode) => (
       <div className="absolute right-2 top-10 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 shadow-xl z-30 min-w-[140px] rounded-lg overflow-hidden animate-in zoom-in-95 origin-top-right">
           <button 
@@ -161,14 +197,14 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
          
          {/* 1. HERO HEADER */}
          {navStack.length === 0 && (
-            <div className="p-10 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors flex-none">
+            <div className="px-4 pt-6 pb-4 md:px-10 md:pt-10 md:pb-6 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors flex-none">
                 <div className="max-w-5xl mx-auto">
-                    <div className="flex items-center gap-3 mb-6 text-academic-gold">
-                        <Hexagon className="w-10 h-10 fill-academic-gold/10" />
-                        <h1 className="text-sm font-bold uppercase tracking-[0.3em]">Knowledge Graph</h1>
+                    <div className="flex items-center gap-2 mb-3 md:mb-6 text-academic-gold">
+                        <Hexagon className="w-7 h-7 md:w-10 md:h-10 fill-academic-gold/10" />
+                        <h1 className="text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Knowledge Graph</h1>
                     </div>
-                    <h2 className="text-5xl md:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">Profiles & Leaders</h2>
-                    <p className="text-xl font-serif text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed">
+                    <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-2 md:mb-6 tracking-tight">Profiles & Leaders</h2>
+                    <p className="text-sm md:text-xl font-serif text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed hidden md:block">
                         Explore the key figures shaping history, theory, and fiction. From presidents to philosophers.
                     </p>
                 </div>
@@ -216,7 +252,7 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
 
          {/* 3. LIST CONTENT */}
          <div className="flex-1 overflow-hidden flex bg-stone-50/50 dark:bg-black/20">
-            <div ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-8 pb-32 scroll-smooth">
+            <div ref={containerRef} className="flex-1 overflow-y-auto p-3 md:p-8 pb-32 scroll-smooth">
                 
                 {filteredItems.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 opacity-50 h-full">
@@ -234,19 +270,20 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
                                             <span className="text-3xl font-serif font-bold text-academic-gold">{letter}</span>
                                         </div>
                                         <div className={`
-                                            ${viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'flex flex-col gap-2'}
+                                            ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6' : 'flex flex-col gap-2'}
                                         `}>
                                             {groupedItems[letter].map((item, i) => (
-                                                <PersonCard 
-                                                    key={i} 
-                                                    item={item} 
-                                                    viewMode={viewMode} 
-                                                    onClick={() => handleItemClick(item)} 
+                                                <PersonCard
+                                                    key={i}
+                                                    item={item}
+                                                    viewMode={viewMode}
+                                                    onClick={() => handleItemClick(item)}
                                                     icon={getIconForType(item)}
                                                     colorClass={getColorClass(item)}
                                                     activeMenu={activeMenu}
                                                     setActiveMenu={setActiveMenu}
                                                     renderMenu={renderMenu}
+                                                    avatarGradient={getAvatarGradient(item.name, item.era)}
                                                 />
                                             ))}
                                         </div>
@@ -256,19 +293,20 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
                         ) : (
                             // FLAT VIEW
                             <div className={`
-                                ${viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'flex flex-col gap-2'}
+                                ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6' : 'flex flex-col gap-2'}
                             `}>
                                 {filteredItems.map((item, i) => (
-                                    <PersonCard 
-                                        key={i} 
-                                        item={item} 
-                                        viewMode={viewMode} 
-                                        onClick={() => handleItemClick(item)} 
+                                    <PersonCard
+                                        key={i}
+                                        item={item}
+                                        viewMode={viewMode}
+                                        onClick={() => handleItemClick(item)}
                                         icon={getIconForType(item)}
                                         colorClass={getColorClass(item)}
                                         activeMenu={activeMenu}
                                         setActiveMenu={setActiveMenu}
                                         renderMenu={renderMenu}
+                                        avatarGradient={getAvatarGradient(item.name, item.era)}
                                     />
                                 ))}
                             </div>
@@ -317,7 +355,7 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
   );
 };
 
-const PersonCard = ({ item, viewMode, onClick, icon: Icon, colorClass, activeMenu, setActiveMenu, renderMenu }: any) => {
+const PersonCard = ({ item, viewMode, onClick, icon: Icon, colorClass, activeMenu, setActiveMenu, renderMenu, avatarGradient }: any) => {
     const isFolder = item.type === 'Folder' || item.type === 'Category';
 
     if (isFolder) {
@@ -355,41 +393,50 @@ const PersonCard = ({ item, viewMode, onClick, icon: Icon, colorClass, activeMen
     }
 
     // PERSON CARD
+    const initials = (item.name || '').split(' ').slice(0, 2).map((w: string) => w.charAt(0)).join('');
     return (
         <div
             onClick={onClick}
             className={`group bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-academic-accent dark:hover:border-indigo-500 hover:shadow-lg transition-all rounded-xl text-left relative overflow-hidden cursor-pointer active:scale-[0.98]
-            ${viewMode === 'list' ? 'flex items-center p-3 gap-4' : 'p-5 flex flex-col h-auto'}`}
+            ${viewMode === 'list' ? 'flex items-center p-3 gap-3' : 'flex flex-col overflow-hidden'}`}
         >
-            <div className={`${viewMode === 'list' ? '' : 'flex justify-between items-start mb-4 relative'}`}>
-                <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 dark:text-stone-500 font-serif font-bold text-xl border border-stone-200 dark:border-stone-700 shadow-sm group-hover:bg-academic-accent group-hover:text-white dark:group-hover:bg-indigo-600 transition-colors shrink-0">
-                    {(item.name || '').charAt(0)}
-                </div>
-                
-                {viewMode !== 'list' && (
-                    <div className="flex flex-col items-end">
-                         <button 
+            {/* Avatar Banner for grid view */}
+            {viewMode !== 'list' && (
+                <div className={`w-full h-20 bg-gradient-to-br ${avatarGradient || 'from-stone-500 to-stone-400'} flex items-center justify-center relative overflow-hidden`}>
+                    <span className="text-white font-serif font-bold text-3xl opacity-80 select-none">{initials}</span>
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
+                    <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
+                        <button
                             onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === item.name ? null : item.name); }}
-                            className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full text-stone-300 dark:text-stone-600 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors z-20"
+                            className="p-1 bg-black/20 hover:bg-black/40 rounded-full text-white/70 hover:text-white transition-colors z-20"
                         >
-                            <MoreHorizontal className="w-4 h-4" />
+                            <MoreHorizontal className="w-3.5 h-3.5" />
                         </button>
                         {activeMenu === item.name && renderMenu(item)}
-                        <span className="mt-1 px-2 py-0.5 bg-stone-50 dark:bg-stone-800 rounded text-[9px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors">{item.era}</span>
                     </div>
-                )}
-            </div>
-            
-            <div className="flex-1 min-w-0">
-                <h3 className="font-serif font-bold text-base text-academic-text dark:text-stone-100 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors leading-tight mb-1">{item.name}</h3>
-                <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">{item.role || 'Political Figure'}</p>
-                {viewMode !== 'list' && <p className="text-[10px] text-stone-400 dark:text-stone-600 uppercase tracking-widest mt-2">{item.country}</p>}
-            </div>
-            
+                    {item.era && (
+                        <span className="absolute bottom-2 left-2 px-1.5 py-0.5 bg-black/30 backdrop-blur-sm rounded text-[8px] font-bold uppercase tracking-wider text-white/80">{item.era}</span>
+                    )}
+                </div>
+            )}
+
+            {/* List view avatar */}
             {viewMode === 'list' && (
-                <div className="ml-auto flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarGradient || 'from-stone-500 to-stone-400'} flex items-center justify-center shrink-0 shadow-sm`}>
+                    <span className="text-white font-serif font-bold text-sm select-none">{initials}</span>
+                </div>
+            )}
+
+            <div className={`flex-1 min-w-0 ${viewMode !== 'list' ? 'p-3' : ''}`}>
+                <h3 className="font-serif font-bold text-sm md:text-base text-academic-text dark:text-stone-100 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors leading-tight mb-0.5">{item.name}</h3>
+                <p className="text-xs text-stone-500 dark:text-stone-400 font-medium truncate">{item.role || 'Political Figure'}</p>
+                {viewMode !== 'list' && item.country && <p className="text-[10px] text-stone-400 dark:text-stone-600 uppercase tracking-widest mt-1.5">{item.country}</p>}
+            </div>
+
+            {viewMode === 'list' && (
+                <div className="ml-auto flex items-center gap-3 flex-shrink-0">
                     <span className="text-[9px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 hidden sm:block">{item.country}</span>
-                    <button 
+                    <button
                         onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === item.name ? null : item.name); }}
                         className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full text-stone-300 dark:text-stone-600 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors relative"
                     >

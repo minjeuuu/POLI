@@ -362,7 +362,7 @@ const LibraryTab: React.FC<LibraryTabProps> = ({ onNavigate, onAddToCompare, onT
                     </div>
 
                     {/* CURATED COLLECTIONS (Dynamic Links) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-10">
                          <div 
                              onClick={() => onNavigate('Explore', { search: 'Constitution' })}
                              className="bg-white dark:bg-stone-900 p-6 rounded-xl border border-stone-200 dark:border-stone-800 hover:border-academic-accent dark:hover:border-indigo-500 cursor-pointer group shadow-sm transition-all"

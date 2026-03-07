@@ -61,44 +61,44 @@ const ComparativeTab: React.FC<ComparativeTabProps> = ({ onNavigate, onAddToComp
     <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 overflow-y-auto pb-24 transition-colors duration-500">
         
         {/* HERO HEADER */}
-        <div className="p-10 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors">
+        <div className="px-4 pt-6 pb-4 md:p-10 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors">
             <div className="max-w-5xl mx-auto">
-                <div className="flex items-center gap-3 mb-6 text-academic-gold">
-                    <Hexagon className="w-10 h-10 fill-academic-gold/10" />
-                    <h1 className="text-sm font-bold uppercase tracking-[0.3em]">Knowledge Graph</h1>
+                <div className="flex items-center gap-2 mb-3 md:mb-6 text-academic-gold">
+                    <Hexagon className="w-7 h-7 md:w-10 md:h-10 fill-academic-gold/10" />
+                    <h1 className="text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Knowledge Graph</h1>
                 </div>
-                <h2 className="text-5xl md:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">Comparative Analysis</h2>
-                <p className="text-xl font-serif text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed">
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-2 md:mb-6 tracking-tight">Comparative Analysis</h2>
+                <p className="text-sm md:text-xl font-serif text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed hidden md:block">
                     Evaluate political entities side-by-side to uncover structural differences, historical parallels, and ideological divergences.
                 </p>
             </div>
         </div>
 
         {/* CONTROLS */}
-        <div className="p-8 max-w-5xl mx-auto w-full">
-            
+        <div className="p-4 md:p-8 max-w-5xl mx-auto w-full">
+
             {/* 1. Category Selection */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-4 mb-6 md:mb-12">
                 {COMPARISON_CATEGORIES.map(cat => (
                     <button
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat.id)}
-                        className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-300 group cursor-pointer active:scale-95
+                        className={`flex flex-col items-center justify-center p-3 md:p-6 rounded-xl md:rounded-2xl border transition-all duration-300 group cursor-pointer active:scale-95
                         ${selectedCategory === cat.id 
                             ? 'bg-white dark:bg-stone-900 border-academic-accent dark:border-indigo-500 shadow-xl transform -translate-y-1' 
                             : 'bg-transparent border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-900'}`}
                     >
-                        <cat.icon className={`w-8 h-8 mb-3 transition-colors ${selectedCategory === cat.id ? 'text-academic-accent dark:text-indigo-400' : 'text-stone-300 dark:text-stone-600 group-hover:text-stone-500 dark:group-hover:text-stone-400'}`} />
-                        <span className={`text-xs font-bold uppercase tracking-widest ${selectedCategory === cat.id ? 'text-academic-text dark:text-stone-100' : 'text-stone-400 dark:text-stone-500'}`}>{cat.label}</span>
+                        <cat.icon className={`w-5 h-5 md:w-8 md:h-8 mb-1.5 md:mb-3 transition-colors ${selectedCategory === cat.id ? 'text-academic-accent dark:text-indigo-400' : 'text-stone-300 dark:text-stone-600 group-hover:text-stone-500 dark:group-hover:text-stone-400'}`} />
+                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-widest ${selectedCategory === cat.id ? 'text-academic-text dark:text-stone-100' : 'text-stone-400 dark:text-stone-500'}`}>{cat.label}</span>
                     </button>
                 ))}
             </div>
 
             {/* 2. Input Engine */}
             <div className="bg-stone-100 dark:bg-stone-900 p-2 rounded-3xl flex flex-col md:flex-row gap-2 shadow-inner border border-stone-200 dark:border-stone-800">
-                
+
                 {/* Card A */}
-                <div className="flex-1 bg-white dark:bg-stone-950 rounded-2xl p-10 flex flex-col items-center justify-center border border-stone-100 dark:border-stone-800 relative group focus-within:border-academic-accent dark:focus-within:border-indigo-500 transition-colors shadow-sm">
+                <div className="flex-1 bg-white dark:bg-stone-950 rounded-2xl p-6 md:p-10 flex flex-col items-center justify-center border border-stone-100 dark:border-stone-800 relative group focus-within:border-academic-accent dark:focus-within:border-indigo-500 transition-colors shadow-sm">
                     <span className="absolute top-4 left-4 text-[10px] font-bold uppercase tracking-widest text-stone-300 dark:text-stone-600 group-focus-within:text-academic-gold transition-colors">Entity A</span>
                     <activeCat.icon className="w-16 h-16 text-stone-200 dark:text-stone-800 mb-8 group-focus-within:text-academic-accent dark:group-focus-within:text-indigo-400 transition-colors opacity-50" />
                     <input 
@@ -122,7 +122,7 @@ const ComparativeTab: React.FC<ComparativeTabProps> = ({ onNavigate, onAddToComp
                 </div>
 
                 {/* Card B */}
-                <div className="flex-1 bg-white dark:bg-stone-950 rounded-2xl p-10 flex flex-col items-center justify-center border border-stone-100 dark:border-stone-800 relative group focus-within:border-academic-accent dark:focus-within:border-indigo-500 transition-colors shadow-sm">
+                <div className="flex-1 bg-white dark:bg-stone-950 rounded-2xl p-6 md:p-10 flex flex-col items-center justify-center border border-stone-100 dark:border-stone-800 relative group focus-within:border-academic-accent dark:focus-within:border-indigo-500 transition-colors shadow-sm">
                     <span className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-widest text-stone-300 dark:text-stone-600 group-focus-within:text-academic-gold transition-colors">Entity B</span>
                     <activeCat.icon className="w-16 h-16 text-stone-200 dark:text-stone-800 mb-8 group-focus-within:text-academic-accent dark:group-focus-within:text-indigo-400 transition-colors opacity-50" />
                     <input 
