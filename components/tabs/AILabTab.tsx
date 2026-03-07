@@ -348,7 +348,7 @@ const ProImageLab = () => {
 
     const handleGenerate = async () => {
         setLoading(true);
-        const res = await generateImage(prompt, 'gemini-3.1-flash-image-preview', { aspectRatio, imageSize: size });
+        const res = await generateImage(prompt, undefined, { aspectRatio, imageSize: size });
         setResult(res);
         setLoading(false);
     };

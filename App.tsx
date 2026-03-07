@@ -47,7 +47,7 @@ export default function App() {
   // Lifecycle State
   const [hasLaunched, setHasLaunched] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showIntro, setShowIntro] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
   
   // App State
   const [activeTab, setActiveTab] = useState<MainTab>('home');

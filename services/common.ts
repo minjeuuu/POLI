@@ -1,24 +1,5 @@
 
-import { GoogleGenAI } from "@google/genai";
-
-// Lazy-initialize GoogleGenAI to avoid constructor crash in browser (key is server-side only)
-let _ai: GoogleGenAI | null = null;
-const _getAI = (): GoogleGenAI => {
-    if (!_ai) {
-        const apiKey = (typeof process !== 'undefined' && process.env?.API_KEY) ||
-                       (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) || '';
-        try {
-            _ai = new GoogleGenAI({ apiKey: apiKey || 'no-key' });
-        } catch {
-            // Fallback stub so callers get a runtime error instead of a load-time crash
-            _ai = new GoogleGenAI({ apiKey: 'no-key' });
-        }
-    }
-    return _ai;
-};
-export const ai: GoogleGenAI = new Proxy({} as GoogleGenAI, {
-    get(_, prop) { return (_getAI() as any)[prop]; },
-});
+import { generateWithClaude } from "./claudeService";
 
 export const GLOBAL_CACHE: Record<string, any> = {};
 
@@ -33,31 +14,6 @@ export const withCache = async <T>(key: string, fetcher: () => Promise<T>): Prom
     throw error;
   }
 };
-
-/**
- * Robust wrapper for AI content generation with automatic retries.
- * Handles 503s, 429s, and network blips with exponential backoff + jitter.
- */
-export const generateWithRetry = async (params: any, retries = 3) => {
-    for (let i = 0; i <= retries; i++) {
-        try {
-            return await ai.models.generateContent(params);
-        } catch (e: any) {
-            const isLast = i === retries;
-            const msg = e.message || JSON.stringify(e);
-            console.warn(`Gemini generation failed (Attempt ${i + 1}/${retries + 1}):`, msg);
-
-            if (isLast) throw e;
-
-            // Exponential backoff: 1s, 2s, 4s... plus random jitter
-            const delay = 1000 * Math.pow(2, i) + (Math.random() * 1000);
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
-    throw new Error("Gemini generation failed after retries");
-};
-
-import { generateWithClaude } from "./claudeService";
 
 /**
  * High-Availability Wrapper — Claude is the sole AI provider.
