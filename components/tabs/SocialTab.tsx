@@ -13,7 +13,6 @@ import { playSFX } from '../../services/soundService';
 import ReaderView from '../ReaderView';
 import { TrendRadar } from '../social/TrendRadar'; 
 import { db } from '../../services/database';
-import socket from '../../services/socket';
 
 interface SocialTabProps {
   onNavigate: (type: string, payload: any) => void;
@@ -77,19 +76,16 @@ const SocialTab: React.FC<SocialTabProps> = ({ onNavigate, user }) => {
     };
     initFeed();
 
-    socket.on('new_post', (post: SocialPost) => {
-        setFeed(prev => [post, ...prev]);
-        playSFX('notification');
-    });
+    // Poll for new/updated posts every 5 seconds (replaces Socket.IO on Vercel)
+    const poll = setInterval(async () => {
+        try {
+            const res = await fetch('/api/posts');
+            const data = await res.json();
+            if (Array.isArray(data)) setFeed(data);
+        } catch { /* ignore network blips */ }
+    }, 5000);
 
-    socket.on('update_post', (updatedPost: SocialPost) => {
-        setFeed(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
-    });
-
-    return () => {
-        socket.off('new_post');
-        socket.off('update_post');
-    };
+    return () => clearInterval(poll);
   }, []);
 
   const filteredFeed = useMemo(() => {
