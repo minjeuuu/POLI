@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { MainTab, DailyContext, SavedItem, UserProfile, ThemeScope, SpecialTheme, UserPreferences } from './types';
 import { fetchDailyContext } from './services/homeService';
 import { FALLBACK_DAILY_CONTEXT } from './data/homeData';
@@ -393,6 +394,7 @@ export default function App() {
         </div>
       </div>
       <PWAInstallButton />
+      <Analytics />
     </Layout>
   );
 }
