@@ -4,23 +4,21 @@
       <stop offset="0%" style="stop-color:#0F172A"/>
       <stop offset="100%" style="stop-color:#1E3A5F"/>
     </linearGradient>
-    <linearGradient id="globe2" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#B45309"/>
-      <stop offset="100%" style="stop-color:#D97706"/>
-    </linearGradient>
   </defs>
   <!-- Background -->
   <rect width="512" height="512" rx="100" fill="url(#bg2)"/>
-  <!-- Globe circle -->
-  <circle cx="256" cy="230" r="130" fill="none" stroke="url(#globe2)" stroke-width="9"/>
-  <!-- Meridians -->
-  <ellipse cx="256" cy="230" rx="60" ry="130" fill="none" stroke="url(#globe2)" stroke-width="6" opacity="0.7"/>
-  <!-- Latitude lines -->
-  <line x1="126" y1="230" x2="386" y2="230" stroke="url(#globe2)" stroke-width="5" opacity="0.6"/>
-  <line x1="140" y1="178" x2="372" y2="178" stroke="url(#globe2)" stroke-width="4" opacity="0.4"/>
-  <line x1="140" y1="282" x2="372" y2="282" stroke="url(#globe2)" stroke-width="4" opacity="0.4"/>
-  <!-- POLI text -->
-  <text x="256" y="418" text-anchor="middle" font-family="Georgia, serif" font-weight="bold" font-size="76" fill="#FDFBF7" letter-spacing="16">POLI</text>
-  <!-- Decorative dot -->
-  <circle cx="256" cy="110" r="10" fill="#B45309"/>
+  <!-- Base platform -->
+  <rect x="90" y="376" width="332" height="26" rx="5" fill="#D97706"/>
+  <!-- Step -->
+  <rect x="112" y="352" width="288" height="26" rx="5" fill="#D97706"/>
+  <!-- Column 1 -->
+  <rect x="118" y="190" width="58" height="164" rx="5" fill="#D97706"/>
+  <!-- Column 2 -->
+  <rect x="227" y="190" width="58" height="164" rx="5" fill="#D97706"/>
+  <!-- Column 3 -->
+  <rect x="336" y="190" width="58" height="164" rx="5" fill="#D97706"/>
+  <!-- Entablature body -->
+  <rect x="96" y="148" width="320" height="44" rx="5" fill="#D97706"/>
+  <!-- Pediment / roof cap -->
+  <rect x="74" y="122" width="364" height="30" rx="7" fill="#B45309"/>
 </svg>
