@@ -4,6 +4,9 @@ import { DailyContext, HighlightedEntity, HighlightDetail, DailyHistoryEvent } f
 import { FALLBACK_DAILY_CONTEXT } from "../data/homeData";
 import { generateMassiveHistory, getMassiveArchive } from "../data/archives/massiveHistory";
 
+// Reactive AI status — true when the last daily fetch got real AI data, false on fallback
+export let aiOnline = false;
+
 // Helper to parse year strings like "3200 BCE", "1945", "c. 500" into numbers
 const parseYear = (yearStr: string): number => {
     const clean = yearStr.replace(/c\.|circa|approx/i, '').trim();
@@ -24,7 +27,7 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
                 
                 INSTRUCTIONS:
                 - **History**: Provide exactly 15 distinct, verified historical events for this date.
-                - **News**: Provide 8 major global headlines. **CRITICAL: You MUST provide a valid source URL for each news item in the 'url' field.** Use search if necessary.
+                - **News**: Provide 8 major global headlines. For each item, provide the outlet name in 'source' and omit the 'url' field — do not fabricate URLs.
                 - **Trivia**: Provide 5 distinct obscure facts.
                 
                 JSON SCHEMA:
@@ -46,7 +49,23 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
 
         try {
             let response = await generateWithFallback({ contents: contents });
-            const parsed = safeParse(response.text || '{}', FALLBACK_DAILY_CONTEXT) as any;
+            const parsed = safeParse(response.text || '{}', {}) as any;
+            // If we got an empty object (AI failed), response.text was '{}' → use full fallback
+            if (!parsed || !parsed.synthesis) {
+                aiOnline = false;
+                const proceduralEvents = generateMassiveHistory(date);
+                const archiveEvents = getMassiveArchive();
+                const allFallbackEvents = [...archiveEvents, ...proceduralEvents];
+                const seenF = new Set<string>();
+                const uniqueFallback: DailyHistoryEvent[] = [];
+                for (const evt of allFallbackEvents) {
+                    const key = evt.event || evt.title;
+                    if (!seenF.has(key)) { seenF.add(key); uniqueFallback.push(evt); }
+                }
+                uniqueFallback.sort((a, b) => parseYear(a.year) - parseYear(b.year));
+                return { ...FALLBACK_DAILY_CONTEXT, historicalEvents: uniqueFallback };
+            }
+            aiOnline = true;
             
             const proceduralEvents = generateMassiveHistory(date);
             const archiveEvents = getMassiveArchive();
@@ -81,17 +100,17 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
                 dailyTrivia: parsed.dailyTrivia || FALLBACK_DAILY_CONTEXT.dailyTrivia,
                 historicalEvents: uniqueEvents, // Now sorted
                 otherHighlights: parsed.otherHighlights || [],
-                synthesis: parsed.synthesis || "Data synthesis complete."
+                synthesis: parsed.synthesis || FALLBACK_DAILY_CONTEXT.synthesis
             };
 
             return merged;
         } catch (e) {
             console.error("Home Service Critical Failure:", e);
+            aiOnline = false;
             const proceduralEvents = generateMassiveHistory(date);
-            return { 
-                ...FALLBACK_DAILY_CONTEXT, 
+            return {
+                ...FALLBACK_DAILY_CONTEXT,
                 historicalEvents: proceduralEvents.sort((a, b) => parseYear(a.year) - parseYear(b.year)),
-                synthesis: "Archive systems offline. Displaying local cache."
             };
         }
     });

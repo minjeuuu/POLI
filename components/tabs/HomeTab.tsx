@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { DailyContext, HighlightedEntity, SavedItem } from '../../types';
-import { ChevronLeft, ChevronRight, Bookmark, Archive, Trash2, MoreHorizontal, Sparkles, Shuffle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bookmark, Archive, Trash2, MoreHorizontal, Sparkles, Shuffle, WifiOff, Settings } from 'lucide-react';
 import HighlightDetailScreen from '../HighlightDetailScreen';
 import { COUNTRIES_DATA } from '../../data/countriesData';
 import { PERSONS_HIERARCHY } from '../../data/personsData';
@@ -20,6 +20,7 @@ import { SynthesisWidget } from '../home/SynthesisWidget';
 interface HomeTabProps {
   data: DailyContext | null;
   isLoading: boolean;
+  aiOnline: boolean;
   currentDate: Date;
   onDateChange: (date: Date) => void;
   onNavigate: (type: string, payload: any) => void;
@@ -39,11 +40,12 @@ const flattenPersons = (nodes: any[]): any[] => {
 
 const flattenTheories = () => THEORY_HIERARCHY.flatMap(cat => cat.items);
 
-const HomeTab: React.FC<HomeTabProps> = ({ 
-    data, 
-    isLoading, 
-    currentDate, 
-    onDateChange, 
+const HomeTab: React.FC<HomeTabProps> = ({
+    data,
+    isLoading,
+    aiOnline,
+    currentDate,
+    onDateChange,
     onNavigate,
     savedItems,
     onDeleteSaved,
@@ -277,6 +279,23 @@ const HomeTab: React.FC<HomeTabProps> = ({
       </div>
 
       {/* CONTENT */}
+      {/* AI Offline Banner — shown after loading completes and AI isn't online */}
+      {!isLoading && !aiOnline && (
+        <div className="mx-3 sm:mx-4 md:mx-8 mt-4 flex items-start gap-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl px-4 py-3">
+          <WifiOff className="w-4 h-4 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-amber-800 dark:text-amber-300">AI offline — showing curated archive content</p>
+            <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">Enter your Claude API key to get live AI-generated briefings, quotes, and analysis.</p>
+          </div>
+          <button
+            onClick={() => onNavigate('profile', null)}
+            className="flex-shrink-0 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 transition-colors"
+          >
+            <Settings className="w-3 h-3" /> Configure
+          </button>
+        </div>
+      )}
+
       {isLoading ? (
         <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 200px)' }}>
           <LoadingScreen message="Synthesizing Global Archive with Claude…" />

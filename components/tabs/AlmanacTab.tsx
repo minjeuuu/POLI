@@ -18,26 +18,32 @@ const AlmanacTab: React.FC<AlmanacTabProps> = ({ onNavigate }) => {
   const [data, setData] = useState<AlmanacData | null>(null);
   const [calendar, setCalendar] = useState<PoliticalCalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [activeView, setActiveView] = useState<'Day' | 'Calendar'>('Day');
-  
+
   // Drill Down
   const [selectedEra, setSelectedEra] = useState<string | null>(null); // For detail screen reuse
-  
+
   // Fetch Data
   useEffect(() => {
     let mounted = true;
     const load = async () => {
       setLoading(true);
-      
-      const [almanac, cal] = await Promise.all([
-          fetchDailyAlmanac(currentDate),
-          fetchUpcomingCalendar()
-      ]);
-      
-      if (mounted) {
-        setData(almanac);
-        setCalendar(cal);
-        setLoading(false);
+      setLoadError(false);
+      try {
+        const [almanac, cal] = await Promise.all([
+            fetchDailyAlmanac(currentDate),
+            fetchUpcomingCalendar()
+        ]);
+        if (mounted) {
+          setData(almanac);
+          setCalendar(cal);
+        }
+      } catch (e) {
+        console.error('AlmanacTab load error:', e);
+        if (mounted) setLoadError(true);
+      } finally {
+        if (mounted) setLoading(false);
       }
     };
     load();
@@ -67,6 +73,17 @@ const AlmanacTab: React.FC<AlmanacTabProps> = ({ onNavigate }) => {
   };
 
   if (loading) return <div className="h-full bg-academic-bg dark:bg-stone-950"><LoadingScreen message="Accessing Global Chronos..." /></div>;
+
+  if (loadError || !data) return (
+    <div className="h-full flex flex-col items-center justify-center bg-academic-bg dark:bg-stone-950 gap-4 px-8 text-center">
+      <Calendar className="w-12 h-12 text-rose-400 opacity-60" />
+      <h3 className="font-serif text-xl font-bold text-stone-700 dark:text-stone-300">Almanac Unavailable</h3>
+      <p className="text-sm text-stone-500 dark:text-stone-500 max-w-xs">Could not load almanac data. This usually means the Claude AI key is missing or invalid. Configure it in <strong>Settings → Advanced / Dev</strong>.</p>
+      <button onClick={() => setCurrentDate(new Date(currentDate))} className="px-5 py-2 bg-rose-500 text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-rose-600 transition-colors">
+        Retry
+      </button>
+    </div>
+  );
 
   return (
     <>

@@ -59,18 +59,22 @@ export const NewsWidget: React.FC<NewsWidgetProps> = ({ news }) => {
                                 </p>
                             </div>
 
-                            {/* ROBUST LINK RENDERING — only show validated https:// URLs */}
-                            <div className="pt-4 border-t border-stone-200/50 dark:border-stone-800 flex flex-wrap gap-2">
-                                {item.url && isValidUrl(item.url) && (
+                            {/* Source — link only when URL is structurally valid; otherwise just label */}
+                            <div className="pt-4 border-t border-stone-200/50 dark:border-stone-800 flex flex-wrap items-center gap-2">
+                                {item.url && isValidUrl(item.url) ? (
                                     <a
                                         href={item.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-[10px] font-bold uppercase tracking-widest text-stone-500 hover:text-academic-gold dark:text-stone-400 dark:hover:text-white flex items-center gap-1 transition-colors"
                                     >
-                                        Read Source <ExternalLink className="w-3 h-3" />
+                                        {item.source || 'Read Source'} <ExternalLink className="w-3 h-3" />
                                     </a>
-                                )}
+                                ) : item.source ? (
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">
+                                        {item.source}
+                                    </span>
+                                ) : null}
 
                                 {item.sources && item.sources.filter(s => isValidUrl(s.uri)).map((s, i) => (
                                     <a
@@ -83,10 +87,6 @@ export const NewsWidget: React.FC<NewsWidgetProps> = ({ news }) => {
                                         {s.title || 'Source'} <ExternalLink className="w-3 h-3" />
                                     </a>
                                 ))}
-
-                                {(!item.url || !isValidUrl(item.url)) && (!item.sources || item.sources.filter(s => isValidUrl(s.uri)).length === 0) && (
-                                    <span className="text-[10px] text-stone-300 italic">Source unavailable</span>
-                                )}
                             </div>
                         </div>
                     ))}

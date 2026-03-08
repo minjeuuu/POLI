@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { MainTab, DailyContext, SavedItem, UserProfile, ThemeScope, SpecialTheme, UserPreferences } from './types';
-import { fetchDailyContext } from './services/homeService';
+import { fetchDailyContext, aiOnline as homeAiOnline } from './services/homeService';
 import { FALLBACK_DAILY_CONTEXT } from './data/homeData';
 import { db } from './services/database';
 
@@ -61,6 +61,7 @@ export default function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dailyData, setDailyData] = useState<DailyContext>(FALLBACK_DAILY_CONTEXT);
   const [isDailyLoading, setIsDailyLoading] = useState(true);
+  const [isAiOnline, setIsAiOnline] = useState(false);
   const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [appLang, setAppLang] = useState('English');
   const [user, setUser] = useState<UserProfile | null>(() => {
@@ -133,8 +134,10 @@ export default function App() {
       try {
         const data = await fetchDailyContext(currentDate);
         setDailyData(data);
+        setIsAiOnline(homeAiOnline);
       } catch (e) {
         console.error("Failed to load daily context", e);
+        setIsAiOnline(false);
       } finally {
         setIsDailyLoading(false);
       }
@@ -358,7 +361,7 @@ export default function App() {
       {renderOverlay()}
 
       <div className="h-full w-full relative">
-        {lazyTab('home',        <HomeTab data={dailyData} isLoading={isDailyLoading} currentDate={currentDate} onDateChange={setCurrentDate} savedItems={savedItems} onDeleteSaved={handleDeleteSaved} initialSubTab="Today" {...commonTabProps} />, 'Home')}
+        {lazyTab('home',        <HomeTab data={dailyData} isLoading={isDailyLoading} aiOnline={isAiOnline} currentDate={currentDate} onDateChange={setCurrentDate} savedItems={savedItems} onDeleteSaved={handleDeleteSaved} initialSubTab="Today" {...commonTabProps} />, 'Home')}
         {lazyTab('explore',     <ExploreTab {...commonTabProps} />, 'Explore')}
         {lazyTab('countries',   <CountriesTab {...commonTabProps} />, 'Countries')}
         {lazyTab('ailab',       <AILabTab />, 'AI Lab')}
