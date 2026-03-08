@@ -201,9 +201,11 @@ export async function* streamWithClaude(prompt: string, system?: string): AsyncG
         for (let attempt = 0; attempt <= 1; attempt++) {
             let didYield = false;
             try {
+                const streamHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+                if (streamKey) streamHeaders['X-User-API-Key'] = streamKey;
                 const response = await fetch('/api/ai/stream', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: streamHeaders,
                     body: JSON.stringify({ prompt, system }),
                     signal: AbortSignal.timeout(120000),
                 });

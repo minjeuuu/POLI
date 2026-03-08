@@ -98,11 +98,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ prefs, onUpdate }) =
                     }),
                     signal: AbortSignal.timeout(15000),
                 });
-                setAiTestStatus(res.ok ? 'ok' : 'fail');
-                return;
-            } catch { /* fall through to proxy */ }
+                if (res.ok) { setAiTestStatus('ok'); return; }
+                // 401/403 = bad key; don't bother trying proxy with it
+                if (res.status === 401 || res.status === 403) { setAiTestStatus('fail'); return; }
+                // Other error — fall through to proxy
+            } catch { /* network/CORS blocked — fall through to proxy */ }
         }
-        // Fall back to server proxy test
+        // Fall back to server proxy test (key forwarded via X-User-API-Key header)
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (key) headers['X-User-API-Key'] = key;
         try {
@@ -110,7 +112,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ prefs, onUpdate }) =
                 method: 'POST',
                 headers,
                 body: JSON.stringify({ prompt: 'Reply with the single word: online', maxTokens: 10 }),
-                signal: AbortSignal.timeout(15000),
+                signal: AbortSignal.timeout(20000),
             });
             setAiTestStatus(res.ok ? 'ok' : 'fail');
         } catch {
