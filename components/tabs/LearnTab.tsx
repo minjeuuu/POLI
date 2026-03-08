@@ -361,7 +361,7 @@ const LearnTab: React.FC<LearnTabProps> = ({ onNavigate }) => {
                                                  onClick={() => handleStartGame(item.name, 'Debate')}
                                                  className="py-1.5 bg-stone-50 dark:bg-stone-800 hover:bg-rose-600 hover:text-white transition-colors rounded text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-1"
                                                >
-                                                   <DebateIcon className="w-3 h-3" /> Debate
+                                                   <Gavel className="w-3 h-3" /> Debate
                                                </button>
                                            </div>
                                        </div>

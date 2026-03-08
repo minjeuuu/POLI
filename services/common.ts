@@ -3,6 +3,9 @@ import { generateWithClaude } from "./claudeService";
 
 export const GLOBAL_CACHE: Record<string, any> = {};
 
+/** Clear all cached AI responses — call this when the API key changes. */
+export const clearCache = () => { Object.keys(GLOBAL_CACHE).forEach(k => delete GLOBAL_CACHE[k]); };
+
 export const withCache = async <T>(key: string, fetcher: () => Promise<T>): Promise<T> => {
   if (GLOBAL_CACHE[key]) return GLOBAL_CACHE[key];
   try {

@@ -128,6 +128,8 @@ export default function App() {
   }, [currentDate, themeScope, myCountry, themeMode]);
 
   // Load Daily Data
+  const [dailyRefreshKey, setDailyRefreshKey] = useState(0);
+
   useEffect(() => {
     const loadDaily = async () => {
       setIsDailyLoading(true);
@@ -143,7 +145,14 @@ export default function App() {
       }
     };
     loadDaily();
-  }, [currentDate]);
+  }, [currentDate, dailyRefreshKey]);
+
+  // When user changes API key in Settings, re-fetch daily data with the new key
+  useEffect(() => {
+    const handler = () => setDailyRefreshKey(k => k + 1);
+    window.addEventListener('poli:ai-key-changed', handler);
+    return () => window.removeEventListener('poli:ai-key-changed', handler);
+  }, []);
 
   // Handlers
   const handleLogin = (userData: any) => {
@@ -188,15 +197,13 @@ export default function App() {
         handleLogout();
     } else {
         if (['home','read','explore','messages','social','countries','sim','games','translate','comparative','theory','persons','learn','rates','profile', 'almanac', 'ailab'].includes(type.toLowerCase())) {
-            setActiveTab(type.toLowerCase() as MainTab);
-            setOverlayStack([]);
+            handleTabChange(type.toLowerCase() as MainTab);
         }
     }
   };
 
   const handleAddToCompare = (compareItem: {name: string, type: string}) => {
-    setActiveTab('comparative');
-    setOverlayStack([]); 
+    handleTabChange('comparative');
     console.log("Add to compare:", compareItem);
   };
 
