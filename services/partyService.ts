@@ -21,13 +21,12 @@ export const fetchPartyDetail = async (name: string, country: string): Promise<P
     return withCache(cacheKey, async () => {
         try {
             const prompt = `
-            SYSTEM OVERRIDE: POLI ARCHIVE V1 (LIVE WEB INTELLIGENCE).
-            PARTY: ${name} (${country}).
-            
+            POLI ARCHIVE — PARTY: ${name} (${country}).
+
             ${getLanguageInstruction()}
 
             **DIRECTIVES:**
-            1. **USE GOOGLE SEARCH**: Ensure the "Current Leader" is accurate as of today. Check for recent elections or leadership spills.
+            1. **ACCURACY**: Provide the most accurate current leader and party information based on your knowledge.
             2. **PLATFORM**: Detailed breakdown of policy stances.
             3. **COLORS**: Exact Hex codes for party colors.
             

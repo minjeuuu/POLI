@@ -1,0 +1,37 @@
+# fly.toml — deploy POLI on fly.io
+# Run once: flyctl launch --no-deploy  (then set secrets, then fly deploy)
+#
+# Set your API key:  flyctl secrets set CLAUDE_API_KEY=sk-ant-...
+#
+app = "poli-app"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT     = "3000"
+
+[http_service]
+  internal_port       = 3000
+  force_https         = true
+  auto_stop_machines  = "stop"
+  auto_start_machines = true
+  min_machines_running = 1   # keep at least 1 alive (Socket.io needs persistence)
+  processes           = ["app"]
+
+  [http_service.concurrency]
+    type       = "connections"
+    hard_limit = 200
+    soft_limit = 150
+
+# Persistent volume for uploaded files
+[[mounts]]
+  source      = "poli_uploads"
+  destination = "/app/uploads"
+
+[[vm]]
+  memory   = "512mb"
+  cpu_kind = "shared"
+  cpus     = 1

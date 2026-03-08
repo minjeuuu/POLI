@@ -2,72 +2,60 @@
 import { generateWithFallback, safeParse, getLanguageInstruction } from "../common";
 import { CountryImageArchive } from "../../types";
 
+const picsumUrl = (seed: string) =>
+    `https://picsum.photos/seed/${encodeURIComponent(seed)}/800/600`;
+
+const KEYWORDS = ['history', 'parliament', 'culture', 'landscape', 'festival', 'monument', 'city', 'tradition', 'nature'];
+const CATEGORIES = ['Historical', 'Government', 'Cultural', 'Historical', 'Government', 'Cultural', 'Historical', 'Government', 'Cultural'];
+
+const makeFallbacks = (countryName: string): CountryImageArchive[] =>
+    CATEGORIES.map((cat, i) => ({
+        title: `${countryName} — ${cat}`,
+        url: picsumUrl(`${countryName}-${KEYWORDS[i]}`),
+        category: cat,
+        year: new Date().getFullYear().toString(),
+        description: `${cat} image of ${countryName}`,
+        credit: 'Picsum Photos',
+    }));
+
 export const fetchCountryImages = async (countryName: string): Promise<CountryImageArchive[]> => {
     const prompt = `
-    GENERATE IMAGE ARCHIVE FOR: ${countryName}.
+    Generate an image archive for ${countryName} with exactly 9 entries (3 per category).
 
-    TASK: Provide metadata for 9 real, verifiable images of ${countryName}.
-    USE GOOGLE SEARCH to find actual image URLs from Wikimedia Commons, Wikipedia, or official government sites.
+    CATEGORIES: Historical, Government, Cultural
 
-    CATEGORIES (3 images each):
-    1. Historical: Founding moments, wars, revolutions, independence ceremonies
-    2. Government: Capital buildings, parliament, presidential palace, supreme court
-    3. Cultural: National landmarks, traditional dress, festivals, cuisine
+    For the "url" field, provide a real Wikimedia Commons direct-link URL you are confident exists, like:
+    https://upload.wikimedia.org/wikipedia/commons/[path]/[File.jpg]
+    Do NOT invent file paths. If you are not sure a specific file exists, use this reliable placeholder instead:
+    https://picsum.photos/seed/${encodeURIComponent(countryName)}-[keyword]/800/600
 
-    CRITICAL URL RULES:
-    - Prefer Wikimedia Commons URLs: https://upload.wikimedia.org/wikipedia/commons/...
-    - Or Wikipedia image URLs from the country's Wikipedia page
-    - Use the actual file path from search results, not guessed paths
-    - If uncertain of exact URL, use: https://source.unsplash.com/featured/800x600?${countryName},{keyword}
-
-    RETURN ONLY VALID JSON ARRAY:
+    RETURN ONLY VALID JSON ARRAY (no markdown fences):
     [
       {
         "title": "Descriptive title",
         "url": "https://...",
         "category": "Historical|Government|Cultural",
         "year": "YYYY",
-        "description": "Brief description",
-        "credit": "Source name"
+        "description": "One sentence description",
+        "credit": "Wikimedia Commons"
       }
     ]
     ${getLanguageInstruction()}
     `;
 
     try {
-        const response = await generateWithFallback({
-            model: 'gemini-3-flash-preview',
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
-                tools: [{ googleSearch: {} }]
-            }
-        });
-
+        const response = await generateWithFallback({ contents: prompt });
         const parsed = safeParse(response.text || '[]', []) as CountryImageArchive[];
+        if (!Array.isArray(parsed) || parsed.length === 0) return makeFallbacks(countryName);
 
-        // Validate and clean URLs - replace any broken ones with Unsplash fallbacks
-        const keywords = ['government', 'landscape', 'culture', 'history', 'capital'];
-        return parsed.map((img, i) => {
-            const kw = keywords[i % keywords.length];
-            const fallbackUrl = `https://source.unsplash.com/featured/800x600?${encodeURIComponent(countryName)},${kw}&sig=${i}`;
-
-            return {
-                ...img,
-                url: img.url && img.url.startsWith('http') ? img.url : fallbackUrl
-            };
-        });
-    } catch (e) {
-        // Return Unsplash fallbacks if everything fails
-        const categories = ['Historical', 'Government', 'Cultural', 'Geography', 'Cultural', 'Historical', 'Government', 'Cultural', 'Geography'];
-        const keywords2 = ['history', 'parliament', 'culture', 'landscape', 'festival', 'monument', 'city', 'tradition', 'nature'];
-        return categories.map((cat, i) => ({
-            title: `${countryName} - ${cat}`,
-            url: `https://source.unsplash.com/featured/800x600?${encodeURIComponent(countryName)},${keywords2[i]}&sig=${i}`,
-            category: cat,
-            year: new Date().getFullYear().toString(),
-            description: `${cat} image of ${countryName}`,
-            credit: 'Unsplash'
+        return parsed.map((img, i) => ({
+            ...img,
+            // Non-http URLs get replaced with a deterministic picsum seed
+            url: img.url && img.url.startsWith('http')
+                ? img.url
+                : picsumUrl(`${countryName}-${KEYWORDS[i % KEYWORDS.length]}`),
         }));
+    } catch {
+        return makeFallbacks(countryName);
     }
 };

@@ -197,14 +197,14 @@ const TheoryTab: React.FC<TheoryTabProps> = ({ onNavigate, onAddToCompare, onTog
 
               {/* LIST CONTENT */}
               <div className="flex-1 overflow-hidden flex">
-                  <div ref={containerRef} className="flex-1 overflow-y-auto scroll-smooth p-6 pb-32">
+                  <div ref={containerRef} className="flex-1 overflow-y-auto scroll-smooth p-3 md:p-6 pb-28">
                       <div className="space-y-10">
                           {sortedKeys.map(letter => (
                               <div key={letter} id={`section-${letter}`} className="scroll-mt-20">
                                   <div className="flex items-center gap-4 mb-6 border-b border-stone-100 dark:border-stone-800 pb-2 sticky top-0 bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-sm z-10">
                                       <span className="text-4xl font-serif font-bold text-stone-200 dark:text-stone-800">{letter}</span>
                                   </div>
-                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
                                       {groupedItems[letter].map((item, i) => {
                                           const Icon = getIconForType(item.type);
                                           const colorClass = getColorForType(item.type);
@@ -264,27 +264,27 @@ const TheoryTab: React.FC<TheoryTabProps> = ({ onNavigate, onAddToCompare, onTog
     <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 relative pb-24 overflow-y-auto transition-colors">
         
         {/* HERO HEADER */}
-        <div className="p-10 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors">
+        <div className="px-4 pt-6 pb-4 md:p-10 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors">
             <div className="max-w-5xl mx-auto">
-                <div className="flex items-center gap-3 mb-6 text-academic-gold">
-                    <Hexagon className="w-10 h-10 fill-academic-gold/10" />
-                    <h1 className="text-sm font-bold uppercase tracking-[0.3em]">Knowledge Graph</h1>
+                <div className="flex items-center gap-2 mb-3 md:mb-6 text-academic-gold">
+                    <Hexagon className="w-7 h-7 md:w-10 md:h-10 fill-academic-gold/10" />
+                    <h1 className="text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Knowledge Graph</h1>
                 </div>
-                <h2 className="text-5xl md:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">Political Theory</h2>
-                <p className="text-xl font-serif text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed">
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-2 md:mb-6 tracking-tight">Political Theory</h2>
+                <p className="text-sm md:text-xl font-serif text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed hidden md:block">
                     Explore the vast network of political thought, from ancient philosophies to contemporary critical theories.
                 </p>
             </div>
         </div>
 
         {/* VIEW CONTENT */}
-        <div className="p-8 max-w-6xl mx-auto w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="p-3 md:p-8 max-w-6xl mx-auto w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {THEORY_HIERARCHY.map((cat, idx) => (
-                    <div 
-                        key={idx} 
+                    <div
+                        key={idx}
                         onClick={() => handleCategoryClick(cat)}
-                        className="group bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-8 cursor-pointer hover:shadow-2xl hover:border-academic-accent/30 dark:hover:border-indigo-500/30 transition-all relative overflow-hidden rounded-2xl active:scale-[0.99]"
+                        className="group bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-5 md:p-8 cursor-pointer hover:shadow-2xl hover:border-academic-accent/30 dark:hover:border-indigo-500/30 transition-all relative overflow-hidden rounded-2xl active:scale-[0.99]"
                     >
                         {/* Decorative Background */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-stone-50 to-transparent dark:from-stone-800/50 dark:to-transparent rounded-bl-full -mr-20 -mt-20 z-0 group-hover:scale-110 transition-transform duration-700"></div>

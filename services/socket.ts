@@ -1,5 +1,13 @@
-import { io } from "socket.io-client";
+// No-op socket mock — Vercel is serverless and does not support persistent WebSocket connections.
+// Real-time features (social feed, messaging) use REST polling instead.
+const noop = () => {};
 
-const socket = io(); // Connects to the same host/port as the window
+const socket = {
+    on: noop,
+    off: noop,
+    emit: noop,
+    join: noop,
+    disconnect: noop,
+};
 
 export default socket;

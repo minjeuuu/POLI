@@ -1,41 +1,48 @@
 {
-  "name": "POLI - Political Science Foundation",
+  "name": "POLI — Political Science Foundation",
   "short_name": "POLI",
-  "description": "Comprehensive political science research platform with country deep-dives, government analysis, and geopolitical intelligence.",
+  "description": "Comprehensive political science research platform powered by Claude AI. Country deep-dives, government analysis, geopolitical intelligence, and daily briefings.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#FDFBF7",
+  "background_color": "#0F172A",
   "theme_color": "#0F172A",
   "lang": "en",
   "scope": "/",
   "categories": ["education", "news", "politics"],
   "icons": [
     {
-      "src": "https://flagcdn.com/w80/un.png",
-      "sizes": "80x80",
-      "type": "image/png",
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "https://flagcdn.com/w160/un.png",
-      "sizes": "160x160",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
-    {
-      "src": "https://flagcdn.com/w320/un.png",
-      "sizes": "320x320",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
   ],
-  "screenshots": [],
   "shortcuts": [
     {
-      "name": "Search Countries",
-      "url": "/?action=search",
-      "description": "Search for a country to analyze"
+      "name": "Daily Briefing",
+      "short_name": "Briefing",
+      "url": "/?tab=home",
+      "description": "Open today's political briefing"
+    },
+    {
+      "name": "Countries",
+      "short_name": "Nations",
+      "url": "/?tab=countries",
+      "description": "Explore countries of the world"
+    },
+    {
+      "name": "AI Lab",
+      "short_name": "AI Lab",
+      "url": "/?tab=ailab",
+      "description": "Political AI analysis tools"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }

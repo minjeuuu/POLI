@@ -9,7 +9,7 @@ interface IntroScreenProps {
 }
 
 const IntroScreen: React.FC<IntroScreenProps> = ({ onContinue }) => {
-  const [quote, setQuote] = useState<Quote | null>(null);
+  const [quote] = useState<Quote>(() => getRandomQuote().quote);
   const [stage, setStage] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
   
@@ -28,9 +28,6 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onContinue }) => {
     const failsafe = setTimeout(() => {
         onContinue();
     }, 12000);
-
-    const { quote: randomQuote } = getRandomQuote();
-    setQuote(randomQuote);
 
     // Sequence
     const t1 = setTimeout(() => setStage(1), 500);  // Turn White
@@ -80,8 +77,6 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onContinue }) => {
         setTimeout(onContinue, 1000); // Unmount
     }
   }, [stage, onContinue]);
-
-  if (!quote) return null;
 
   return (
     <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center transition-colors duration-[800ms] ease-out 

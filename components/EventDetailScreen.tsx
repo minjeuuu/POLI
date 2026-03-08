@@ -107,7 +107,13 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
             {/* HERO VISUAL */}
             <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-stone-200 dark:border-stone-800 group bg-stone-200 dark:bg-stone-900">
                  {(data as any).imageUrl ? (
-                     <img src={(data as any).imageUrl} alt={data.title} className="w-full h-full object-cover" />
+                     <img
+                         src={(data as any).imageUrl}
+                         alt={data.title}
+                         className="w-full h-full object-cover"
+                         referrerPolicy="no-referrer"
+                         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                     />
                  ) : (
                      <div className="w-full h-full flex flex-col items-center justify-center text-stone-400">
                          <History className="w-20 h-20 mb-4 opacity-50" />

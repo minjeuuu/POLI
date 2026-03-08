@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="white"/>
+  <!-- Top cap (gray, 50% opacity) -->
+  <rect x="128" y="78" width="256" height="24" fill="black" opacity="0.5"/>
+  <!-- Entablature outline -->
+  <rect x="102" y="102" width="308" height="51" stroke="black" stroke-width="16" fill="none"/>
+  <!-- 3 Pillars -->
+  <rect x="143" y="153" width="42" height="256" fill="black"/>
+  <rect x="235" y="153" width="42" height="256" fill="black"/>
+  <rect x="327" y="153" width="42" height="256" fill="black"/>
+  <!-- Base line -->
+  <path d="M102 409 L410 409" stroke="black" stroke-width="19" stroke-linecap="round"/>
+</svg>

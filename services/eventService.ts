@@ -24,14 +24,13 @@ export const fetchEventDetail = async (name: string): Promise<EventDetail> => {
     return withCache(cacheKey, async () => {
         try {
             const prompt = `
-            SYSTEM OVERRIDE: POLI ARCHIVE V1 (LIVE WEB INTELLIGENCE).
-            EVENT: ${name}.
-            
+            POLI ARCHIVE — EVENT: ${name}.
+
             ${getLanguageInstruction()}
 
             **DIRECTIVES:**
-            1. **USE GOOGLE SEARCH**: Validate dates, casualty numbers, and specific details using real-time search.
-            2. **IMAGE**: Find a valid Wikimedia Commons or public domain URL for the event.
+            1. **KNOWLEDGE**: Use your comprehensive historical knowledge to provide detailed, accurate information about this event.
+            2. **IMAGE**: Provide a real Wikimedia Commons URL if you are confident it exists (e.g. https://upload.wikimedia.org/wikipedia/commons/[path]/[File.jpg]). If uncertain, leave imageUrl as empty string "".
             3. **TIMELINE**: Minute-by-minute or day-by-day breakdown of the event.
             4. **FORCES**: Exact troop numbers, equipment lists, and commanders for all sides.
             5. **CASUALTIES**: Precise breakdown of losses.

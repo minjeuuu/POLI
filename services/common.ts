@@ -1,13 +1,10 @@
 
-import { GoogleGenAI } from "@google/genai";
-import { generateWithOllama } from "./ollamaService";
-
-// Centralized API Client Initialization (Gemini kept for legacy compatibility only)
-const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
-
-export const ai = new GoogleGenAI({ apiKey: apiKey || 'placeholder' });
+import { generateWithClaude } from "./claudeService";
 
 export const GLOBAL_CACHE: Record<string, any> = {};
+
+/** Clear all cached AI responses — call this when the API key changes. */
+export const clearCache = () => { Object.keys(GLOBAL_CACHE).forEach(k => delete GLOBAL_CACHE[k]); };
 
 export const withCache = async <T>(key: string, fetcher: () => Promise<T>): Promise<T> => {
   if (GLOBAL_CACHE[key]) return GLOBAL_CACHE[key];
@@ -22,49 +19,17 @@ export const withCache = async <T>(key: string, fetcher: () => Promise<T>): Prom
 };
 
 /**
- * Robust wrapper for AI content generation with automatic retries.
- * Handles 503s, 429s, and network blips with exponential backoff + jitter.
- */
-export const generateWithRetry = async (params: any, retries = 3) => {
-    for (let i = 0; i <= retries; i++) {
-        try {
-            return await ai.models.generateContent(params);
-        } catch (e: any) {
-            const isLast = i === retries;
-            const msg = e.message || JSON.stringify(e);
-            console.warn(`Gemini generation failed (Attempt ${i + 1}/${retries + 1}):`, msg);
-
-            if (isLast) throw e;
-
-            // Exponential backoff: 1s, 2s, 4s... plus random jitter
-            const delay = 1000 * Math.pow(2, i) + (Math.random() * 1000);
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
-    throw new Error("Gemini generation failed after retries");
-};
-
-import { generateWithClaude } from "./claudeService";
-
-/**
- * High-Availability Wrapper — Priority chain: Claude → Ollama → empty JSON.
- * Claude is always the primary AI. Ollama (local) is the fallback.
- * Gemini is no longer in the chain.
+ * High-Availability Wrapper — Claude is the sole AI provider.
+ * All requests route through /api/ai/generate in the browser (key stays server-side)
+ * or call Anthropic directly on the server.
  */
 export const generateWithFallback = async (params: any, _fallbackModel?: string): Promise<{ text: string }> => {
     const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
 
-    // 1. Try Claude (primary)
     const claudeResponse = await generateWithClaude(prompt);
     if (claudeResponse) return { text: claudeResponse };
 
-    // 2. Fallback to Ollama (local)
-    console.warn("POLI: Claude unavailable or key missing — falling back to Ollama.");
-    const ollamaResponse = await generateWithOllama(prompt);
-    if (ollamaResponse) return { text: ollamaResponse };
-
-    // 3. All AI services unavailable
-    console.error("POLI: All AI services unavailable. Returning empty JSON.");
+    console.error("POLI: Claude unavailable. Check CLAUDE_API_KEY environment variable.");
     return { text: '{}' };
 };
 

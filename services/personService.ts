@@ -26,14 +26,13 @@ export const fetchPersonDetail = async (name: string): Promise<PersonDetail> => 
     return withCache(cacheKey, async () => {
         try {
             const prompt = `
-            SYSTEM OVERRIDE: POLI ARCHIVE V1 (LIVE WEB INTELLIGENCE).
-            SUBJECT: ${name}.
+            POLI ARCHIVE — SUBJECT: ${name}.
             
             ${getLanguageInstruction()}
 
             **DIRECTIVES:**
-            1. **USE GOOGLE SEARCH**: You MUST use the search tool to find the most current information (current office, recent actions) and valid image URLs.
-            2. **IMAGE**: Find a valid Wikimedia Commons or public domain URL for the person's portrait.
+            1. **KNOWLEDGE**: Use your comprehensive knowledge of this person to provide detailed, accurate information.
+            2. **IMAGE**: Provide a real Wikimedia Commons portrait URL if you are confident it exists (e.g. https://upload.wikimedia.org/wikipedia/commons/[path]/[File.jpg]). If uncertain, leave imageUrl as empty string "".
             3. **FULL ROSTER**: List **ALL** major offices held with exact years.
             4. **PSYCHOBIOGRAPHY**: Detailed analysis of their personality, leadership style, and ideological evolution.
             5. **NETWORK**: Exhaustive list of allies, rivals, mentors, and students.

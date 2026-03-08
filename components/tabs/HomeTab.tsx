@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { DailyContext, HighlightedEntity, SavedItem } from '../../types';
-import { ChevronLeft, ChevronRight, Bookmark, Archive, Trash2, MoreHorizontal, Sparkles, Shuffle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bookmark, Archive, Trash2, MoreHorizontal, Sparkles, Shuffle, WifiOff, Settings } from 'lucide-react';
 import HighlightDetailScreen from '../HighlightDetailScreen';
 import { COUNTRIES_DATA } from '../../data/countriesData';
 import { PERSONS_HIERARCHY } from '../../data/personsData';
@@ -20,6 +20,7 @@ import { SynthesisWidget } from '../home/SynthesisWidget';
 interface HomeTabProps {
   data: DailyContext | null;
   isLoading: boolean;
+  aiOnline: boolean;
   currentDate: Date;
   onDateChange: (date: Date) => void;
   onNavigate: (type: string, payload: any) => void;
@@ -39,11 +40,12 @@ const flattenPersons = (nodes: any[]): any[] => {
 
 const flattenTheories = () => THEORY_HIERARCHY.flatMap(cat => cat.items);
 
-const HomeTab: React.FC<HomeTabProps> = ({ 
-    data, 
-    isLoading, 
-    currentDate, 
-    onDateChange, 
+const HomeTab: React.FC<HomeTabProps> = ({
+    data,
+    isLoading,
+    aiOnline,
+    currentDate,
+    onDateChange,
     onNavigate,
     savedItems,
     onDeleteSaved,
@@ -233,42 +235,82 @@ const HomeTab: React.FC<HomeTabProps> = ({
 
   // Standard View
   return (
-    <div className="h-full overflow-y-auto bg-academic-bg dark:bg-stone-950 transition-colors p-3 sm:p-4 md:p-8">
+    <div className="h-full overflow-y-auto bg-academic-bg dark:bg-stone-950 transition-colors">
       {/* TOAST */}
-      <div 
-        className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[70] flex items-center gap-3 px-6 py-3 bg-academic-accent dark:bg-indigo-600 text-white rounded-full shadow-xl transition-all duration-500 ease-out pointer-events-none
+      <div
+        className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[70] flex items-center gap-3 px-6 py-3 bg-indigo-600 text-white rounded-full shadow-xl transition-all duration-500 ease-out pointer-events-none
         ${toast.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
       >
         <span className="text-[10px] font-bold uppercase tracking-widest">{toast.message}</span>
       </div>
 
-      <div className="flex items-center justify-between mb-6 px-1">
-          <button onClick={handlePrevDay} className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"><ChevronLeft className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
-          <div className="flex flex-col items-center cursor-pointer group" onClick={() => onDateChange(new Date())}>
-               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors">{isLoading ? 'Loading...' : 'Daily Briefing'}</span>
-               <h2 className="font-serif text-base sm:text-lg font-bold text-academic-text dark:text-stone-100">{currentDate.toLocaleDateString(undefined, {month:'long', day:'numeric'})}</h2>
-          </div>
-          <button onClick={handleNextDay} className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"><ChevronRight className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
+      {/* DATE NAV — sticky so it scrolls away with content on mobile */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <button onClick={handlePrevDay} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 active:scale-90 transition-all">
+          <ChevronLeft className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+        </button>
+        <div className="flex flex-col items-center cursor-pointer group" onClick={() => onDateChange(new Date())}>
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500 group-hover:text-indigo-500 transition-colors">
+            {isLoading ? '● Fetching from Claude…' : 'Daily Briefing'}
+          </span>
+          <h2 className="font-serif text-base sm:text-lg font-bold text-academic-text dark:text-stone-100 mt-0.5">
+            {currentDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}
+          </h2>
+        </div>
+        <button onClick={handleNextDay} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 active:scale-90 transition-all">
+          <ChevronRight className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+        </button>
       </div>
 
-      <div className="sticky top-0 bg-academic-bg dark:bg-stone-950 z-10 pt-2 pb-4 -mx-4 px-4 border-b border-stone-100 dark:border-stone-800 mb-6 flex gap-2 overflow-x-auto no-scrollbar backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 transition-all duration-300">
-          {['Today', 'Highlights', 'History', 'Saved'].map((tab) => (
-              <button key={tab} onClick={() => setSubTab(tab as any)} className={`px-5 py-2 text-xs font-bold uppercase tracking-widest rounded-full border transition-all duration-300
-              ${subTab === tab ? 'bg-academic-text dark:bg-stone-100 text-white dark:text-stone-900 border-academic-text dark:border-stone-100 shadow-md' : 'bg-transparent text-stone-400 dark:text-stone-500 border-transparent hover:bg-stone-100 dark:hover:bg-stone-800'}`}>{tab}</button>
-          ))}
+      {/* SUB-TABS */}
+      <div className="sticky top-0 z-10 bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-md border-b border-stone-100 dark:border-stone-800 px-4 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
+        {(['Today', 'Highlights', 'History', 'Saved'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setSubTab(tab)}
+            className={`flex-shrink-0 px-4 py-1.5 text-xs font-bold uppercase tracking-widest rounded-full transition-all duration-200 active:scale-95
+            ${subTab === tab
+              ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-sm'
+              : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'}`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
+
+      {/* CONTENT */}
+      {/* AI Offline Banner — shown after loading completes and AI isn't online */}
+      {!isLoading && !aiOnline && (
+        <div className="mx-3 sm:mx-4 md:mx-8 mt-4 flex items-start gap-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl px-4 py-3">
+          <WifiOff className="w-4 h-4 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-amber-800 dark:text-amber-300">AI offline — showing curated archive content</p>
+            <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">Enter your Claude API key to get live AI-generated briefings, quotes, and analysis.</p>
+          </div>
+          <button
+            onClick={() => onNavigate('profile', null)}
+            className="flex-shrink-0 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 transition-colors"
+          >
+            <Settings className="w-3 h-3" /> Configure
+          </button>
+        </div>
+      )}
 
       {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 h-96">
-               <LoadingScreen message="Synthesizing Global Archive..." />
-          </div>
+        <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 200px)' }}>
+          <LoadingScreen message="Synthesizing Global Archive with Claude…" />
+        </div>
       ) : (
-          <div className="min-h-[50vh] pb-24">
-            {subTab === 'Today' && renderToday()}
-            {subTab === 'History' && renderHistory()}
-            {subTab === 'Saved' && renderSaved()}
-            {subTab === 'Highlights' && <div className="text-center text-stone-400 dark:text-stone-600 py-10 font-serif italic">Curated highlights from global archives.</div>}
-          </div>
+        <div className="px-3 sm:px-4 md:px-8 pt-6 pb-28">
+          {subTab === 'Today' && renderToday()}
+          {subTab === 'History' && renderHistory()}
+          {subTab === 'Saved' && renderSaved()}
+          {subTab === 'Highlights' && (
+            <div className="text-center text-stone-400 dark:text-stone-600 py-16 font-serif italic">
+              Curated highlights from global archives.
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

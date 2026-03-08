@@ -8,7 +8,42 @@ import { InventoryRail } from './InventoryRail';
 import { HUD } from './HUD';
 import { playSFX } from '../../../services/soundService';
 import { ChevronRight, RefreshCcw, CheckCircle, BrainCircuit, X } from 'lucide-react';
-import Confetti from 'react-confetti';
+// Inline confetti — no external dependency
+const Confetti: React.FC<{ numberOfPieces?: number; recycle?: boolean }> = ({ numberOfPieces = 200 }) => {
+    const canvasRef = React.useRef<HTMLCanvasElement>(null);
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const pieces = Array.from({ length: numberOfPieces }, () => ({
+            x: Math.random() * canvas.width, y: Math.random() * -canvas.height,
+            w: 8 + Math.random() * 8, h: 4 + Math.random() * 4,
+            color: `hsl(${Math.random() * 360},90%,60%)`,
+            vx: (Math.random() - 0.5) * 3, vy: 2 + Math.random() * 3,
+            angle: Math.random() * Math.PI * 2, spin: (Math.random() - 0.5) * 0.2,
+        }));
+        let frame: number;
+        const draw = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            pieces.forEach(p => {
+                p.x += p.vx; p.y += p.vy; p.angle += p.spin;
+                if (p.y < canvas.height + 20) active = true;
+                ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                ctx.restore();
+            });
+            if (active) frame = requestAnimationFrame(draw);
+        };
+        frame = requestAnimationFrame(draw);
+        return () => cancelAnimationFrame(frame);
+    }, [numberOfPieces]);
+    return <canvas ref={canvasRef} style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9999 }} />;
+};
 
 export const PoliverseGame: React.FC = () => {
     // Game State

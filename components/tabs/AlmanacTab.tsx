@@ -18,26 +18,32 @@ const AlmanacTab: React.FC<AlmanacTabProps> = ({ onNavigate }) => {
   const [data, setData] = useState<AlmanacData | null>(null);
   const [calendar, setCalendar] = useState<PoliticalCalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [activeView, setActiveView] = useState<'Day' | 'Calendar'>('Day');
-  
+
   // Drill Down
   const [selectedEra, setSelectedEra] = useState<string | null>(null); // For detail screen reuse
-  
+
   // Fetch Data
   useEffect(() => {
     let mounted = true;
     const load = async () => {
       setLoading(true);
-      
-      const [almanac, cal] = await Promise.all([
-          fetchDailyAlmanac(currentDate),
-          fetchUpcomingCalendar()
-      ]);
-      
-      if (mounted) {
-        setData(almanac);
-        setCalendar(cal);
-        setLoading(false);
+      setLoadError(false);
+      try {
+        const [almanac, cal] = await Promise.all([
+            fetchDailyAlmanac(currentDate),
+            fetchUpcomingCalendar()
+        ]);
+        if (mounted) {
+          setData(almanac);
+          setCalendar(cal);
+        }
+      } catch (e) {
+        console.error('AlmanacTab load error:', e);
+        if (mounted) setLoadError(true);
+      } finally {
+        if (mounted) setLoading(false);
       }
     };
     load();
@@ -68,25 +74,36 @@ const AlmanacTab: React.FC<AlmanacTabProps> = ({ onNavigate }) => {
 
   if (loading) return <div className="h-full bg-academic-bg dark:bg-stone-950"><LoadingScreen message="Accessing Global Chronos..." /></div>;
 
+  if (loadError || !data) return (
+    <div className="h-full flex flex-col items-center justify-center bg-academic-bg dark:bg-stone-950 gap-4 px-8 text-center">
+      <Calendar className="w-12 h-12 text-rose-400 opacity-60" />
+      <h3 className="font-serif text-xl font-bold text-stone-700 dark:text-stone-300">Almanac Unavailable</h3>
+      <p className="text-sm text-stone-500 dark:text-stone-500 max-w-xs">Could not load almanac data. This usually means the Claude AI key is missing or invalid. Configure it in <strong>Settings → Advanced / Dev</strong>.</p>
+      <button onClick={() => setCurrentDate(new Date(currentDate))} className="px-5 py-2 bg-rose-500 text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-rose-600 transition-colors">
+        Retry
+      </button>
+    </div>
+  );
+
   return (
     <>
     <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 overflow-hidden animate-in fade-in">
         
         {/* HEADER */}
-        <div className="flex-none p-6 border-b border-academic-line dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm sticky top-0 z-20">
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-rose-500 text-white rounded-lg shadow-md">
-                        <Calendar className="w-6 h-6" />
+        <div className="flex-none px-4 py-3 md:p-6 border-b border-academic-line dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm sticky top-0 z-20">
+            <div className="flex justify-between items-center mb-3 md:mb-6">
+                <div className="flex items-center gap-2 md:gap-3">
+                    <div className="p-1.5 md:p-2 bg-rose-500 text-white rounded-lg shadow-md">
+                        <Calendar className="w-5 h-5 md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-serif font-bold text-academic-text dark:text-stone-100">Political Almanac</h1>
-                        <p className="text-xs font-mono text-stone-500 uppercase tracking-widest">The Living Record</p>
+                        <h1 className="text-lg md:text-2xl font-serif font-bold text-academic-text dark:text-stone-100">Political Almanac</h1>
+                        <p className="text-[10px] md:text-xs font-mono text-stone-500 uppercase tracking-widest hidden sm:block">The Living Record</p>
                     </div>
                 </div>
                 <div className="flex bg-stone-100 dark:bg-stone-800 p-1 rounded-lg">
-                    <button onClick={() => setActiveView('Day')} className={`px-4 py-1.5 text-xs font-bold uppercase rounded-md transition-colors ${activeView === 'Day' ? 'bg-white dark:bg-stone-700 shadow-sm text-academic-accent dark:text-indigo-400' : 'text-stone-400'}`}>Day View</button>
-                    <button onClick={() => setActiveView('Calendar')} className={`px-4 py-1.5 text-xs font-bold uppercase rounded-md transition-colors ${activeView === 'Calendar' ? 'bg-white dark:bg-stone-700 shadow-sm text-academic-accent dark:text-indigo-400' : 'text-stone-400'}`}>Upcoming</button>
+                    <button onClick={() => setActiveView('Day')} className={`px-2 md:px-4 py-1.5 text-xs font-bold uppercase rounded-md transition-colors ${activeView === 'Day' ? 'bg-white dark:bg-stone-700 shadow-sm text-academic-accent dark:text-indigo-400' : 'text-stone-400'}`}>Day</button>
+                    <button onClick={() => setActiveView('Calendar')} className={`px-2 md:px-4 py-1.5 text-xs font-bold uppercase rounded-md transition-colors ${activeView === 'Calendar' ? 'bg-white dark:bg-stone-700 shadow-sm text-academic-accent dark:text-indigo-400' : 'text-stone-400'}`}>Upcoming</button>
                 </div>
             </div>
 
@@ -111,7 +128,7 @@ const AlmanacTab: React.FC<AlmanacTabProps> = ({ onNavigate }) => {
         </div>
 
         {/* CONTENT */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth pb-32">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth pb-28">
             
             {activeView === 'Day' && data ? (
                 <div className="max-w-5xl mx-auto space-y-12">

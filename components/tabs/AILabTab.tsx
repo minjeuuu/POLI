@@ -18,37 +18,64 @@ const AILabTab: React.FC = () => {
 
     const tools = [
         { id: 'claude-chat', label: 'Claude Chat', icon: Bot, desc: 'Streaming political analysis with Claude', badge: 'Claude' },
-        { id: 'think', label: 'Deep Thinker', icon: Brain, desc: 'Complex reasoning & analysis', badge: 'Gemini' },
-        { id: 'search', label: 'Grounded Search', icon: Search, desc: 'Google Search grounded AI', badge: 'Gemini' },
-        { id: 'veo', label: 'Veo Studio', icon: Video, desc: 'Generate videos from text & images', badge: 'Gemini' },
-        { id: 'nano', label: 'Nano Banana', icon: Wand2, desc: 'Edit images with natural language', badge: 'Gemini' },
-        { id: 'pro-image', label: 'Pro Image Lab', icon: ImageIcon, desc: 'High-fidelity image generation', badge: 'Gemini' },
-        { id: 'live', label: 'Live Debate', icon: Mic, desc: 'Real-time voice conversation', badge: 'Gemini' },
-        { id: 'analyst', label: 'Media Analyst', icon: ScanEye, desc: 'Analyze images & videos', badge: 'Gemini' },
-        { id: 'transcribe', label: 'Transcriber', icon: Mic, desc: 'Audio to text', badge: 'Gemini' },
-        { id: 'tts', label: 'TTS Studio', icon: FileAudio, desc: 'Text-to-Speech synthesis', badge: 'Gemini' },
-        { id: 'maps', label: 'Grounded Maps', icon: MapIcon, desc: 'Location-aware AI', badge: 'Gemini' },
+        { id: 'think', label: 'Deep Thinker', icon: Brain, desc: 'Complex reasoning & analysis', badge: 'Claude' },
+        { id: 'search', label: 'Knowledge Search', icon: Search, desc: 'Claude-powered knowledge retrieval', badge: 'Claude' },
+        { id: 'veo', label: 'Veo Studio', icon: Video, desc: 'Generate videos from text & images', badge: 'Claude' },
+        { id: 'nano', label: 'Image Editor', icon: Wand2, desc: 'Edit images with natural language', badge: 'Claude' },
+        { id: 'pro-image', label: 'Image Lab', icon: ImageIcon, desc: 'AI image generation', badge: 'Claude' },
+        { id: 'live', label: 'Live Debate', icon: Mic, desc: 'Real-time voice conversation', badge: 'Claude' },
+        { id: 'analyst', label: 'Media Analyst', icon: ScanEye, desc: 'Analyze images with Claude vision', badge: 'Claude' },
+        { id: 'transcribe', label: 'Transcriber', icon: Mic, desc: 'Audio to text', badge: 'Claude' },
+        { id: 'tts', label: 'TTS Studio', icon: FileAudio, desc: 'Text-to-Speech synthesis', badge: 'Claude' },
+        { id: 'maps', label: 'Geo Intelligence', icon: MapIcon, desc: 'Geographic & political AI', badge: 'Claude' },
     ];
 
-    const badgeColor = (badge: string) =>
-        badge === 'Claude' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+    const badgeColor = (_badge: string) =>
+        'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
+
+    const activeTool_ = tools.find(t => t.id === activeTool) || tools[0];
 
     return (
         <div className="h-full flex flex-col bg-stone-50 dark:bg-stone-950 overflow-hidden">
             {/* Header */}
-            <div className="p-6 border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 flex items-center justify-between">
+            <div className="px-4 pt-4 pb-3 md:px-6 md:pt-6 md:pb-4 border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 flex items-center justify-between flex-none">
                 <div>
-                    <h1 className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
-                        <Sparkles className="w-6 h-6 text-indigo-500" />
+                    <h1 className="text-xl md:text-2xl font-serif font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-indigo-500" />
                         AI Lab
                     </h1>
-                    <p className="text-stone-500 dark:text-stone-400 text-sm">Powered by Claude (Anthropic) and Gemini (Google DeepMind)</p>
+                    <p className="text-stone-500 dark:text-stone-400 text-xs md:text-sm">
+                        <span className="md:hidden">{activeTool_.label} · </span>
+                        Powered by Claude (Anthropic)
+                    </p>
                 </div>
             </div>
 
-            <div className="flex flex-1 overflow-hidden">
-                {/* Sidebar */}
-                <div className="w-64 bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-800 overflow-y-auto hidden md:block">
+            {/* Mobile tool picker — horizontal scrolling pills */}
+            <div className="md:hidden flex-none bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800">
+                <div className="flex gap-2 overflow-x-auto no-scrollbar px-4 py-2.5">
+                    {tools.map((tool) => {
+                        const isActive = activeTool === tool.id;
+                        return (
+                            <button
+                                key={tool.id}
+                                onClick={() => setActiveTool(tool.id)}
+                                className={`flex-none flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all active:scale-95
+                                    ${isActive
+                                        ? 'bg-indigo-600 text-white shadow-sm'
+                                        : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'}`}
+                            >
+                                <tool.icon className="w-3.5 h-3.5" />
+                                {tool.label}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            <div className="flex flex-1 overflow-hidden min-h-0">
+                {/* Sidebar — desktop only */}
+                <div className="w-64 bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-800 overflow-y-auto hidden md:block flex-none">
                     <div className="p-4 space-y-1">
                         {tools.map((tool) => (
                             <button
@@ -73,19 +100,23 @@ const AILabTab: React.FC = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 overflow-y-auto p-6">
-                    <div className="max-w-4xl mx-auto">
+                <div className="flex-1 overflow-y-auto min-h-0">
+                    <div className="max-w-4xl mx-auto h-full flex flex-col">
                         {activeTool === 'claude-chat' && <ClaudeChat />}
-                        {activeTool === 'veo' && <VeoStudio />}
-                        {activeTool === 'nano' && <NanoBanana />}
-                        {activeTool === 'pro-image' && <ProImageLab />}
-                        {activeTool === 'live' && <LiveDebate />}
-                        {activeTool === 'think' && <DeepThinker />}
-                        {activeTool === 'analyst' && <MediaAnalyst />}
-                        {activeTool === 'transcribe' && <Transcriber />}
-                        {activeTool === 'tts' && <TTSStudio />}
-                        {activeTool === 'search' && <GroundedSearch />}
-                        {activeTool === 'maps' && <GroundedMaps />}
+                        {activeTool !== 'claude-chat' && (
+                            <div className="p-4 md:p-6">
+                                {activeTool === 'veo' && <VeoStudio />}
+                                {activeTool === 'nano' && <NanoBanana />}
+                                {activeTool === 'pro-image' && <ProImageLab />}
+                                {activeTool === 'live' && <LiveDebate />}
+                                {activeTool === 'think' && <DeepThinker />}
+                                {activeTool === 'analyst' && <MediaAnalyst />}
+                                {activeTool === 'transcribe' && <Transcriber />}
+                                {activeTool === 'tts' && <TTSStudio />}
+                                {activeTool === 'search' && <GroundedSearch />}
+                                {activeTool === 'maps' && <GroundedMaps />}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -137,7 +168,7 @@ Use advanced political science terminology where appropriate.`;
     };
 
     return (
-        <div className="flex flex-col h-[600px] bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden shadow-sm">
+        <div className="flex flex-col flex-1 min-h-0 bg-white dark:bg-stone-900 md:rounded-2xl md:border border-stone-200 dark:border-stone-800 overflow-hidden md:shadow-sm md:m-6">
             <div className="p-4 border-b border-stone-200 dark:border-stone-800 flex items-center gap-3">
                 <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
                     <Bot className="w-4 h-4 text-orange-600 dark:text-orange-400" />
@@ -348,7 +379,7 @@ const ProImageLab = () => {
 
     const handleGenerate = async () => {
         setLoading(true);
-        const res = await generateImage(prompt, 'gemini-3.1-flash-image-preview', { aspectRatio, imageSize: size });
+        const res = await generateImage(prompt, undefined, { aspectRatio, imageSize: size });
         setResult(res);
         setLoading(false);
     };

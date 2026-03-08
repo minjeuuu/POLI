@@ -1,8 +1,9 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { COUNTRIES_DATA } from '../../data/countriesData';
-import { 
-  Search, Globe, Clock, MapPin, MoreHorizontal, Bookmark, 
+import { getFlagUrl } from '../../utils/countryFlags';
+import {
+  Search, Globe, Clock, MapPin, MoreHorizontal, Bookmark,
   ArrowRightLeft, ArrowDownAZ, ArrowUpAZ, Shuffle, LayoutGrid, List, Table as TableIcon, Flag, Layers, ArrowUp
 } from 'lucide-react';
 
@@ -158,13 +159,43 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
       }
   };
   
-  const renderIcon = (country: any, size: 'sm' | 'md' | 'lg' = 'md') => {
-      const Icon = Flag;
-      const iconSize = size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-12 h-12' : 'w-8 h-8';
+  const renderFlag = (country: any, size: 'sm' | 'md' | 'lg' = 'md') => {
+      const flagUrl = getFlagUrl(country.name, size === 'lg' ? 160 : size === 'md' ? 80 : 40);
+      const initial = (country.name || '?').charAt(0);
+      const containerBase = 'w-full h-full flex items-center justify-center overflow-hidden';
+
+      if (flagUrl) {
+          return (
+              <div className={containerBase}>
+                  <img
+                      src={flagUrl}
+                      alt={`Flag of ${country.name}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) parent.setAttribute('data-fallback', 'true');
+                      }}
+                  />
+              </div>
+          );
+      }
+      // Fallback: styled initial
+      const regionColors: Record<string, string> = {
+          Africa: 'from-amber-500 to-yellow-600',
+          Americas: 'from-blue-500 to-indigo-600',
+          Asia: 'from-red-500 to-rose-600',
+          Europe: 'from-indigo-500 to-blue-700',
+          Oceania: 'from-cyan-500 to-teal-600',
+      };
+      const gradient = regionColors[country.region] || 'from-stone-400 to-stone-600';
       return (
-        <div className="w-full h-full flex items-center justify-center bg-stone-100 dark:bg-stone-800 group-hover:bg-stone-200 dark:group-hover:bg-stone-700 transition-colors">
-            <Icon className={`${iconSize} text-stone-300 dark:text-stone-600 opacity-80 group-hover:scale-110 transition-transform duration-500`} />
-        </div>
+          <div className={`${containerBase} bg-gradient-to-br ${gradient}`}>
+              <span className={`font-serif font-bold text-white select-none drop-shadow ${size === 'lg' ? 'text-4xl' : size === 'md' ? 'text-2xl' : 'text-base'}`}>
+                  {initial}
+              </span>
+          </div>
       );
   };
 
@@ -209,7 +240,7 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
         onClick={() => onNavigate('Country', country.name)}
       >
           <div className="h-32 w-full relative border-b border-stone-100 dark:border-stone-800">
-              {renderIcon(country, 'lg')}
+              {renderFlag(country, 'lg')}
               <button 
                 onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === country.name ? null : country.name); }}
                 className="absolute top-2 right-2 p-1.5 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 transition-colors z-20 opacity-0 group-hover:opacity-100"
@@ -240,7 +271,7 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
         className="group flex items-center gap-4 p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-academic-accent dark:hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer relative active:scale-[0.99]"
       >
           <div className="w-16 h-10 rounded-lg border border-stone-200 dark:border-stone-700 overflow-hidden flex-shrink-0 shadow-sm">
-              {renderIcon(country, 'sm')}
+              {renderFlag(country, 'sm')}
           </div>
           
           <div className="flex-1 min-w-0">
@@ -266,18 +297,21 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
   );
 
   const renderTableItem = (country: any, i: number) => (
-      <div 
-        key={`${country.name}-${i}`} 
+      <div
+        key={`${country.name}-${i}`}
         onClick={() => onNavigate('Country', country.name)}
-        className="group flex items-center p-3 hover:bg-stone-50 dark:hover:bg-stone-800/50 border-b border-stone-100 dark:border-stone-800 last:border-0 cursor-pointer transition-colors text-xs"
+        className="group flex items-center gap-3 px-3 py-2.5 hover:bg-stone-50 dark:hover:bg-stone-800/50 border-b border-stone-100 dark:border-stone-800 last:border-0 cursor-pointer transition-colors text-xs"
       >
-          <div className="w-8 flex-shrink-0 text-center font-mono text-stone-300 dark:text-stone-600">{i + 1}</div>
-          <div className="flex-1 font-serif font-bold text-academic-text dark:text-stone-200 group-hover:text-academic-accent dark:group-hover:text-indigo-400 pr-4 pl-2">{country.name}</div>
-          <div className="w-32 hidden sm:block text-stone-500 dark:text-stone-400 flex items-center gap-2">
-             <div className={`w-1.5 h-1.5 rounded-full ${getStatusColor(country.status)}`}></div>
-             {country.status}
+          <div className="w-6 flex-shrink-0 text-center font-mono text-stone-300 dark:text-stone-600 text-[10px]">{i + 1}</div>
+          <div className="w-10 h-6 rounded overflow-hidden flex-shrink-0 border border-stone-200 dark:border-stone-700 shadow-sm">
+              {renderFlag(country, 'sm')}
           </div>
-          <div className="w-24 hidden md:block text-stone-400 dark:text-stone-500 text-right font-mono">{country.region}</div>
+          <div className="flex-1 font-serif font-bold text-academic-text dark:text-stone-200 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 truncate">{country.name}</div>
+          <div className="hidden sm:flex items-center gap-1.5 w-28 flex-shrink-0 text-stone-500 dark:text-stone-400">
+              <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${getStatusColor(country.status)}`} />
+              <span className="truncate">{country.status}</span>
+          </div>
+          <div className="hidden md:block w-20 text-stone-400 dark:text-stone-500 text-right font-mono flex-shrink-0">{country.region}</div>
       </div>
   );
 
@@ -398,7 +432,7 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
                                             <span className="text-3xl font-serif font-bold text-academic-gold">{letter}</span>
                                         </div>
                                         <div className={`
-                                            ${viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'flex flex-col gap-2'}
+                                            ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4' : 'flex flex-col gap-2'}
                                         `}>
                                             {groupedCountries[letter].map((country, i) => (
                                                 viewMode === 'grid' ? renderGridItem(country, i) : 
@@ -412,7 +446,7 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
                         ) : (
                             // FLAT VIEW
                             <div className={`
-                                ${viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'flex flex-col gap-2'}
+                                ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4' : 'flex flex-col gap-2'}
                             `}>
                                 {filteredList.map((country, i) => (
                                     viewMode === 'grid' ? renderGridItem(country, i) : 

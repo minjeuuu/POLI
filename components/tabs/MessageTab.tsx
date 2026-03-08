@@ -4,7 +4,6 @@ import { Mail, Search, Edit3, Paperclip, Send, Phone, Video, Info, CheckCheck, X
 import { ChatConversation, ChatMessage } from '../../types';
 import { playSFX } from '../../services/soundService';
 import { db } from '../../services/database';
-import socket from '../../services/socket';
 
 const ICE_SERVERS = {
     iceServers: [
@@ -112,10 +111,8 @@ const MessageTab: React.FC<MessageTabProps> = ({ onNavigate, user }) => {
     const createPeerConnection = useCallback(() => {
         const pc = new RTCPeerConnection(ICE_SERVERS);
 
-        pc.onicecandidate = (e) => {
-            if (e.candidate && activeChatIdRef.current) {
-                socket.emit('call-ice-candidate', { chatId: activeChatIdRef.current, candidate: e.candidate });
-            }
+        pc.onicecandidate = (_e) => {
+            // WebRTC ICE signaling requires WebSockets — not supported on Vercel serverless.
         };
 
         pc.ontrack = (e) => {
@@ -138,84 +135,38 @@ const MessageTab: React.FC<MessageTabProps> = ({ onNavigate, user }) => {
         return pc;
     }, [cleanupCall, startCallTimer]);
 
+    // Poll for new messages every 3 seconds (replaces Socket.IO on Vercel)
     useEffect(() => {
-        socket.on('receive_message', (msg: any) => {
-            if (msg.senderId === user?.id) return;
-            setConversations(prev => prev.map(c => {
-                if (c.id === msg.chatId) {
-                    return {
-                        ...c,
-                        messages: [...(c.messages || []), msg],
-                        lastMessage: msg.text,
-                        lastTime: 'Just now',
-                        unread: c.id !== activeChatIdRef.current ? (c.unread || 0) + 1 : 0
-                    };
-                }
-                return c;
-            }));
-            playSFX('message');
-        });
-
-        socket.on('user_typing', (data: { chatId: string; from: string }) => {
-            if (data.chatId === activeChatIdRef.current) {
-                setIsTyping(true);
-                setTimeout(() => setIsTyping(false), 2500);
-            }
-        });
-
-        socket.on('call-offer', (data: IncomingCallData) => {
-            setIncomingCall(data);
-            playSFX('notification');
-        });
-
-        socket.on('call-answer', async (data: { answer: RTCSessionDescriptionInit }) => {
-            if (peerConnectionRef.current) {
-                try {
-                    await peerConnectionRef.current.setRemoteDescription(data.answer);
-                    setCallState('active');
-                    startCallTimer();
-                } catch (err) {
-                    console.error('Error setting remote description:', err);
-                }
-            }
-        });
-
-        socket.on('call-ice-candidate', async (data: { candidate: RTCIceCandidateInit }) => {
-            if (peerConnectionRef.current && data.candidate) {
-                try {
-                    await peerConnectionRef.current.addIceCandidate(data.candidate);
-                } catch (err) {
-                    console.error('Error adding ICE candidate:', err);
-                }
-            }
-        });
-
-        socket.on('call-ended', () => cleanupCall());
-        socket.on('call-declined', () => {
-            cleanupCall();
-            showToast('Call declined');
-        });
-
-        return () => {
-            socket.off('receive_message');
-            socket.off('user_typing');
-            socket.off('call-offer');
-            socket.off('call-answer');
-            socket.off('call-ice-candidate');
-            socket.off('call-ended');
-            socket.off('call-declined');
-        };
-    }, [user, cleanupCall, startCallTimer]);
+        const poll = setInterval(async () => {
+            const chatId = activeChatIdRef.current;
+            if (!chatId) return;
+            try {
+                const res = await fetch(`/api/messages/${chatId}`);
+                const msgs = await res.json();
+                if (!Array.isArray(msgs)) return;
+                setConversations(prev => prev.map(c => {
+                    if (c.id !== chatId) return c;
+                    const existingIds = new Set((c.messages || []).map((m: any) => m.id));
+                    const newMsgs = msgs.filter((m: any) => !existingIds.has(m.id) && m.senderId !== (user?.id || 'guest'));
+                    if (!newMsgs.length) return c;
+                    newMsgs.forEach(() => playSFX('message'));
+                    return { ...c, messages: [...(c.messages || []), ...newMsgs], lastMessage: newMsgs[newMsgs.length - 1].text, lastTime: 'Just now' };
+                }));
+            } catch { /* ignore */ }
+        }, 3000);
+        return () => clearInterval(poll);
+    }, [user]);
 
     useEffect(() => {
         if (activeChatId) {
-            socket.emit('join_chat', activeChatId);
             fetch(`/api/messages/${activeChatId}`)
                 .then(res => res.json())
                 .then(msgs => {
-                    setConversations(prev => prev.map(c =>
-                        c.id === activeChatId ? { ...c, messages: msgs } : c
-                    ));
+                    if (Array.isArray(msgs)) {
+                        setConversations(prev => prev.map(c =>
+                            c.id === activeChatId ? { ...c, messages: msgs } : c
+                        ));
+                    }
                 }).catch(() => {});
         }
     }, [activeChatId]);
@@ -235,14 +186,11 @@ const MessageTab: React.FC<MessageTabProps> = ({ onNavigate, user }) => {
             stream.getTracks().forEach(track => pc.addTrack(track, stream));
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-            socket.emit('call-offer', {
-                chatId: activeChatId,
-                offer,
-                type,
-                from: user?.displayName || 'User'
-            });
+            // WebRTC call signaling requires WebSockets — not available on Vercel serverless.
+            showToast('Live calls require a WebSocket server. Not available on Vercel.');
+            cleanupCall();
             setCallType(type);
-            setCallState('calling');
+            setCallState('idle');
             playSFX('click');
         } catch (err) {
             console.error('Could not start call:', err);
@@ -266,7 +214,7 @@ const MessageTab: React.FC<MessageTabProps> = ({ onNavigate, user }) => {
             await pc.setRemoteDescription(incomingCall.offer);
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
-            socket.emit('call-answer', { chatId: incomingCall.chatId, answer });
+            // call-answer would go here if WebSockets were available
             setCallType(incomingCall.type);
             setCallState('active');
             startCallTimer();
@@ -280,12 +228,10 @@ const MessageTab: React.FC<MessageTabProps> = ({ onNavigate, user }) => {
 
     const handleDeclineCall = () => {
         if (!incomingCall) return;
-        socket.emit('call-declined', { chatId: incomingCall.chatId });
         setIncomingCall(null);
     };
 
     const handleEndCall = () => {
-        if (activeChatId) socket.emit('call-ended', { chatId: activeChatId });
         cleanupCall();
         playSFX('click');
     };
@@ -320,14 +266,12 @@ const MessageTab: React.FC<MessageTabProps> = ({ onNavigate, user }) => {
         ));
         setInputText('');
         playSFX('send');
-        socket.emit('send_message', newMessage);
+        fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newMessage) }).catch(() => {});
     };
 
     const handleTypingInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputText(e.target.value);
-        if (activeChatId) {
-            socket.emit('typing', { chatId: activeChatId, from: user?.displayName || 'User' });
-        }
+        // Typing indicator removed (requires WebSockets)
         if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     };
 
@@ -353,7 +297,7 @@ const MessageTab: React.FC<MessageTabProps> = ({ onNavigate, user }) => {
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isMe: true
             };
-            socket.emit('send_message', newMessage);
+            fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newMessage) }).catch(() => {});
             setConversations(prev => prev.map(c =>
                 c.id === activeChatId
                     ? { ...c, messages: [...(c.messages || []), newMessage], lastMessage: 'Sent a file', lastTime: 'Just now' }

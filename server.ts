@@ -6,6 +6,21 @@ import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
 
+// Load .env file if present (tsx doesn't auto-load dotenv)
+const envPath = path.join(process.cwd(), '.env');
+if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf-8');
+    for (const line of envContent.split('\n')) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const eq = trimmed.indexOf('=');
+        if (eq === -1) continue;
+        const key = trimmed.slice(0, eq).trim();
+        const value = trimmed.slice(eq + 1).trim().replace(/^['"]|['"]$/g, '');
+        if (key && !(key in process.env)) process.env[key] = value;
+    }
+}
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -168,15 +183,17 @@ app.get('/api/health', (req, res) => {
 // --- CLAUDE AI PROXY ---
 // Keeps the API key server-side (never exposed in the browser bundle).
 // Browser calls POST /api/ai/generate instead of Anthropic directly.
-const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || process.env.VITE_CLAUDE_API_KEY || '';
+// Read per-request so the value is always current (supports hot env changes).
+const getClaudeApiKey = () => process.env.CLAUDE_API_KEY || process.env.VITE_CLAUDE_API_KEY || '';
 const CLAUDE_BASE_URL = 'https://api.anthropic.com/v1/messages';
 const CLAUDE_MODEL = 'claude-sonnet-4-6';
 const CLAUDE_MAX_TOKENS = 16000;
 const CLAUDE_SYSTEM = "You are POLI, an expert encyclopedic political science, geopolitics, history, culture, and global knowledge AI. Provide exhaustive, accurate, real-world data. When asked for JSON, return ONLY valid JSON — no markdown fences, no preamble, no commentary. Start directly with { or [. Fill every field with specific, detailed information.";
 
 app.post('/api/ai/generate', async (req: any, res: any) => {
+    const CLAUDE_API_KEY = (req.headers['x-user-api-key'] as string) || getClaudeApiKey();
     if (!CLAUDE_API_KEY) {
-        return res.status(503).json({ error: 'Claude API key not configured on server.' });
+        return res.status(503).json({ error: 'Claude API key not configured. Enter it in Settings or set CLAUDE_API_KEY env var.' });
     }
     const { prompt, system, maxTokens } = req.body || {};
     if (!prompt) return res.status(400).json({ error: 'prompt is required' });
@@ -211,8 +228,9 @@ app.post('/api/ai/generate', async (req: any, res: any) => {
 
 // Streaming variant — returns Server-Sent Events from Claude
 app.post('/api/ai/stream', async (req: any, res: any) => {
+    const CLAUDE_API_KEY = (req.headers['x-user-api-key'] as string) || getClaudeApiKey();
     if (!CLAUDE_API_KEY) {
-        res.status(503).json({ error: 'Claude API key not configured on server.' });
+        res.status(503).json({ error: 'Claude API key not configured.' });
         return;
     }
     const { prompt, system } = req.body || {};

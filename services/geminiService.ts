@@ -1,5 +1,3 @@
-
-import { Type, ThinkingLevel, Modality } from "@google/genai";
 import {
   PoliticalRecord,
   DailyContext,
@@ -14,14 +12,13 @@ import {
   BookStructure,
   Flashcard,
   QuizQuestion,
-  ComparisonResult,
   ExchangeRate,
   HighlightDetail,
   HighlightedEntity
 } from "../types";
 import { FALLBACK_DAILY_CONTEXT, FALLBACK_DISCIPLINE_DETAIL } from "../data/homeData";
-import { setAppLanguage, getLanguageInstruction, cleanJson, safeParse, withCache, generateWithRetry, generateWithFallback, ai } from "./common";
-import { streamWithClaude } from "./claudeService";
+import { getLanguageInstruction, safeParse, withCache, generateWithFallback } from "./common";
+import { generateWithClaude, streamWithClaude } from "./claudeService";
 
 // --- API Functions ---
 
@@ -258,310 +255,94 @@ Return JSON: { "history": string, "economics": string }. ${getLanguageInstructio
     });
 };
 
+// --- Advanced AI Capabilities (Claude-powered) ---
 
-declare global {
-    interface Window {
-        aistudio: any;
-    }
-}
-
-// --- Advanced AI Capabilities ---
-
-export const generateImage = async (prompt: string, model: 'gemini-3.1-flash-image-preview' | 'gemini-2.5-flash-image' = 'gemini-2.5-flash-image', options: any = {}): Promise<string | null> => {
-    try {
-        const config: any = {};
-        if (model === 'gemini-3.1-flash-image-preview') {
-             config.imageConfig = {
-                aspectRatio: options.aspectRatio || "1:1",
-                imageSize: options.imageSize || "1K"
-             };
-        }
-
-        const response = await ai.models.generateContent({
-            model: model,
-            contents: {
-                parts: [{ text: prompt }]
-            },
-            config: config
-        });
-
-        for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData) {
-                return `data:image/png;base64,${part.inlineData.data}`;
-            }
-        }
-        return null;
-    } catch (e) {
-        console.error("Image generation failed:", e);
-        return null;
-    }
+/** Image generation is not supported by Claude. */
+export const generateImage = async (_prompt: string, _model?: string, _options?: any): Promise<string | null> => {
+    console.warn("Image generation is not available — Claude does not support image generation.");
+    return null;
 };
 
-export const editImage = async (base64Image: string, prompt: string): Promise<string | null> => {
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: {
-                parts: [
-                    {
-                        inlineData: {
-                            data: base64Image.split(',')[1],
-                            mimeType: "image/png"
-                        }
-                    },
-                    { text: prompt }
-                ]
-            }
-        });
-
-        for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData) {
-                return `data:image/png;base64,${part.inlineData.data}`;
-            }
-        }
-        return null;
-    } catch (e) {
-        console.error("Image editing failed:", e);
-        return null;
-    }
+/** Image editing is not supported by Claude. */
+export const editImage = async (_base64Image: string, _prompt: string): Promise<string | null> => {
+    console.warn("Image editing is not available — Claude does not support image generation.");
+    return null;
 };
 
-export const generateVideo = async (prompt: string, aspectRatio: '16:9' | '9:16' = '16:9', image?: string): Promise<string | null> => {
-    try {
-        // Check for API key selection for Veo
-        if (window.aistudio && !await window.aistudio.hasSelectedApiKey()) {
-            await window.aistudio.openSelectKey();
-            // Re-check or just proceed assuming they did it
-        }
-
-        const payload: any = {
-            model: 'veo-3.1-fast-generate-preview',
-            prompt: prompt,
-            config: {
-                numberOfVideos: 1,
-                resolution: '720p',
-                aspectRatio: aspectRatio
-            }
-        };
-
-        if (image) {
-            payload.image = {
-                imageBytes: image.split(',')[1],
-                mimeType: 'image/png'
-            };
-        }
-
-        let operation = await ai.models.generateVideos(payload);
-
-        // Poll for completion
-        while (!operation.done) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            operation = await ai.operations.getVideosOperation({ operation: operation });
-        }
-
-        const videoUri = operation.response?.generatedVideos?.[0]?.video?.uri;
-        if (!videoUri) return null;
-
-        // Fetch the video content
-        const apiKey = process.env.GEMINI_API_KEY;
-        const videoResponse = await fetch(videoUri, {
-            headers: { 'x-goog-api-key': apiKey || '' }
-        });
-        
-        const blob = await videoResponse.blob();
-        return URL.createObjectURL(blob);
-
-    } catch (e) {
-        console.error("Video generation failed:", e);
-        return null;
-    }
+/** Video generation is not supported by Claude. */
+export const generateVideo = async (_prompt: string, _aspectRatio?: string, _image?: string): Promise<string | null> => {
+    console.warn("Video generation is not available — Claude does not support video generation.");
+    return null;
 };
 
-export const generateSpeech = async (text: string, voice: string = 'Kore'): Promise<string | null> => {
-    try {
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-preview-tts",
-            contents: [{ parts: [{ text }] }],
-            config: {
-                responseModalities: [Modality.AUDIO],
-                speechConfig: {
-                    voiceConfig: {
-                        prebuiltVoiceConfig: { voiceName: voice },
-                    },
-                },
-            },
-        });
-
-        const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-        if (base64Audio) {
-            return `data:audio/mp3;base64,${base64Audio}`;
-        }
-        return null;
-    } catch (e) {
-        console.error("TTS failed:", e);
-        return null;
-    }
+/** Text-to-speech via the browser Web Speech API. */
+export const generateSpeech = async (text: string, _voice?: string): Promise<string | null> => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return null;
+    return `__tts__:${text}`;
 };
 
+/** Analyze an image using Claude vision via the server proxy. */
 export const analyzeImage = async (base64Image: string, prompt: string): Promise<string> => {
     try {
-        const response = await generateWithRetry({
-            model: 'gemini-3.1-pro-preview',
-            contents: {
-                parts: [
-                    {
-                        inlineData: {
-                            data: base64Image.split(',')[1],
-                            mimeType: "image/png" // Assuming PNG for simplicity, could detect
-                        }
-                    },
-                    { text: prompt }
-                ]
-            }
+        const imageData = base64Image.split(',')[1] || base64Image;
+        const mimeMatch = base64Image.match(/data:([^;]+);/);
+        const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+        const response = await fetch('/api/ai/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt, image: imageData, imageMimeType: mimeType }),
+            signal: AbortSignal.timeout(60000),
         });
-        return response.text || "Analysis failed.";
+        if (!response.ok) return "Analysis failed.";
+        const data = await response.json() as any;
+        return data.text || "Analysis failed.";
     } catch (e) {
         console.error("Image analysis failed:", e);
         return "Analysis failed.";
     }
 };
 
-export const analyzeVideo = async (base64Video: string, prompt: string): Promise<string> => {
-    // Note: Direct base64 video analysis might be limited by size. 
-    // For large videos, File API is better, but here we assume short clips or frames.
-    try {
-        const response = await generateWithRetry({
-            model: 'gemini-3.1-pro-preview',
-            contents: {
-                parts: [
-                    {
-                        inlineData: {
-                            data: base64Video.split(',')[1],
-                            mimeType: "video/mp4" 
-                        }
-                    },
-                    { text: prompt }
-                ]
-            }
-        });
-        return response.text || "Analysis failed.";
-    } catch (e) {
-        console.error("Video analysis failed:", e);
-        return "Analysis failed.";
-    }
+/** Video analysis is not supported by Claude. */
+export const analyzeVideo = async (_base64Video: string, _prompt: string): Promise<string> => {
+    return "Video analysis is not available with Claude.";
 };
 
+/** Web search via Claude's knowledge base. */
 export const groundedSearch = async (query: string): Promise<{text: string, chunks: any[]}> => {
     try {
-        const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
-            contents: query,
-            config: {
-                tools: [{ googleSearch: {} }],
-            },
-        });
-        
-        return {
-            text: response.text || "",
-            chunks: response.candidates?.[0]?.groundingMetadata?.groundingChunks || []
-        };
+        const text = await generateWithClaude(`Answer the following question with detailed, accurate information:\n\n${query}`) || "Search unavailable.";
+        return { text, chunks: [] };
     } catch (e) {
-        console.error("Search grounding failed:", e);
         return { text: "Search unavailable.", chunks: [] };
     }
 };
 
-export const groundedMaps = async (query: string, location?: {lat: number, lng: number}): Promise<{text: string, chunks: any[]}> => {
+/** Geographic/political query via Claude. */
+export const groundedMaps = async (query: string, _location?: {lat: number, lng: number}): Promise<{text: string, chunks: any[]}> => {
     try {
-        const config: any = {
-            tools: [{ googleMaps: {} }],
-        };
-        
-        if (location) {
-            config.toolConfig = {
-                retrievalConfig: {
-                    latLng: {
-                        latitude: location.lat,
-                        longitude: location.lng
-                    }
-                }
-            };
-        }
-
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: query,
-            config: config
-        });
-
-        return {
-            text: response.text || "",
-            chunks: response.candidates?.[0]?.groundingMetadata?.groundingChunks || []
-        };
+        const text = await generateWithClaude(`Provide detailed geographic and political information for: ${query}`) || "Information unavailable.";
+        return { text, chunks: [] };
     } catch (e) {
-        console.error("Maps grounding failed:", e);
-        return { text: "Maps unavailable.", chunks: [] };
+        return { text: "Information unavailable.", chunks: [] };
     }
 };
 
+/** Deep reasoning via Claude. */
 export const thinkingMode = async (query: string): Promise<string> => {
     try {
-        const response = await ai.models.generateContent({
-            model: "gemini-3.1-pro-preview",
-            contents: query,
-            config: {
-                thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
-            }
-        });
-        return response.text || "No response.";
+        const system = "You are POLI, an expert in political science and geopolitics. Think step by step, reason carefully, and provide a thorough, nuanced analysis.";
+        return await generateWithClaude(query, system) || "No response.";
     } catch (e) {
-        console.error("Thinking mode failed:", e);
-        return "Thinking mode unavailable.";
+        return "Analysis unavailable.";
     }
 };
 
-export const transcribeAudio = async (base64Audio: string): Promise<string> => {
-    try {
-        const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
-            contents: {
-                parts: [
-                    {
-                        inlineData: {
-                            data: base64Audio.split(',')[1],
-                            mimeType: "audio/mp3" // Assuming MP3 or WAV, model is flexible
-                        }
-                    },
-                    { text: "Transcribe this audio." }
-                ]
-            }
-        });
-        return response.text || "Transcription failed.";
-    } catch (e) {
-        console.error("Transcription failed:", e);
-        return "Transcription failed.";
-    }
+/** Audio transcription is not natively supported by Claude. */
+export const transcribeAudio = async (_base64Audio: string): Promise<string> => {
+    return "Audio transcription is not supported. Please use browser speech recognition.";
 };
 
-export const connectLiveSession = async (onAudioData: (data: string) => void) => {
-    // This returns the session promise to be used by the component
-    return ai.live.connect({
-        model: "gemini-2.5-flash-native-audio-preview-09-2025",
-        config: {
-            responseModalities: [Modality.AUDIO],
-            speechConfig: {
-                voiceConfig: { prebuiltVoiceConfig: { voiceName: "Zephyr" } },
-            },
-        },
-        callbacks: {
-            onopen: () => console.log("Live session connected"),
-            onmessage: (msg) => {
-                const base64Audio = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-                if (base64Audio) onAudioData(base64Audio);
-            },
-            onclose: () => console.log("Live session closed"),
-            onerror: (err) => console.error("Live session error:", err),
-        }
-    });
+/** Live voice sessions are not supported by Claude. */
+export const connectLiveSession = async (_onAudioData: (data: string) => void): Promise<any> => {
+    throw new Error("Live voice sessions are not supported with Claude.");
 };
-

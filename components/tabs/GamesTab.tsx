@@ -100,7 +100,7 @@ const GamesTab: React.FC = () => {
             </div>
 
             {/* LIBRARY GRID */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth">
+            <div className="flex-1 overflow-y-auto p-3 md:p-8 scroll-smooth pb-28">
                 {/* FEATURED SECTION */}
                 {activeCategory === 'All' && !searchQuery && (
                     <div className="mb-12">
