@@ -19,9 +19,8 @@ export const withCache = async <T>(key: string, fetcher: () => Promise<T>): Prom
 };
 
 /**
- * High-Availability Wrapper — Claude is the sole AI provider.
- * All requests route through /api/ai/generate in the browser (key stays server-side)
- * or call Anthropic directly on the server.
+ * AI Wrapper — Claude is the sole AI provider. No offline fallback.
+ * Throws if Claude is unavailable so callers can handle the error cleanly.
  */
 export const generateWithFallback = async (params: any, _fallbackModel?: string): Promise<{ text: string }> => {
     const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
@@ -29,8 +28,7 @@ export const generateWithFallback = async (params: any, _fallbackModel?: string)
     const claudeResponse = await generateWithClaude(prompt);
     if (claudeResponse) return { text: claudeResponse };
 
-    console.error("POLI: Claude unavailable. Check CLAUDE_API_KEY environment variable.");
-    return { text: '{}' };
+    throw new Error("Claude AI unavailable. Please check your API key.");
 };
 
 export class JSONRepair {

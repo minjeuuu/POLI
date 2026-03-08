@@ -10,7 +10,7 @@ const DIRECT_API_KEY =
 
 const CLAUDE_BASE_URL = "https://api.anthropic.com/v1/messages";
 const CLAUDE_MODEL = "claude-sonnet-4-6";
-const CLAUDE_MAX_TOKENS = 16000;
+const CLAUDE_MAX_TOKENS = 8000;
 const CLAUDE_SYSTEM = "You are POLI, an expert encyclopedic political science, geopolitics, history, culture, and global knowledge AI. Provide exhaustive, accurate, real-world data. When asked for JSON, return ONLY valid JSON — no markdown fences, no preamble, no commentary. Start directly with { or [. Fill every field with specific, detailed information.";
 
 const isBrowser = typeof window !== 'undefined';
@@ -23,7 +23,7 @@ const getUserKey = (): string => {
 };
 const getActiveKey = (): string => getUserKey() || DIRECT_API_KEY || '';
 
-export const generateWithClaude = async (prompt: string, system?: string, maxTokens?: number, _retries = 2): Promise<string | null> => {
+export const generateWithClaude = async (prompt: string, system?: string, maxTokens?: number, _retries = 1): Promise<string | null> => {
     if (isBrowser) {
         const browserKey = getActiveKey();
         // Strategy 1: Direct Anthropic API call from browser (if key is available)

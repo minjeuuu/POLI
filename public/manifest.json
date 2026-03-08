@@ -1,5 +1,5 @@
 {
-  "name": "POLI — Political Science Foundation",
+  "name": "POLI \u2014 Political Science Foundation",
   "short_name": "POLI",
   "description": "Comprehensive political science research platform powered by Claude AI. Country deep-dives, government analysis, geopolitical intelligence, and daily briefings.",
   "start_url": "/",
@@ -9,7 +9,11 @@
   "theme_color": "#0F172A",
   "lang": "en",
   "scope": "/",
-  "categories": ["education", "news", "politics"],
+  "categories": [
+    "education",
+    "news",
+    "politics"
+  ],
   "icons": [
     {
       "src": "/icon-192.svg",
@@ -22,7 +26,7 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
-    },
+    }
   ],
   "shortcuts": [
     {

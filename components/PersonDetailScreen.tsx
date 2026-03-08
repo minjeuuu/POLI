@@ -83,8 +83,8 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
     <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden relative">
       
       {/* HEADER */}
-      <div className="sticky top-0 z-50 bg-academic-paper/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-academic-line dark:border-stone-800 shadow-sm">
-          <div className="flex items-center justify-between px-4 h-16">
+      <div className="flex-none bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 shadow-sm z-50">
+          <div className="flex items-center justify-between px-6 h-16">
             <div className="flex items-center gap-4">
                 <button onClick={() => { playSFX('close'); onClose(); }} className="p-2 -ml-2 text-stone-500 hover:text-academic-accent dark:text-stone-400 dark:hover:text-indigo-400 transition-colors">
                     <ArrowLeft className="w-6 h-6" />
@@ -106,9 +106,9 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                 </button>
             </div>
           </div>
-          <div className="flex overflow-x-auto no-scrollbar border-t border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 px-4">
+          <div className="flex-none bg-stone-50 dark:bg-stone-900/50 border-b border-stone-200 dark:border-stone-800 px-6 py-2 overflow-x-auto no-scrollbar flex gap-4">
               {TABS.map((tab) => (
-                  <button key={tab.id} onClick={() => scrollToSection(tab.id)} className={`flex items-center gap-2 px-4 py-3 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-colors border-b-2 ${activeTab === tab.id ? 'border-academic-gold text-academic-gold bg-stone-100 dark:bg-stone-800' : 'border-transparent text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'}`}>
+                  <button key={tab.id} onClick={() => scrollToSection(tab.id)} className={`text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === tab.id ? 'bg-academic-text dark:bg-stone-100 text-white dark:text-stone-900 border-transparent shadow-sm' : 'bg-white dark:bg-stone-900 text-stone-500 border-stone-200 dark:border-stone-700 hover:border-academic-accent'}`}>
                       <tab.icon className="w-3 h-3" /> {tab.label}
                   </button>
               ))}
