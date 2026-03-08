@@ -23,20 +23,20 @@ export type ExportFormat =
     | 'odt' | 'tsv';
 
 export const EXPORT_FORMATS: { id: ExportFormat; label: string; icon: string; ext: string; mime: string }[] = [
-    { id: 'pdf',  label: 'PDF Document',    icon: '📄', ext: '.pdf',  mime: 'application/pdf' },
-    { id: 'txt',  label: 'Plain Text',       icon: '📝', ext: '.txt',  mime: 'text/plain' },
-    { id: 'html', label: 'HTML Page',        icon: '🌐', ext: '.html', mime: 'text/html' },
-    { id: 'md',   label: 'Markdown',         icon: '#️⃣',  ext: '.md',   mime: 'text/markdown' },
+    { id: 'pdf',  label: 'PDF Document',    icon: 'PDF', ext: '.pdf',  mime: 'application/pdf' },
+    { id: 'txt',  label: 'Plain Text',       icon: 'TXT', ext: '.txt',  mime: 'text/plain' },
+    { id: 'html', label: 'HTML Page',        icon: 'HTM', ext: '.html', mime: 'text/html' },
+    { id: 'md',   label: 'Markdown',         icon: '#',  ext: '.md',   mime: 'text/markdown' },
     { id: 'json', label: 'JSON Data',        icon: '{}', ext: '.json', mime: 'application/json' },
-    { id: 'xml',  label: 'XML Document',     icon: '📋', ext: '.xml',  mime: 'application/xml' },
+    { id: 'xml',  label: 'XML Document',     icon: 'XML', ext: '.xml',  mime: 'application/xml' },
     { id: 'doc',  label: 'Word Document',    icon: 'W',  ext: '.doc',  mime: 'application/msword' },
     { id: 'rtf',  label: 'Rich Text (RTF)',  icon: 'R',  ext: '.rtf',  mime: 'application/rtf' },
-    { id: 'csv',  label: 'CSV Spreadsheet',  icon: '📊', ext: '.csv',  mime: 'text/csv' },
-    { id: 'tsv',  label: 'TSV Spreadsheet',  icon: '📊', ext: '.tsv',  mime: 'text/tab-separated-values' },
+    { id: 'csv',  label: 'CSV Spreadsheet',  icon: 'CSV', ext: '.csv',  mime: 'text/csv' },
+    { id: 'tsv',  label: 'TSV Spreadsheet',  icon: 'TSV', ext: '.tsv',  mime: 'text/tab-separated-values' },
     { id: 'yaml', label: 'YAML',             icon: '~',  ext: '.yaml', mime: 'text/yaml' },
     { id: 'tex',  label: 'LaTeX Source',     icon: 'Λ',  ext: '.tex',  mime: 'application/x-latex' },
-    { id: 'epub', label: 'EPUB eBook',       icon: '📚', ext: '.epub', mime: 'application/epub+zip' },
-    { id: 'odt',  label: 'OpenDocument',     icon: '📃', ext: '.odt',  mime: 'application/vnd.oasis.opendocument.text' },
+    { id: 'epub', label: 'EPUB eBook',       icon: 'EPB', ext: '.epub', mime: 'application/epub+zip' },
+    { id: 'odt',  label: 'OpenDocument',     icon: 'ODT', ext: '.odt',  mime: 'application/vnd.oasis.opendocument.text' },
 ];
 
 // --- Content to string helpers ---
