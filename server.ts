@@ -191,9 +191,9 @@ const CLAUDE_MAX_TOKENS = 16000;
 const CLAUDE_SYSTEM = "You are POLI, an expert encyclopedic political science, geopolitics, history, culture, and global knowledge AI. Provide exhaustive, accurate, real-world data. When asked for JSON, return ONLY valid JSON — no markdown fences, no preamble, no commentary. Start directly with { or [. Fill every field with specific, detailed information.";
 
 app.post('/api/ai/generate', async (req: any, res: any) => {
-    const CLAUDE_API_KEY = getClaudeApiKey();
+    const CLAUDE_API_KEY = (req.headers['x-user-api-key'] as string) || getClaudeApiKey();
     if (!CLAUDE_API_KEY) {
-        return res.status(503).json({ error: 'Claude API key not configured on server.' });
+        return res.status(503).json({ error: 'Claude API key not configured. Enter it in Settings or set CLAUDE_API_KEY env var.' });
     }
     const { prompt, system, maxTokens } = req.body || {};
     if (!prompt) return res.status(400).json({ error: 'prompt is required' });
@@ -228,9 +228,9 @@ app.post('/api/ai/generate', async (req: any, res: any) => {
 
 // Streaming variant — returns Server-Sent Events from Claude
 app.post('/api/ai/stream', async (req: any, res: any) => {
-    const CLAUDE_API_KEY = getClaudeApiKey();
+    const CLAUDE_API_KEY = (req.headers['x-user-api-key'] as string) || getClaudeApiKey();
     if (!CLAUDE_API_KEY) {
-        res.status(503).json({ error: 'Claude API key not configured on server.' });
+        res.status(503).json({ error: 'Claude API key not configured.' });
         return;
     }
     const { prompt, system } = req.body || {};

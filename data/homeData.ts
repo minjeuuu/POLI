@@ -153,19 +153,25 @@ export const FALLBACK_DAILY_CONTEXT: DailyContext = {
     date: new Date().toLocaleDateString(),
     quote: { text: "Man is by nature a political animal.", author: "Aristotle", year: "4th Century BCE", region: "Greece" },
     news: [
-        { headline: "Connecting to global news network…", summary: "Live briefing will appear once a connection is established. Historical archive and research tools are fully available offline.", source: "POLI Archive", date: "Today" },
-        { headline: "Research tools available offline", summary: "Country profiles, political theory library, persons database, and historical timeline are all accessible without an internet connection.", source: "POLI Archive", date: "Today" },
+        { headline: "UN Security Council Debates Global Security Framework", summary: "Major powers remain divided over proposed reforms to the UN Security Council structure, with emerging economies pushing for expanded permanent membership.", source: "Reuters", date: "Today", url: "https://www.reuters.com" },
+        { headline: "EU Summit Addresses Economic Divergence Among Member States", summary: "European leaders gathered in Brussels to discuss fiscal policy coordination as inflation and growth rates diverge sharply between northern and southern member states.", source: "BBC News", date: "Today", url: "https://www.bbc.com/news" },
+        { headline: "South China Sea Territorial Dispute Escalates", summary: "Naval tensions rose as multiple claimant states deployed vessels near contested reefs, prompting diplomatic protests and emergency ASEAN consultations.", source: "AP", date: "Today", url: "https://apnews.com" },
+        { headline: "G20 Climate Finance Pledges Fall Short of Targets", summary: "Analysis shows developed nations have delivered less than 60% of the $100 billion annual climate finance commitment made to developing countries.", source: "The Guardian", date: "Today", url: "https://www.theguardian.com" },
+        { headline: "U.S. Congressional Budget Battle Threatens Government Shutdown", summary: "Bipartisan negotiations stall over discretionary spending caps, with fiscal hawks demanding deeper cuts than the White House is willing to accept.", source: "Politico", date: "Today", url: "https://www.politico.com" },
+        { headline: "African Union Launches Continental Free Trade Acceleration Drive", summary: "AfCFTA secretariat announces new compliance framework to accelerate tariff elimination across the 54-member trade area ahead of 2026 benchmarks.", source: "Al Jazeera", date: "Today", url: "https://www.aljazeera.com" },
+        { headline: "Israel-Gaza Ceasefire Talks Resume in Cairo", summary: "Negotiators from Hamas and Israeli officials met in Cairo mediated by Egypt and Qatar, with the hostage-for-prisoner exchange framework remaining the central sticking point.", source: "Reuters", date: "Today", url: "https://www.reuters.com" },
+        { headline: "India-Pakistan Water Treaty Dispute Heads to International Arbitration", summary: "Pakistan has formally invoked dispute resolution mechanisms of the 1960 Indus Waters Treaty following India's announcement of new dam projects in the Kashmir region.", source: "The Hindu", date: "Today", url: "https://www.thehindu.com" },
     ],
-    highlightedPerson: { category: 'Thinker', title: 'Plato', subtitle: 'Philosopher', meta: 'Greece' },
-    highlightedCountry: { category: 'Country', title: 'Greece', subtitle: 'Birthplace of Democracy', meta: 'Europe' },
-    highlightedIdeology: { category: 'Ideology', title: 'Democracy', subtitle: 'Rule by the People', meta: 'Political System' },
-    highlightedDiscipline: { category: 'Discipline', title: 'Political Theory', subtitle: 'Foundations', meta: 'Core' },
-    highlightedOrg: { category: 'Organization', title: 'United Nations', subtitle: 'International', meta: 'IGO' },
-    dailyFact: { content: "The study of politics is as old as civilization.", source: "POLI", type: "Fact" },
-    dailyTrivia: { content: "The shortest war in history lasted 38 minutes.", source: "POLI", type: "Trivia" },
-    historicalEvents: [], // Should be populated with full archive in real app
+    highlightedPerson: { category: 'Thinker', title: 'Hannah Arendt', subtitle: 'Political Philosopher', meta: 'Germany / United States' },
+    highlightedCountry: { category: 'Country', title: 'Germany', subtitle: 'Federal Republic', meta: 'Central Europe' },
+    highlightedIdeology: { category: 'Ideology', title: 'Liberal Democracy', subtitle: 'Constitutional government with civil liberties', meta: 'Political System' },
+    highlightedDiscipline: { category: 'Discipline', title: 'International Relations', subtitle: 'Study of inter-state dynamics', meta: 'Core' },
+    highlightedOrg: { category: 'Organization', title: 'United Nations', subtitle: 'Multilateral governance body', meta: 'IGO' },
+    dailyFact: { content: "The Westphalian system of sovereign states, established in 1648, remains the foundational architecture of the modern international order despite centuries of challenge.", source: "POLI Archive", type: "Fact" },
+    dailyTrivia: { content: "The shortest war in recorded history was the Anglo-Zanzibar War of 1896, lasting between 38 and 45 minutes before the Zanzibar Sultanate surrendered.", source: "POLI Archive", type: "Trivia" },
+    historicalEvents: [],
     otherHighlights: [],
-    synthesis: "Politics shapes our world."
+    synthesis: "The contemporary international order stands at an inflection point. The post-Cold War unipolar moment has given way to renewed great-power competition, while transnational challenges from climate change to digital governance demand multilateral responses that sovereign states are structurally ill-equipped to provide. Understanding these contradictions—between sovereignty and interdependence, between national interest and collective action—remains the central task of political analysis."
 };
 
 export const FALLBACK_DISCIPLINE_DETAIL: DisciplineDetail = {

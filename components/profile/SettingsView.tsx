@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
 import { UserPreferences, SpecialTheme, ThemeScope } from '../../types';
-import { 
-    Globe, Palette, Bell, Lock, Database, Code, Type, Mic, Eye, Sliders, 
-    Download, HardDrive, Keyboard, Monitor
+import {
+    Globe, Palette, Bell, Lock, Database, Code, Type, Mic, Eye, Sliders,
+    Download, HardDrive, Keyboard, Monitor, Bot, CheckCircle, XCircle, Loader
 } from 'lucide-react';
 import { AtomicToggle } from '../shared/AtomicToggle';
 import { playSFX } from '../../services/soundService';
@@ -61,6 +61,33 @@ const Select = ({ value, options, onChange }: any) => (
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ prefs, onUpdate }) => {
     const [activeSection, setActiveSection] = useState('appearance');
+    const [claudeKey, setClaudeKey] = useState(() => {
+        try { return localStorage.getItem('poli_claude_key') || ''; } catch { return ''; }
+    });
+    const [aiTestStatus, setAiTestStatus] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle');
+
+    const saveClaudeKey = (key: string) => {
+        setClaudeKey(key);
+        try { if (key) localStorage.setItem('poli_claude_key', key); else localStorage.removeItem('poli_claude_key'); } catch { /* ignore */ }
+    };
+
+    const testClaudeConnection = async () => {
+        setAiTestStatus('testing');
+        const key = claudeKey.trim();
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (key) headers['X-User-API-Key'] = key;
+        try {
+            const res = await fetch('/api/ai/generate', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ prompt: 'Reply with the single word: online', maxTokens: 10 }),
+                signal: AbortSignal.timeout(15000),
+            });
+            setAiTestStatus(res.ok ? 'ok' : 'fail');
+        } catch {
+            setAiTestStatus('fail');
+        }
+    };
 
     const update = (key: keyof UserPreferences, val: any) => {
         playSFX('click');
@@ -358,20 +385,63 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ prefs, onUpdate }) =
                     </div>
                 </div>
             );
-             case 'advanced': return (
-                <div className="space-y-2">
-                    <SettingRow label="Developer Mode" desc="Enable advanced debug tools.">
-                        <AtomicToggle label="" checked={prefs.developerMode} onChange={(c) => update('developerMode', c)} />
-                    </SettingRow>
-                    <SettingRow label="Beta Features" desc="Early access to experimental modules.">
-                        <AtomicToggle label="" checked={prefs.betaFeatures} onChange={(c) => update('betaFeatures', c)} />
-                    </SettingRow>
-                     <SettingRow label="Debug Logging" desc="Verbose console output.">
-                        <AtomicToggle label="" checked={prefs.debugLogging} onChange={(c) => update('debugLogging', c)} />
-                    </SettingRow>
-                    <SettingRow label="API Endpoint" desc="Custom server URL.">
-                         <input type="text" value={prefs.apiEndpoint} onChange={(e) => update('apiEndpoint', e.target.value)} className="w-full sm:w-64 p-1 bg-stone-100 dark:bg-stone-900 rounded border border-stone-200 dark:border-stone-800 text-xs font-mono" />
-                    </SettingRow>
+            case 'advanced': return (
+                <div className="space-y-6">
+                    {/* Claude AI Configuration */}
+                    <div className="rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50/50 dark:bg-indigo-950/20 p-5">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Bot className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                            <h3 className="font-bold text-sm text-indigo-900 dark:text-indigo-200">Claude AI Configuration</h3>
+                        </div>
+                        <p className="text-xs text-indigo-700 dark:text-indigo-300 mb-4 leading-relaxed">
+                            Enter your Claude API key to enable AI-powered features. Get a key at{' '}
+                            <span className="font-mono font-bold">console.anthropic.com</span>.
+                            Your key is stored locally and never shared.
+                        </p>
+                        <div className="flex gap-2 mb-3">
+                            <input
+                                type="password"
+                                value={claudeKey}
+                                onChange={(e) => saveClaudeKey(e.target.value)}
+                                placeholder="sk-ant-api03-..."
+                                className="flex-1 p-2.5 bg-white dark:bg-stone-900 rounded-lg border border-indigo-200 dark:border-indigo-700 text-xs font-mono text-stone-800 dark:text-stone-200 placeholder-stone-400 outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
+                            />
+                            <button
+                                onClick={testClaudeConnection}
+                                disabled={aiTestStatus === 'testing'}
+                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap"
+                            >
+                                {aiTestStatus === 'testing' ? (
+                                    <><Loader className="w-3.5 h-3.5 animate-spin" /> Testing…</>
+                                ) : 'Test Connection'}
+                            </button>
+                        </div>
+                        {aiTestStatus === 'ok' && (
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                <CheckCircle className="w-3.5 h-3.5" /> AI online — Claude is responding correctly.
+                            </div>
+                        )}
+                        {aiTestStatus === 'fail' && (
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-red-500 dark:text-red-400">
+                                <XCircle className="w-3.5 h-3.5" /> Connection failed. Check your key and try again.
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <SettingRow label="Developer Mode" desc="Enable advanced debug tools.">
+                            <AtomicToggle label="" checked={prefs.developerMode} onChange={(c) => update('developerMode', c)} />
+                        </SettingRow>
+                        <SettingRow label="Beta Features" desc="Early access to experimental modules.">
+                            <AtomicToggle label="" checked={prefs.betaFeatures} onChange={(c) => update('betaFeatures', c)} />
+                        </SettingRow>
+                        <SettingRow label="Debug Logging" desc="Verbose console output.">
+                            <AtomicToggle label="" checked={prefs.debugLogging} onChange={(c) => update('debugLogging', c)} />
+                        </SettingRow>
+                        <SettingRow label="API Endpoint" desc="Custom server URL.">
+                            <input type="text" value={prefs.apiEndpoint} onChange={(e) => update('apiEndpoint', e.target.value)} className="w-full sm:w-64 p-1 bg-stone-100 dark:bg-stone-900 rounded border border-stone-200 dark:border-stone-800 text-xs font-mono" />
+                        </SettingRow>
+                    </div>
                 </div>
             );
             default: return null;

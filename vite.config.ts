@@ -13,6 +13,12 @@ export default defineConfig(({ mode }) => {
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        // Expose Claude key into the browser bundle so the app can call Anthropic
+        // directly (with anthropic-dangerous-direct-browser-access header) when
+        // the server-side proxy is unavailable or returns errors.
+        'process.env.VITE_CLAUDE_API_KEY': JSON.stringify(
+          env.CLAUDE_API_KEY || env.VITE_CLAUDE_API_KEY || ''
+        ),
       },
       resolve: {
         alias: {
