@@ -1,33 +1,15 @@
 
-import { generateWithFallback, safeParse, withCache, getLanguageInstruction, deepMerge } from "./common";
+import { generateWithFallback, safeParse, withCache, getLanguageInstruction } from "./common";
 import { PersonDetail } from "../types";
 
-const FALLBACK_PERSON: PersonDetail = {
-    name: "Political Figure",
-    role: "Unknown",
-    country: "Unknown",
-    era: "Unknown",
-    bio: "Biography unavailable.",
-    ideology: "Unknown",
-    politicalWorks: [],
-    officesHeld: [],
-    timeline: [],
-    relatedLinks: [],
-    imageUrl: "",
-    allies: [],
-    rivals: [],
-    education: [],
-    quotes: []
-};
-
-export const fetchPersonDetail = async (name: string): Promise<PersonDetail> => {
+export const fetchPersonDetail = async (name: string): Promise<PersonDetail | null> => {
     const cacheKey = `person_poli_v1_search_${name.replace(/\s+/g, '_')}`;
 
     return withCache(cacheKey, async () => {
         try {
             const prompt = `
             POLI ARCHIVE — SUBJECT: ${name}.
-            
+
             ${getLanguageInstruction()}
 
             **DIRECTIVES:**
@@ -79,10 +61,11 @@ export const fetchPersonDetail = async (name: string): Promise<PersonDetail> => 
             `;
 
             const response = await generateWithFallback({ contents: prompt });
-            const aiData = safeParse(response.text || '{}', {}) as any;
-            const merged = deepMerge(FALLBACK_PERSON, aiData);
-
-            return merged as PersonDetail;
-        } catch (e) { return { ...FALLBACK_PERSON, name }; }
+            const aiData = safeParse(response.text || '{}', null) as any;
+            if (!aiData || !aiData.name) return null;
+            return aiData as PersonDetail;
+        } catch (e) {
+            return null;
+        }
     });
 };

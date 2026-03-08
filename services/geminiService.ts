@@ -16,7 +16,6 @@ import {
   HighlightDetail,
   HighlightedEntity
 } from "../types";
-import { FALLBACK_DAILY_CONTEXT, FALLBACK_DISCIPLINE_DETAIL } from "../data/homeData";
 import { getLanguageInstruction, safeParse, withCache, generateWithFallback } from "./common";
 import { generateWithClaude, streamWithClaude } from "./claudeService";
 
@@ -38,7 +37,7 @@ ${getLanguageInstruction()}`
     });
 };
 
-export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
+export const fetchDailyContext = async (date: Date): Promise<DailyContext | null> => {
     return withCache(`daily_v16_schema_${date.toDateString()}`, async () => {
         try {
             const response = await generateWithFallback({
@@ -48,16 +47,17 @@ Return JSON: { "synthesis": string, "quote": { "text", "author", "year", "region
 For news URLs: only use real domains like bbc.com, reuters.com, apnews.com, theguardian.com, nytimes.com, ft.com. If uncertain about a specific article URL, use the homepage of the source (e.g. https://www.bbc.com/news).
 ${getLanguageInstruction()}`
             });
-            const data = safeParse(response.text || '{}', FALLBACK_DAILY_CONTEXT);
-            return { ...FALLBACK_DAILY_CONTEXT, ...data, date: date.toDateString() };
+            const data = safeParse(response.text || '{}', null);
+            if (!data) return null;
+            return { ...data, date: date.toDateString() } as DailyContext;
         } catch (e) {
             console.error(e);
-            return FALLBACK_DAILY_CONTEXT;
+            return null;
         }
     });
 };
 
-export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDetail> => {
+export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDetail | null> => {
     return withCache(`discipline_v4_schema_${name}`, async () => {
         try {
             const response = await generateWithFallback({
@@ -65,10 +65,11 @@ export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDet
 Return JSON: { "name", "overview": { "definition", "scope", "importance", "keyQuestions": [string] }, "historyNarrative": string, "history": [{ "year", "event", "impact" }], "subDisciplines": [string], "coreTheories": [{ "name", "year", "summary" }], "methods": [{ "name", "description", "example" }], "scholars": [{ "name", "country", "period", "contribution" }], "foundationalWorks": [{ "title", "author", "year" }], "regionalFocus": [{ "region", "description" }], "relatedDisciplines": [string] }
 ${getLanguageInstruction()}`
             });
-            const parsed = safeParse(response.text || '{}', FALLBACK_DISCIPLINE_DETAIL);
+            const parsed = safeParse(response.text || '{}', null) as DisciplineDetail | null;
+            if (!parsed) return null;
             if (!parsed.name) parsed.name = name;
-            return parsed as DisciplineDetail;
-        } catch (e) { return FALLBACK_DISCIPLINE_DETAIL; }
+            return parsed;
+        } catch (e) { return null; }
     });
 };
 
@@ -121,111 +122,108 @@ Return a JSON array: [{ "front": string, "back": string, "category": string }]. 
     });
 };
 
-export const fetchRegionalDetail = async (region: string, discipline: string): Promise<RegionalDetail> => {
+export const fetchRegionalDetail = async (region: string, discipline: string): Promise<RegionalDetail | null> => {
     return withCache(`region_v3_${region}_${discipline}`, async () => {
         try {
             const response = await generateWithFallback({
                 contents: `Political analysis of region: ${region} from the perspective of ${discipline}.
 Return JSON: { "region": string, "summary": string, "keyCountries": string[], "politicalThemes": string[], "challenges": string[] }. ${getLanguageInstruction()}`
             });
-            return safeParse(response.text || '{}', {}) as RegionalDetail;
-        } catch (e) { return {} as RegionalDetail; }
+            return safeParse(response.text || '{}', null) as RegionalDetail | null;
+        } catch (e) { return null; }
     });
 };
 
-export const fetchOrganizationDetail = async (name: string): Promise<OrganizationDetail> => {
+export const fetchOrganizationDetail = async (name: string): Promise<OrganizationDetail | null> => {
     return withCache(`org_v3_${name}`, async () => {
         try {
             const response = await generateWithFallback({
                 contents: `Detailed profile of international organization: ${name}.
 Return JSON: { "name", "abbr", "type", "headquarters", "founded", "secretaryGeneral", "mission", "members": string[], "history", "keyOrgans": [{"name","function"}], "majorTreaties": string[], "budget", "ideologicalParadigm", "governanceModel", "satelliteOffices": string[] }. ${getLanguageInstruction()}`
             });
-            return safeParse(response.text || '{}', {}) as OrganizationDetail;
-        } catch (e) { return {} as OrganizationDetail; }
+            return safeParse(response.text || '{}', null) as OrganizationDetail | null;
+        } catch (e) { return null; }
     });
 };
 
-export const fetchPartyDetail = async (name: string, country: string): Promise<PoliticalPartyDetail> => {
+export const fetchPartyDetail = async (name: string, country: string): Promise<PoliticalPartyDetail | null> => {
     return withCache(`party_v2_${name}_${country}`, async () => {
         try {
             const response = await generateWithFallback({
                 contents: `Comprehensive profile of political party: ${name} in ${country}. Include founding, ideology, leadership, electoral history, key policies, and current status. Return detailed JSON. ${getLanguageInstruction()}`
             });
-            return safeParse(response.text || '{}', {}) as PoliticalPartyDetail;
-        } catch (e) { return {} as PoliticalPartyDetail; }
+            return safeParse(response.text || '{}', null) as PoliticalPartyDetail | null;
+        } catch (e) { return null; }
     });
 };
 
-export const fetchPersonDetail = async (name: string): Promise<PersonDetail> => {
+export const fetchPersonDetail = async (name: string): Promise<PersonDetail | null> => {
     return withCache(`person_v2_${name}`, async () => {
         try {
             const response = await generateWithFallback({
                 contents: `Comprehensive political profile of ${name}. Include biography, political career, ideology, key decisions, legacy, and impact. Return detailed JSON. ${getLanguageInstruction()}`
             });
-            return safeParse(response.text || '{}', {}) as PersonDetail;
-        } catch (e) { return {} as PersonDetail; }
+            return safeParse(response.text || '{}', null) as PersonDetail | null;
+        } catch (e) { return null; }
     });
 };
 
-export const fetchEventDetail = async (name: string): Promise<EventDetail> => {
+export const fetchEventDetail = async (name: string): Promise<EventDetail | null> => {
     return withCache(`event_v2_${name}`, async () => {
         try {
             const response = await generateWithFallback({
                 contents: `Detailed political event dossier for: ${name}. Include causes, key actors, timeline, outcomes, and historical significance. Return detailed JSON. ${getLanguageInstruction()}`
             });
-            return safeParse(response.text || '{}', {}) as EventDetail;
-        } catch (e) { return {} as EventDetail; }
+            return safeParse(response.text || '{}', null) as EventDetail | null;
+        } catch (e) { return null; }
     });
 };
 
-export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail> => {
+export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail | null> => {
     return withCache(`ideology_v2_${name}`, async () => {
         try {
             const response = await generateWithFallback({
                 contents: `Detailed analysis of political ideology: ${name}. Include origins, core tenets, key thinkers, historical movements, variants, criticisms, and modern manifestations. Return detailed JSON. ${getLanguageInstruction()}`
             });
-            return safeParse(response.text || '{}', {}) as IdeologyDetail;
-        } catch (e) { return {} as IdeologyDetail; }
+            return safeParse(response.text || '{}', null) as IdeologyDetail | null;
+        } catch (e) { return null; }
     });
 };
 
-export const fetchConceptDetail = async (term: string, context: string): Promise<ConceptDetail> => {
+export const fetchConceptDetail = async (term: string, context: string): Promise<ConceptDetail | null> => {
     return withCache(`concept_v2_${term}_${context}`, async () => {
         try {
             const response = await generateWithFallback({
                 contents: `Define political concept: "${term}" in the context of "${context}".
 Return JSON: { "term": string, "definition": string, "context": string, "examples": string[], "history": string }. ${getLanguageInstruction()}`
             });
-            return safeParse(response.text || '{}', { term, definition: "Definition unavailable.", context, examples: [], history: "" }) as ConceptDetail;
-        } catch (e) { return { term, definition: "Definition unavailable.", context, examples: [], history: "" }; }
+            return safeParse(response.text || '{}', null) as ConceptDetail | null;
+        } catch (e) { return null; }
     });
 };
 
-export const fetchHighlightDetail = async (highlight: HighlightedEntity): Promise<HighlightDetail> => {
+export const fetchHighlightDetail = async (highlight: HighlightedEntity): Promise<HighlightDetail | null> => {
     return withCache(`highlight_v7_${highlight.title}`, async () => {
         try {
             const response = await generateWithFallback({
                 contents: `Provide detailed information for: ${highlight.title} (${highlight.category}).
 Return JSON: { "title", "subtitle", "category", "summary", "historicalBackground", "significance", "keyConcepts": [{"concept","definition"}], "modernConnections": string[], "sources": [{"title","url"}] }. ${getLanguageInstruction()}`
             });
-            const parsed = safeParse(response.text || '{}', {}) as any;
+            const parsed = safeParse(response.text || '{}', null) as any;
+            if (!parsed) return null;
             return {
                 title: parsed.title || highlight.title,
                 subtitle: parsed.subtitle || highlight.subtitle,
                 category: parsed.category || highlight.category,
-                summary: parsed.summary || "Summary unavailable.",
-                historicalBackground: parsed.historicalBackground || "Historical context unavailable.",
-                significance: parsed.significance || "Significance unavailable.",
+                summary: parsed.summary || "",
+                historicalBackground: parsed.historicalBackground || "",
+                significance: parsed.significance || "",
                 keyConcepts: parsed.keyConcepts || [],
                 modernConnections: parsed.modernConnections || [],
                 sources: parsed.sources || []
             };
         } catch (e) {
-            return {
-                title: highlight.title, subtitle: highlight.subtitle, category: highlight.category,
-                summary: "Details currently unavailable.", historicalBackground: "", significance: "",
-                keyConcepts: [], modernConnections: [], sources: []
-            };
+            return null;
         }
     });
 };

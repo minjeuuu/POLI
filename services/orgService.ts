@@ -1,22 +1,8 @@
 
-import { generateWithFallback, safeParse, withCache, getLanguageInstruction, deepMerge } from "./common";
+import { generateWithFallback, safeParse, withCache, getLanguageInstruction } from "./common";
 import { OrganizationDetail } from "../types";
 
-const FALLBACK_ORG: OrganizationDetail = {
-    name: "Organization",
-    type: "Organization",
-    headquarters: "Unknown",
-    founded: "Unknown",
-    secretaryGeneral: "Unknown",
-    mission: "Information currently unavailable.",
-    members: [],
-    history: "Historical data unavailable.",
-    keyOrgans: [],
-    majorTreaties: [],
-    satelliteOffices: []
-};
-
-export const fetchOrganizationDetail = async (name: string): Promise<OrganizationDetail> => {
+export const fetchOrganizationDetail = async (name: string): Promise<OrganizationDetail | null> => {
     const cacheKey = `org_poli_v1_search_${name.replace(/\s+/g, '_')}`;
 
     return withCache(cacheKey, async () => {
@@ -49,9 +35,7 @@ export const fetchOrganizationDetail = async (name: string): Promise<Organizatio
                 "secretaryGeneral": "Current Leader",
                 "mission": "Mission Statement",
                 "members": [
-                    { "name": "Country A", "role": "Member", "isoCode": "AA" },
-                    { "name": "Country B", "role": "Member", "isoCode": "BB" }
-                    // ... LIST EVERY SINGLE ONE
+                    { "name": "Country A", "role": "Member", "isoCode": "AA" }
                 ],
                 "history": "Detailed history...",
                 "keyOrgans": [{ "name": "Body Name", "function": "Purpose" }],
@@ -69,9 +53,11 @@ export const fetchOrganizationDetail = async (name: string): Promise<Organizatio
             `;
 
             const response = await generateWithFallback({ contents: prompt });
-            const aiData = safeParse(response.text || '{}', {}) as OrganizationDetail;
-            const merged = deepMerge(FALLBACK_ORG, aiData);
-            return { ...merged, name }; 
-        } catch (e) { return { ...FALLBACK_ORG, name }; }
+            const aiData = safeParse(response.text || '{}', null) as OrganizationDetail | null;
+            if (!aiData || !aiData.name) return null;
+            return aiData;
+        } catch (e) {
+            return null;
+        }
     });
 };

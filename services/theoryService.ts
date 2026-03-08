@@ -1,23 +1,8 @@
 
 import { generateWithFallback, safeParse, withCache, getLanguageInstruction } from "./common";
 import { IdeologyDetail, DisciplineDetail, ConceptDetail, RegionalDetail } from "../types";
-import { FALLBACK_DISCIPLINE_DETAIL } from "../data/homeData";
 
-const FALLBACK_IDEOLOGY: IdeologyDetail = {
-    name: "Political Ideology",
-    definition: "Definition unavailable.",
-    origins: "Origins unavailable.",
-    historyNarrative: "History unavailable.",
-    timeline: [],
-    branches: [],
-    coreTenets: [],
-    keyThinkers: [],
-    globalImpact: "Impact unavailable.",
-    criticisms: "Criticism unavailable.",
-    foundationalWorks: []
-};
-
-export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail> => {
+export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail | null> => {
     const cacheKey = `ideology_poli_v1_prompt_${name.replace(/\s+/g, '_')}`;
 
     return withCache(cacheKey, async () => {
@@ -25,7 +10,7 @@ export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail>
             const prompt = `
             SYSTEM OVERRIDE: POLI ARCHIVE V1.
             TOPIC: ${name} (Ideology).
-            
+
             ${getLanguageInstruction()}
 
             RETURN JSON ONLY:
@@ -45,21 +30,24 @@ export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail>
             `;
 
             const response = await generateWithFallback({ contents: prompt });
-            const parsed = safeParse(response.text || '{}', FALLBACK_IDEOLOGY) as IdeologyDetail;
-            return { ...FALLBACK_IDEOLOGY, ...parsed, name };
-        } catch (e) { return { ...FALLBACK_IDEOLOGY, name }; }
+            const parsed = safeParse(response.text || '{}', null) as IdeologyDetail | null;
+            if (!parsed || !parsed.name) return null;
+            return { ...parsed, name };
+        } catch (e) {
+            return null;
+        }
     });
 };
 
-export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDetail> => {
-     const cacheKey = `discipline_poli_v1_prompt_${name.replace(/\s+/g, '_')}`;
+export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDetail | null> => {
+    const cacheKey = `discipline_poli_v1_prompt_${name.replace(/\s+/g, '_')}`;
 
-     return withCache(cacheKey, async () => {
+    return withCache(cacheKey, async () => {
         try {
             const prompt = `
             SYSTEM OVERRIDE: POLI ARCHIVE V1.
             DISCIPLINE: ${name}.
-            
+
             ${getLanguageInstruction()}
 
             RETURN JSON ONLY matching DisciplineDetail interface:
@@ -78,13 +66,16 @@ export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDet
             `;
 
             const response = await generateWithFallback({ contents: prompt });
-            const parsed = safeParse(response.text || '{}', FALLBACK_DISCIPLINE_DETAIL) as DisciplineDetail;
-            return { ...FALLBACK_DISCIPLINE_DETAIL, ...parsed, name };
-        } catch (e) { return { ...FALLBACK_DISCIPLINE_DETAIL, name }; }
+            const parsed = safeParse(response.text || '{}', null) as DisciplineDetail | null;
+            if (!parsed || !parsed.name) return null;
+            return { ...parsed, name };
+        } catch (e) {
+            return null;
+        }
     });
 };
 
-export const fetchConceptDetail = async (term: string, context: string): Promise<ConceptDetail> => {
+export const fetchConceptDetail = async (term: string, context: string): Promise<ConceptDetail | null> => {
     const cacheKey = `concept_poli_v1_prompt_${term.replace(/\s+/g, '_')}_${context.replace(/\s+/g, '_')}`;
 
     return withCache(cacheKey, async () => {
@@ -96,12 +87,15 @@ export const fetchConceptDetail = async (term: string, context: string): Promise
             `;
 
             const response = await generateWithFallback({ contents: prompt });
-            return safeParse(response.text || '{}', { term, definition: "Unavailable", context, examples: [], history: "" }) as ConceptDetail;
-        } catch (e) { return { term, definition: "Definition unavailable.", context, examples: [], history: "" }; }
+            const parsed = safeParse(response.text || '{}', null) as ConceptDetail | null;
+            return parsed;
+        } catch (e) {
+            return null;
+        }
     });
 };
 
-export const fetchRegionalDetail = async (region: string, discipline: string): Promise<RegionalDetail> => {
+export const fetchRegionalDetail = async (region: string, discipline: string): Promise<RegionalDetail | null> => {
     const cacheKey = `region_poli_v1_prompt_${region.replace(/\s+/g, '_')}_${discipline.replace(/\s+/g, '_')}`;
 
     return withCache(cacheKey, async () => {
@@ -113,7 +107,10 @@ export const fetchRegionalDetail = async (region: string, discipline: string): P
             `;
 
             const response = await generateWithFallback({ contents: prompt });
-            return safeParse(response.text || '{}', {}) as RegionalDetail;
-        } catch (e) { return {} as RegionalDetail; }
+            const parsed = safeParse(response.text || '{}', null) as RegionalDetail | null;
+            return parsed;
+        } catch (e) {
+            return null;
+        }
     });
 };

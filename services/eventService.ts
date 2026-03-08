@@ -1,24 +1,8 @@
 
-import { generateWithFallback, safeParse, withCache, getLanguageInstruction, deepMerge } from "./common";
+import { generateWithFallback, safeParse, withCache, getLanguageInstruction } from "./common";
 import { EventDetail } from "../types";
 
-const FALLBACK_EVENT: EventDetail = {
-    title: "Historical Event",
-    date: "Unknown",
-    location: "Unknown",
-    context: "Context unavailable.",
-    keyActors: [],
-    outcome: "Outcome unavailable.",
-    significance: "Significance unavailable.",
-    imageUrl: "",
-    casualties: "Unknown",
-    forcesInvolved: [],
-    weather: "Unknown",
-    timeline: [],
-    documents: []
-};
-
-export const fetchEventDetail = async (name: string): Promise<EventDetail> => {
+export const fetchEventDetail = async (name: string): Promise<EventDetail | null> => {
     const cacheKey = `event_poli_v1_search_${name.replace(/\s+/g, '_')}`;
 
     return withCache(cacheKey, async () => {
@@ -55,10 +39,11 @@ export const fetchEventDetail = async (name: string): Promise<EventDetail> => {
             `;
 
             const response = await generateWithFallback({ contents: prompt });
-            const aiData = safeParse(response.text || '{}', {}) as any;
-            const merged = deepMerge(FALLBACK_EVENT, aiData);
-
-            return merged as EventDetail;
-        } catch (e) { return { ...FALLBACK_EVENT, title: name }; }
+            const aiData = safeParse(response.text || '{}', null) as any;
+            if (!aiData || !aiData.title) return null;
+            return aiData as EventDetail;
+        } catch (e) {
+            return null;
+        }
     });
 };
