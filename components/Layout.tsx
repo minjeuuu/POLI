@@ -83,25 +83,26 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onNav
   const toggleTheme = () => setIsDark(!isDark);
 
   const allNavItems: { id: MainTab; label: string; icon: React.ElementType; emoji?: string }[] = [
-    { id: 'home',        label: 'Home',      icon: Home,          emoji: '🏠' },
-    { id: 'explore',     label: 'Explore',   icon: Compass,       emoji: '🧭' },
-    { id: 'countries',   label: 'Nations',   icon: Globe,         emoji: '🌍' },
-    { id: 'ailab',       label: 'AI Lab',    icon: Sparkles,      emoji: '✨' },
-    { id: 'persons',     label: 'People',    icon: Users,         emoji: '👤' },
-    { id: 'theory',      label: 'Theory',    icon: BookOpen,      emoji: '📖' },
-    { id: 'read',        label: 'Library',   icon: Library,       emoji: '📚' },
-    { id: 'almanac',     label: 'Almanac',   icon: Calendar,      emoji: '📅' },
-    { id: 'comparative', label: 'Compare',   icon: Scale,         emoji: '⚖️' },
-    { id: 'learn',       label: 'Learn',     icon: GraduationCap, emoji: '🎓' },
-    { id: 'games',       label: 'Games',     icon: Brain,         emoji: '🧠' },
-    { id: 'sim',         label: 'Sim',       icon: Gamepad2,      emoji: '🎮' },
-    { id: 'rates',       label: 'Markets',   icon: DollarSign,    emoji: '💹' },
-    { id: 'social',      label: 'Feed',      icon: MessageSquare, emoji: '💬' },
-    { id: 'messages',    label: 'Chat',      icon: Mail,          emoji: '✉️' },
-    { id: 'profile',     label: 'Profile',   icon: User,          emoji: '👤' },
+    { id: 'home',        label: 'Home',      icon: Home          },
+    { id: 'explore',     label: 'Explore',   icon: Compass       },
+    { id: 'countries',   label: 'Nations',   icon: Globe         },
+    { id: 'ailab',       label: 'AI Lab',    icon: Sparkles      },
+    { id: 'learn',       label: 'Learn',     icon: GraduationCap },
+    { id: 'profile',     label: 'Profile',   icon: User          },
+    { id: 'persons',     label: 'People',    icon: Users         },
+    { id: 'theory',      label: 'Theory',    icon: BookOpen      },
+    { id: 'read',        label: 'Library',   icon: Library       },
+    { id: 'almanac',     label: 'Almanac',   icon: Calendar      },
+    { id: 'comparative', label: 'Compare',   icon: Scale         },
+    { id: 'games',       label: 'Games',     icon: Brain         },
+    { id: 'sim',         label: 'Sim',       icon: Gamepad2      },
+    { id: 'rates',       label: 'Markets',   icon: DollarSign    },
+    { id: 'social',      label: 'Feed',      icon: MessageSquare },
+    { id: 'messages',    label: 'Chat',      icon: Mail          },
+    { id: 'translate',   label: 'Translate', icon: Languages     },
   ];
 
-  // 5 primary tabs always visible on mobile
+  // 5 primary tabs always visible on mobile (most used)
   const primaryTabs: MainTab[] = ['home', 'explore', 'countries', 'ailab', 'profile'];
   const primaryItems = allNavItems.filter(i => primaryTabs.includes(i.id));
   // All other tabs go into More drawer
@@ -223,28 +224,31 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onNav
           ['Tech','Matrix','Cyberpunk','Neon'].includes(themeMode) ? 'bg-slate-950' :
           'bg-white dark:bg-stone-900'}
         ${moreOpen ? 'translate-y-0' : 'translate-y-full'}`}
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 70px)' }}
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 72px)' }}
       >
         {/* Handle */}
-        <div className="flex justify-center pt-3 pb-4">
+        <div className="flex justify-center pt-3 pb-2">
           <div className="w-10 h-1 rounded-full bg-stone-300 dark:bg-stone-600" />
         </div>
 
-        {/* Grid of all extra tabs */}
-        <div className="px-4 pb-2 grid grid-cols-4 gap-2">
+        {/* Section label */}
+        <p className="px-5 pb-2 text-[10px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">All Sections</p>
+
+        {/* Grid of all extra tabs — 3 columns for better readability */}
+        <div className="px-3 pb-2 grid grid-cols-3 gap-2">
           {moreItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => { onTabChange(item.id); setMoreOpen(false); }}
-                className={`flex flex-col items-center justify-center gap-2 py-4 rounded-2xl transition-all duration-200 active:scale-95 border
+                className={`flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-2xl transition-all duration-200 active:scale-95 border
                   ${isActive
-                    ? `${activeColor.bg} border-indigo-200 dark:border-indigo-700`
-                    : 'bg-stone-50 dark:bg-stone-800/60 border-stone-100 dark:border-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700'}`}
+                    ? `${activeColor.bg} border-indigo-200 dark:border-indigo-700 shadow-sm`
+                    : 'bg-stone-50 dark:bg-stone-800/60 border-stone-100 dark:border-stone-800'}`}
               >
                 <item.icon className={`w-6 h-6 transition-colors ${isActive ? `${activeColor.text} stroke-[2.5px]` : 'text-stone-500 dark:text-stone-400 stroke-2'}`} />
-                <span className={`text-[10px] font-semibold leading-tight text-center px-1 ${isActive ? activeColor.text : 'text-stone-500 dark:text-stone-400'}`}>
+                <span className={`text-[11px] font-semibold leading-tight text-center ${isActive ? activeColor.text : 'text-stone-600 dark:text-stone-400'}`}>
                   {item.label}
                 </span>
               </button>

@@ -1,10 +1,10 @@
 
 import React, { useState, useMemo } from 'react';
-import { 
+import {
   Trophy, BookOpen, Star, Crown, Gamepad2, ChevronRight, Layers, LayoutGrid, Check, Map,
   Globe, Flag, Scale, Swords, History, Landmark, Coins, Users, Brain, Shield,
   Microscope, Gavel, Feather, Pyramid, Infinity, Radio, Rocket, Zap, Leaf, Anchor,
-  Code, Eye, Gavel as DebateIcon, AlertTriangle, Shuffle, ChevronUp
+  Code, Eye, AlertTriangle, Shuffle, ChevronUp
 } from 'lucide-react';
 import { UserProfile } from '../../types';
 import FlashcardView from '../FlashcardView';
@@ -221,13 +221,16 @@ const generateCurriculum = () => {
     return generated;
 };
 
-const MISSION_CATEGORIES = generateCurriculum();
+// generateCurriculum is called inside the component with useMemo so it only runs once
+// (not at module load time, preventing blocking and module-level crashes)
 
 interface LearnTabProps {
   onNavigate: (type: string, payload: any) => void;
 }
 
 const LearnTab: React.FC<LearnTabProps> = ({ onNavigate }) => {
+  // Computed lazily inside component so module import doesn't block
+  const MISSION_CATEGORIES = useMemo(() => generateCurriculum(), []);
   const [profile, setProfile] = useState<UserProfile>(INITIAL_PROFILE);
   const [route, setRoute] = useState<LearnRoute>('Lobby');
   const [selectedTopic, setSelectedTopic] = useState<string>('');
