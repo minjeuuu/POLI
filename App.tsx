@@ -41,6 +41,7 @@ import DisciplineDetailScreen from './components/DisciplineDetailScreen';
 import GenericKnowledgeScreen from './components/GenericKnowledgeScreen';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import PWAInstallButton from './components/PWAInstallButton';
+import { Analytics } from '@vercel/analytics/react';
 
 type OverlayItem = { type: string; payload: any; id: string };
 
@@ -417,6 +418,7 @@ export default function App() {
         )}
       </div>
       <PWAInstallButton />
+      <Analytics />
     </Layout>
   );
 }
