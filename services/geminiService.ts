@@ -123,14 +123,34 @@ Return a JSON array: [{ "front": string, "back": string, "category": string }]. 
 };
 
 export const fetchRegionalDetail = async (region: string, discipline: string): Promise<RegionalDetail | null> => {
-    return withCache(`region_v3_${region}_${discipline}`, async () => {
-        try {
-            const response = await generateWithFallback({
-                contents: `Political analysis of region: ${region} from the perspective of ${discipline}.
-Return JSON: { "region": string, "summary": string, "keyCountries": string[], "politicalThemes": string[], "challenges": string[] }. ${getLanguageInstruction()}`
-            });
-            return safeParse(response.text || '{}', null) as RegionalDetail | null;
-        } catch (e) { return null; }
+    return withCache(`region_v4_${region}_${discipline}`, async () => {
+        const response = await generateWithFallback({
+            contents: `
+POLI REGIONAL ANALYSIS ENGINE — COMPREHENSIVE REGIONAL DOSSIER
+REGION: ${region}
+DISCIPLINARY LENS: ${discipline}
+
+${getLanguageInstruction()}
+
+Produce a comprehensive regional analysis of "${region}" through the lens of ${discipline}.
+
+RETURN VALID JSON ONLY — NO MARKDOWN:
+{
+    "region": "${region}",
+    "summary": "Minimum 200 words — comprehensive overview of the region's political, social, and economic landscape from the ${discipline} perspective",
+    "keyCountries": ["List 6-10 most significant countries in this region"],
+    "politicalThemes": ["List 6-8 dominant political themes shaping the region"],
+    "challenges": ["List 6-8 critical challenges facing the region"],
+    "historicalBackground": "Minimum 200 words — historical forces that shaped this region, colonial legacies, independence movements, cold war dynamics, modern transformations",
+    "keyOrganizations": ["List 5-8 major regional and international organizations active in this region (e.g., EU, ASEAN, AU, NATO, etc.)"],
+    "economicOverview": "Minimum 150 words — economic structure, trade patterns, development indicators, inequality, major industries",
+    "keyFigures": ["List 6-10 important historical and contemporary political figures from this region"],
+    "culturalNotes": "100-150 words — cultural, linguistic, and religious landscape that influences politics",
+    "geopoliticalSignificance": "100-150 words — strategic importance, alliances, conflicts, resource politics, great power competition"
+}`
+        });
+        if (!response.text) return null;
+        return safeParse(response.text, null) as RegionalDetail | null;
     });
 };
 

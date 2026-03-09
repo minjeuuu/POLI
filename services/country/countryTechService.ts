@@ -1,148 +1,139 @@
+
 import { generateWithFallback, safeParse, getLanguageInstruction } from "../common";
 
 export const fetchTechProfile = async (countryName: string) => {
     const prompt = `
-GENERATE AN EXHAUSTIVE TECHNOLOGY & INNOVATION DOSSIER FOR: ${countryName}
-PROTOCOL: POLI ARCHIVE V2 — EXHAUSTIVE MODE.
-MANDATE: Fill every field with real, specific, accurate data.
+POLI ARCHIVE — COMPLETE TECHNOLOGY & INNOVATION DOSSIER: ${countryName}
+CLASSIFICATION: EXHAUSTIVE DIGITAL & TECH PROFILE
+PROTOCOL: POLI ARCHIVE V2 — MAXIMUM DEPTH
 
-RETURN JSON ONLY:
-{
-  "internetPenetration": "string (% of population)",
-  "mobilePenetration": "string",
-  "cyberRank": "string",
-  "spaceProgram": "string",
-  "majorSectors": ["string (at least 10 sectors)"],
-  "innovationIndex": "string (GII rank and score)",
-
-  "connectivity": {
-    "totalInternetUsers": "string",
-    "fixedBroadbandPenetration": "string",
-    "mobileBroadbandPenetration": "string",
-    "averageFixedInternetSpeed": "string (Mbps)",
-    "averageMobileInternetSpeed": "string",
-    "internetFreedom": "string (Freedom House status)",
-    "internetCensorship": "string",
-    "fiveGCoverage": "string",
-    "fiveGLaunchYear": "string",
-    "fiveGOperators": ["string"],
-    "underseasCables": ["string"],
-    "satelliteConnectivity": "string",
-    "ruralConnectivityRate": "string",
-    "digitalDivide": "string"
-  },
-
-  "socialMedia": {
-    "socialMediaPenetration": "string",
-    "topPlatforms": [
-      { "platform": "string", "users": "string", "penetration": "string" }
-    ],
-    "bannedPlatforms": ["string"],
-    "socialMediaRegulation": "string",
-    "influencerEconomy": "string",
-    "digitalAdvertisingMarket": "string"
-  },
-
-  "techEcosystem": {
-    "totalTechStartups": "string",
-    "techUnicorns": [
-      { "name": "string", "valuation": "string", "sector": "string", "founded": "string" }
-    ],
-    "majorTechCompanies": [
-      { "name": "string", "sector": "string", "revenue": "string", "employees": "string", "founded": "string" }
-    ],
-    "techHubs": [
-      { "city": "string", "nickname": "string", "focus": "string", "companies": "string" }
-    ],
-    "ventureCapitalInvestment": "string",
-    "techIPOs": "string",
-    "techEmployment": "string",
-    "techSectorGDP": "string",
-    "techExports": "string"
-  },
-
-  "rAndD": {
-    "rAndDSpendingGDP": "string",
-    "rAndDSpendingAbsolute": "string",
-    "researchersPerMillion": "string",
-    "annualPatentsFiled": "string",
-    "pctPatentApplications": "string",
-    "topResearchInstitutes": ["string"],
-    "publicRAndDFunding": "string",
-    "privateRAndDFunding": "string",
-    "rAndDGrowthRate": "string",
-    "nobelPrizesInScience": "string"
-  },
-
-  "sectors": {
-    "fintech": { "marketSize": "string", "companies": ["string"], "growth": "string", "regulation": "string" },
-    "healthtech": { "marketSize": "string", "companies": ["string"], "growth": "string" },
-    "edtech": { "marketSize": "string", "companies": ["string"], "growth": "string" },
-    "eCommerce": { "marketSize": "string", "topPlatforms": ["string"], "growth": "string", "penetration": "string" },
-    "cloudComputing": { "marketSize": "string", "providers": ["string"], "adoption": "string" },
-    "artificialIntelligence": { "investmentLevel": "string", "governmentStrategy": "string", "companies": ["string"], "researchInstitutes": ["string"] },
-    "semiconductors": { "role": "string", "companies": ["string"], "production": "string" },
-    "cybersecurity": { "marketSize": "string", "companies": ["string"], "incidents": "string" },
-    "telecommunications": { "majorOperators": ["string"], "infrastructure": "string", "regulation": "string" },
-    "gaming": { "marketSize": "string", "developers": ["string"], "players": "string" }
-  },
-
-  "space": {
-    "spaceAgencyName": "string",
-    "founded": "string",
-    "budget": "string",
-    "majorAchievements": ["string"],
-    "currentMissions": ["string"],
-    "satellites": "string",
-    "launchCapability": "string",
-    "internationalPartnerships": ["string"],
-    "commercialSpaceCompanies": ["string"],
-    "spaceAmbitions": "string"
-  },
-
-  "cybersecurity": {
-    "nationalCyberStrategy": "string",
-    "cyberDefenseAgency": "string",
-    "globalCybersecurityIndex": "string",
-    "gciRank": "string",
-    "majorCyberIncidents": [
-      { "year": "string", "incident": "string", "attribution": "string" }
-    ],
-    "cyberMilitary": "string",
-    "dataBreach": "string",
-    "criticalInfrastructureProtection": "string",
-    "cybercrimeRate": "string"
-  },
-
-  "digitalGovernment": {
-    "eGovernmentDevelopmentIndex": "string",
-    "eGovernmentRank": "string",
-    "onlineServicesAvailability": "string",
-    "digitalIdentitySystem": "string",
-    "openDataPolicy": "string",
-    "smartCityPrograms": ["string"],
-    "blockchainGovernmentInitiatives": ["string"],
-    "digitalCurrencyStatus": "string",
-    "citizenDigitalEngagement": "string"
-  },
-
-  "manufacturing": {
-    "techManufacturingHubs": ["string"],
-    "electronicsProduction": "string",
-    "roboticsIndex": "string",
-    "automationLevel": "string",
-    "industryFourPointZeroAdoption": "string",
-    "manufacturingTechExports": "string"
-  }
-}
 ${getLanguageInstruction()}
+
+You are POLI. Generate the COMPLETE technology profile of ${countryName}.
+
+============================================================
+SECTION 1: DIGITAL INFRASTRUCTURE
+============================================================
+- Internet penetration rate, broadband coverage
+- Average internet speed (download/upload), global ranking
+- Mobile penetration rate, smartphone adoption
+- 5G rollout status and coverage
+- Major telecom operators with market share
+- Submarine cable connections
+- Data center industry (number, capacity, major operators)
+- Cloud computing adoption rate
+- E-government services: portal URL, services available, digital ID system
+
+============================================================
+SECTION 2: TECH INDUSTRY
+============================================================
+- Tech sector size (revenue, % of GDP)
+- Number of tech companies, startups
+- Major tech companies headquartered in country (list 20+ with: name, sector, valuation, CEO, website, employees, founded)
+- Major tech hubs/clusters (name, location, companies, description)
+- Tech unicorns (if any)
+- Foreign tech companies with significant presence
+- Top tech employers
+- IT outsourcing/BPO industry (if significant)
+- Major tech parks and incubators
+
+============================================================
+SECTION 3: INNOVATION ECOSYSTEM
+============================================================
+- Global Innovation Index ranking and score
+- R&D spending as % of GDP
+- Number of researchers per million population
+- Major research institutions and labs (list ALL with: name, affiliation, focus areas, website)
+- Patent applications per year
+- Top universities for STEM
+- Venture capital ecosystem: total funding, major VCs, notable deals
+- Government innovation policies and incentives
+- Tech transfer offices and programs
+
+============================================================
+SECTION 4: EMERGING TECHNOLOGIES
+============================================================
+- AI/ML: major initiatives, companies, government strategy
+- Blockchain/crypto: regulation, adoption, major projects
+- Biotechnology: industry size, major companies, regulations
+- Space technology: space agency (name, budget, achievements), satellite programs, launch capabilities
+- Robotics/automation: adoption rate, major applications
+- Quantum computing: research status
+- Cybersecurity: national strategy, major incidents, agencies
+
+============================================================
+SECTION 5: E-COMMERCE & FINTECH
+============================================================
+- E-commerce market size, growth rate, major platforms
+- Digital payments: adoption rate, major providers
+- Fintech landscape: major companies, mobile banking
+- Cryptocurrency regulation and adoption
+- Digital banking licenses
+
+============================================================
+SECTION 6: TECH POLICY & REGULATION
+============================================================
+- Data protection law (name, year, key provisions)
+- Cybercrime law
+- Content moderation policies
+- AI regulation/ethics framework
+- Digital taxation
+- Net neutrality status
+- Surveillance and privacy concerns
+- Digital literacy programs
+
+RETURN VALID JSON ONLY:
+{
+    "digitalInfra": {
+        "internetPenetration": "string", "broadbandCoverage": "string",
+        "averageSpeed": { "download": "string", "upload": "string", "globalRank": "string" },
+        "mobilePenetration": "string", "smartphoneAdoption": "string",
+        "fiveGStatus": "string", "fiveGCoverage": "string",
+        "telecomOperators": [{ "name": "string", "marketShare": "string", "subscribers": "string" }],
+        "submarineCables": ["string"],
+        "dataCenters": { "count": "string", "majorOperators": ["string"] },
+        "eGovernment": { "portal": "string", "services": ["string"], "digitalId": "string" }
+    },
+    "techIndustry": {
+        "sectorSize": "string", "gdpPercentage": "string",
+        "totalCompanies": "string", "totalStartups": "string",
+        "majorCompanies": [{ "name": "string", "sector": "string", "valuation": "string", "ceo": "string", "website": "string", "employees": "string", "founded": "string" }],
+        "techHubs": [{ "name": "string", "location": "string", "companies": "string", "description": "string" }],
+        "unicorns": [{ "name": "string", "valuation": "string", "sector": "string" }],
+        "bpoIndustry": { "revenue": "string", "employees": "string", "majorCompanies": ["string"] }
+    },
+    "innovation": {
+        "giiRanking": "string", "giiScore": "string",
+        "rdSpending": "string", "researchersPerMillion": "string",
+        "researchInstitutions": [{ "name": "string", "focus": "string", "website": "string" }],
+        "patents": "string",
+        "vcEcosystem": { "totalFunding": "string", "majorVCs": ["string"] },
+        "govPolicies": ["string"]
+    },
+    "emergingTech": {
+        "ai": { "strategy": "string", "majorInitiatives": ["string"], "companies": ["string"] },
+        "blockchain": { "regulation": "string", "adoption": "string" },
+        "biotech": { "industrySize": "string", "companies": ["string"] },
+        "space": { "agency": "string", "budget": "string", "achievements": ["string"], "satellites": "string" },
+        "cybersecurity": { "strategy": "string", "agency": "string", "majorIncidents": ["string"] }
+    },
+    "ecommerce": {
+        "marketSize": "string", "growthRate": "string",
+        "majorPlatforms": [{ "name": "string", "marketShare": "string" }],
+        "digitalPayments": { "adoption": "string", "providers": ["string"] },
+        "fintech": [{ "name": "string", "service": "string", "users": "string" }]
+    },
+    "policy": {
+        "dataProtection": { "name": "string", "year": "string", "keyProvisions": ["string"] },
+        "cybercrimeLaw": "string",
+        "aiRegulation": "string",
+        "netNeutrality": "string",
+        "surveillance": "string",
+        "digitalLiteracy": "string"
+    }
+}
     `;
 
-    const response = await generateWithFallback({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: { responseMimeType: "application/json", maxOutputTokens: 32768 }
-    });
-
+    const response = await generateWithFallback({ contents: prompt, maxTokens: 8000 });
     return safeParse(response.text || '{}', {});
 };

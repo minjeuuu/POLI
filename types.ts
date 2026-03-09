@@ -364,6 +364,12 @@ export interface RegionalDetail {
     keyCountries: string[];
     politicalThemes: string[];
     challenges: string[];
+    historicalBackground?: string;
+    keyOrganizations?: string[];
+    economicOverview?: string;
+    keyFigures?: string[];
+    culturalNotes?: string;
+    geopoliticalSignificance?: string;
 }
 
 export interface OrganizationDetail {

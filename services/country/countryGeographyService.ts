@@ -1,114 +1,127 @@
 
 import { generateWithFallback, safeParse, getLanguageInstruction } from "../common";
-import { GeographyProfile } from "../../types";
 
-export const fetchGeography = async (countryName: string): Promise<GeographyProfile> => {
+export const fetchGeography = async (countryName: string) => {
     const prompt = `
-POLI ARCHIVE — COMPLETE GEOGRAPHIC & ADMINISTRATIVE SURVEY: ${countryName}
-CLASSIFICATION: EXHAUSTIVE TERRITORIAL MAPPING
-PROTOCOL: POLI ARCHIVE V2 — DRILL-DOWN SYSTEM
+POLI ARCHIVE — COMPLETE GEOGRAPHIC PROFILE: ${countryName}
+CLASSIFICATION: EXHAUSTIVE TERRITORIAL & ADMINISTRATIVE DOSSIER
+PROTOCOL: POLI ARCHIVE V2 — INFINITE GRANULARITY
 
 ${getLanguageInstruction()}
 
-You are POLI, generating the COMPLETE geographic and administrative profile of ${countryName}. This must support a DRILL-DOWN SYSTEM — users can click a region to see provinces, click a province to see municipalities, etc.
+You are POLI. Generate the COMPLETE geographic profile of ${countryName}. Every border, every division, every natural feature.
 
-MANDATORY REQUIREMENTS:
+============================================================
+SECTION 1: PHYSICAL GEOGRAPHY
+============================================================
 
-1. ADMINISTRATIVE DIVISIONS — COMPLETE DRILL-DOWN HIERARCHY:
-   Level 1 (Top-level divisions): List ALL first-level administrative divisions (states, provinces, regions, oblasts, prefectures, etc.). For EACH provide:
-   - Name, type (state/province/region/etc.), capital, population, area, governor/leader name and party
-   - Official seal/logo description, official website URL
+A. TERRITORY:
+   - Total area (km2 and sq mi), land area, water area
+   - Coastline length, highest point (name + elevation), lowest point
+   - Geographic coordinates (center)
+   - Time zones (all of them with UTC offsets)
+   - Bordering countries (list ALL with border length for each)
 
-   Level 2 (Sub-divisions): For EACH Level 1 division, list ALL level 2 subdivisions (provinces within regions, counties within states, etc.). For EACH:
-   - Name, type, capital, population, governor/leader
-   - Component cities (independent/chartered cities)
+B. TERRAIN & TOPOGRAPHY:
+   - Major mountain ranges, peaks (list ALL significant ones with elevations)
+   - Major rivers (list ALL with length, source, mouth)
+   - Lakes, seas, bodies of water
+   - Plains, plateaus, valleys, deserts, islands
+   - Volcanoes (active and dormant)
 
-   Level 3 (Municipalities/Cities): For EACH Level 2, list municipalities and component cities with:
-   - Name, type (municipality/city/town), population, mayor name
+C. CLIMATE:
+   - Climate classification (Koppen types present)
+   - Climate zones across the country
+   - Average temperatures, annual rainfall
+   - Natural disaster risks
 
-   Level 4 (Lowest level): For the first few Level 3 units, list sample lowest-level divisions (barangays, wards, parishes, communes) with:
-   - Name, captain/chair name
+D. NATURAL RESOURCES:
+   - List ALL mineral resources, fossil fuels, renewable resources
+   - Agricultural products, fisheries, forestry
 
-   IMPORTANT: For ${countryName}, if it has regions, list ALL regions. For each region, list ALL provinces and independent/component cities. For the first 3 provinces, list ALL municipalities. For the first municipality, list ALL barangays/wards.
+E. PROTECTED AREAS:
+   - National parks (list ALL with area, year established)
+   - UNESCO World Heritage natural sites
 
-2. GEOGRAPHY:
-   - Total area (km² and sq mi), land area, water area, coastline length
-   - Highest point, lowest point, longest river, largest lake
-   - Major mountain ranges, plains, valleys, peninsulas, islands
-   - Border countries with border lengths
+============================================================
+SECTION 2: ADMINISTRATIVE DIVISIONS — COMPLETE DRILL-DOWN
+============================================================
 
-3. CLIMATE & TERRAIN:
-   - Climate zones with detailed descriptions
-   - Terrain types: Mountains, plains, deserts, forests, wetlands
-   - Natural hazards: earthquakes, typhoons, flooding, etc.
+MOST CRITICAL SECTION. Provide the COMPLETE administrative hierarchy.
 
-4. NATURAL RESOURCES:
-   - Complete list of all natural resources with estimated reserves
-   - Mining, forestry, fishing, agriculture resources
+A. ADMINISTRATIVE STRUCTURE:
+   - Total number of levels, name of each level, total count at each level
+   - Example: Philippines: 17 Regions > 81 Provinces + 38 Independent Cities > 146 Cities + 1,488 Municipalities > 42,036 Barangays
 
-5. CAPITALS:
-   - National capital: name, coordinates, population, founded date, history
-   - Former capitals if any
-   - Economic capital (if different)
+B. LEVEL 1 — TOP-LEVEL DIVISIONS:
+   List EVERY SINGLE top-level division. For each:
+   - Official name, type, capital, population, area, head (name + title + party), subdivision count, ISO code, special status
+   LIST ALL OF THEM. No abbreviation. No "and X more".
+
+C. MAJOR CITIES (top 30+):
+   - Name, population, province/state, mayor/head, area, designation
+
+D. SPECIAL ZONES:
+   - Autonomous regions, free trade zones, special economic zones, overseas territories
+
+============================================================
+SECTION 3: BORDERS & MARITIME
+============================================================
+- International borders with lengths, border disputes
+- EEZ, territorial sea, continental shelf
 
 RETURN VALID JSON ONLY:
 {
-    "geography": {
-        "totalArea": "string", "landArea": "string", "waterArea": "string", "coastline": "string",
-        "highestPoint": { "name": "string", "elevation": "string" },
-        "lowestPoint": { "name": "string", "elevation": "string" },
-        "longestRiver": { "name": "string", "length": "string" },
-        "largestLake": { "name": "string", "area": "string" },
-        "majorFeatures": ["string"],
-        "borderCountries": [{ "country": "string", "borderLength": "string" }],
-        "capitals": [{ "name": "string", "coordinates": "string", "population": "string", "founded": "string", "type": "string" }],
-        "climateZones": ["string"],
-        "terrain": ["string"],
-        "naturalHazards": ["string"],
-        "naturalResources": ["string"],
-        "adminDivisions": {
-            "systemDescription": "string (explain the full administrative hierarchy of the country)",
-            "totalLevel1": 0,
-            "totalLevel2": 0,
-            "totalLevel3": 0,
-            "level1": [
-                {
-                    "name": "string",
-                    "type": "string (region/state/province/oblast/etc.)",
-                    "capital": "string",
-                    "population": "string",
-                    "area": "string",
-                    "leader": { "name": "string", "title": "string", "party": "string" },
-                    "sealDescription": "string",
-                    "website": "string",
-                    "level2": [
-                        {
-                            "name": "string",
-                            "type": "string (province/county/district/etc.)",
-                            "capital": "string",
-                            "population": "string",
-                            "leader": { "name": "string", "title": "string", "party": "string" },
-                            "componentCities": ["string"],
-                            "level3": [
-                                {
-                                    "name": "string",
-                                    "type": "string (municipality/city/town)",
-                                    "population": "string",
-                                    "leader": { "name": "string", "title": "string" },
-                                    "level4": [
-                                        { "name": "string", "type": "string", "leader": { "name": "string", "title": "string" } }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    }
+    "totalArea": "string", "landArea": "string", "waterArea": "string",
+    "coastline": "string",
+    "highestPoint": { "name": "string", "elevation": "string" },
+    "lowestPoint": { "name": "string", "elevation": "string" },
+    "coordinates": "string",
+    "timeZones": ["string"],
+    "borders": [{ "country": "string", "length": "string" }],
+    "terrain": ["string"],
+    "mountainRanges": [{ "name": "string", "highestPeak": "string", "elevation": "string" }],
+    "rivers": [{ "name": "string", "length": "string", "source": "string", "mouth": "string" }],
+    "lakes": [{ "name": "string", "area": "string", "type": "string" }],
+    "islands": [{ "name": "string", "area": "string", "population": "string" }],
+    "volcanoes": [{ "name": "string", "elevation": "string", "status": "string", "lastEruption": "string" }],
+    "climateZones": ["string"],
+    "climateClassification": "string",
+    "averageTemperature": { "summer": "string", "winter": "string" },
+    "annualRainfall": "string",
+    "naturalDisasters": ["string"],
+    "naturalResources": ["string"],
+    "nationalParks": [{ "name": "string", "area": "string", "yearEstablished": "string" }],
+    "capitals": [{ "name": "string", "type": "string", "population": "string", "coordinates": "string", "founded": "string" }],
+    "adminDivisions": {
+        "structure": "string (e.g., 'Regions > Provinces > Cities/Municipalities > Barangays')",
+        "totalLevels": 0,
+        "levelNames": ["string"],
+        "levelCounts": [{ "level": "string", "count": 0 }],
+        "level1": [{
+            "name": "string",
+            "type": "string",
+            "capital": "string",
+            "population": "string",
+            "area": "string",
+            "head": { "name": "string", "title": "string", "party": "string" },
+            "subdivisionCount": 0,
+            "isoCode": "string",
+            "specialStatus": "string"
+        }]
+    },
+    "majorCities": [{
+        "name": "string", "population": "string", "province": "string",
+        "mayor": "string", "area": "string", "designation": "string"
+    }],
+    "specialZones": [{ "name": "string", "type": "string", "description": "string" }],
+    "borderDisputes": [{ "territory": "string", "claimants": ["string"], "status": "string" }],
+    "maritimeZone": { "eez": "string", "territorialSea": "string" }
 }
     `;
 
-    const response = await generateWithFallback({ contents: prompt });
-    return safeParse(response.text || '{}', {}) as GeographyProfile;
+    const response = await generateWithFallback({ contents: prompt, maxTokens: 8000 });
+    const parsed = safeParse(response.text || '{}', {}) as any;
+    // Handle both wrapped and unwrapped responses
+    return parsed.geography || parsed;
 };

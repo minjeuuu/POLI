@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { MainTab, DailyContext, SavedItem, UserProfile, ThemeScope, SpecialTheme, UserPreferences } from './types';
-import { fetchDailyContext, aiOnline as homeAiOnline } from './services/homeService';
+import { fetchDailyContext } from './services/homeService';
+import { globalAiOnline } from './services/common';
 import { FALLBACK_DAILY_CONTEXT } from './data/homeData';
 import { db } from './services/database';
 
@@ -136,7 +137,7 @@ export default function App() {
       try {
         const data = await fetchDailyContext(currentDate);
         setDailyData(data);
-        setIsAiOnline(homeAiOnline);
+        setIsAiOnline(globalAiOnline);
       } catch (e) {
         console.error("Failed to load daily context", e);
         setIsAiOnline(false);

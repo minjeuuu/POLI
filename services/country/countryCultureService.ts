@@ -1,253 +1,159 @@
+
 import { generateWithFallback, safeParse, getLanguageInstruction } from "../common";
 
 export const fetchCultureProfile = async (countryName: string) => {
     const prompt = `
-GENERATE AN EXHAUSTIVE CULTURAL HERITAGE & TRADITIONS DOSSIER FOR: ${countryName}
-PROTOCOL: POLI ARCHIVE V2 — EXHAUSTIVE MODE.
-MANDATE: Fill every field with real, specific, accurate data. Be encyclopedic.
+POLI ARCHIVE — COMPLETE CULTURAL HERITAGE DOSSIER: ${countryName}
+CLASSIFICATION: EXHAUSTIVE CULTURE, ARTS & TRADITIONS PROFILE
+PROTOCOL: POLI ARCHIVE V2 — MAXIMUM DEPTH
 
-RETURN JSON ONLY:
-{
-  "cuisine": ["string (at least 20 traditional dishes)"],
-  "arts": ["string (at least 15 art forms)"],
-  "sports": ["string (at least 12 sports + achievements)"],
-  "holidays": ["string (at least 15 holidays with dates)"],
-  "literature": ["string (at least 15 works/authors)"],
-  "cinema": ["string (at least 15 films/directors)"],
-  "music": ["string (at least 12 genres/artists)"],
-  "fashion": ["string (at least 8 styles/designers)"],
-  "architecture": ["string (at least 10 styles/landmarks)"],
-  "folklore": ["string (at least 10 stories/myths)"],
-
-  "food": {
-    "overview": "string (paragraph on culinary traditions)",
-    "regionalCuisines": [
-      { "region": "string", "specialty": "string", "keyIngredients": ["string"], "description": "string" }
-    ],
-    "stapleIngredients": ["string"],
-    "traditionalDishes": [
-      { "name": "string", "type": "string (appetizer/main/dessert)", "ingredients": ["string"], "description": "string", "region": "string" }
-    ],
-    "streetFood": [
-      { "name": "string", "location": "string", "description": "string" }
-    ],
-    "beverages": [
-      { "name": "string", "type": "string (alcoholic/non-alcoholic)", "description": "string" }
-    ],
-    "foodEtiquette": ["string"],
-    "mealTimes": "string",
-    "celebrationFoods": ["string"],
-    "fasting Traditions": "string",
-    "topChefs": [
-      { "name": "string", "specialty": "string", "restaurants": ["string"] }
-    ]
-  },
-
-  "music": {
-    "overview": "string",
-    "traditionalGenres": [
-      { "genre": "string", "origin": "string", "instruments": ["string"], "description": "string" }
-    ],
-    "popularGenres": [
-      { "genre": "string", "description": "string" }
-    ],
-    "traditionalInstruments": [
-      { "name": "string", "type": "string", "description": "string" }
-    ],
-    "famousMusicians": [
-      { "name": "string", "genre": "string", "achievements": "string", "era": "string" }
-    ],
-    "topBands": ["string"],
-    "musicFestivals": [
-      { "name": "string", "location": "string", "month": "string", "genre": "string" }
-    ],
-    "musicIndustrySize": "string",
-    "streamingCulture": "string"
-  },
-
-  "visualArts": {
-    "overview": "string",
-    "paintingTraditions": [
-      { "style": "string", "era": "string", "description": "string" }
-    ],
-    "famousArtists": [
-      { "name": "string", "medium": "string", "era": "string", "notableWorks": ["string"] }
-    ],
-    "topMuseums": [
-      { "name": "string", "city": "string", "collection": "string", "founded": "string" }
-    ],
-    "contemporaryArtScene": "string",
-    "streetArt": "string",
-    "craftTraditions": [
-      { "craft": "string", "region": "string", "materials": ["string"], "description": "string" }
-    ],
-    "textile": "string",
-    "pottery": "string",
-    "jewelry": "string"
-  },
-
-  "performingArts": {
-    "theater": {
-      "overview": "string",
-      "traditionalForms": ["string"],
-      "famousPlaywrights": ["string"],
-      "topVenues": [{ "name": "string", "city": "string", "capacity": "string" }]
-    },
-    "dance": {
-      "overview": "string",
-      "traditionalDances": [
-        { "name": "string", "region": "string", "occasion": "string", "description": "string" }
-      ],
-      "famousCompanies": ["string"],
-      "contemporaryDance": "string"
-    },
-    "opera": "string",
-    "circus": "string"
-  },
-
-  "literature": {
-    "overview": "string",
-    "literaryTradition": "string",
-    "famousAuthors": [
-      { "name": "string", "genre": "string", "era": "string", "notableWorks": ["string"], "awards": "string" }
-    ],
-    "notableWorks": [
-      { "title": "string", "author": "string", "year": "string", "genre": "string", "significance": "string" }
-    ],
-    "nobelPrizeLiterature": ["string"],
-    "publishingIndustry": "string",
-    "topLiteraryFestivals": ["string"],
-    "poetry": "string",
-    "oralTradition": "string"
-  },
-
-  "cinema": {
-    "overview": "string",
-    "filmIndustry": "string",
-    "annualFilmsProduced": "string",
-    "boxOfficeRevenue": "string",
-    "famousDirectors": [
-      { "name": "string", "genre": "string", "notableFilms": ["string"], "awards": "string" }
-    ],
-    "famousActors": [
-      { "name": "string", "era": "string", "notableFilms": ["string"] }
-    ],
-    "notableFilms": [
-      { "title": "string", "director": "string", "year": "string", "awards": "string", "significance": "string" }
-    ],
-    "filmFestivals": [
-      { "name": "string", "city": "string", "frequency": "string" }
-    ],
-    "streamingMarket": "string"
-  },
-
-  "sports": {
-    "overview": "string",
-    "nationalSport": "string",
-    "popularSports": [
-      { "sport": "string", "popularity": "string", "achievements": "string", "leagues": ["string"] }
-    ],
-    "olympicHistory": {
-      "totalMedals": "string",
-      "goldMedals": "string",
-      "silverMedals": "string",
-      "bronzeMedals": "string",
-      "famousAthletes": [
-        { "name": "string", "sport": "string", "achievements": "string" }
-      ]
-    },
-    "worldCupHistory": "string",
-    "topSportsStadiums": [
-      { "name": "string", "city": "string", "capacity": "string", "sport": "string" }
-    ],
-    "sportsGoverningBodies": ["string"],
-    "traditionalSports": ["string"],
-    "eSports": "string",
-    "sportsTourism": "string"
-  },
-
-  "festivals": {
-    "majorFestivals": [
-      { "name": "string", "date": "string", "type": "string (Religious/National/Cultural)", "description": "string", "location": "string", "rituals": ["string"] }
-    ],
-    "nationalHolidays": [
-      { "name": "string", "date": "string", "significance": "string" }
-    ],
-    "harvest Festivals": ["string"],
-    "religiousFestivals": ["string"],
-    "folkFestivals": ["string"]
-  },
-
-  "traditions": {
-    "greetingCustoms": "string",
-    "weddingTraditions": "string",
-    "funeralCustoms": "string",
-    "birthCelebrations": "string",
-    "comingOfAge": "string",
-    "giftGivingEtiquette": "string",
-    "tableManners": "string",
-    "dressTraditions": "string",
-    "tattooBody Art": "string",
-    "superstitions": ["string"],
-    "taboos": ["string"],
-    "greetingPhrase": "string"
-  },
-
-  "fashion": {
-    "overview": "string",
-    "traditionalGarments": [
-      { "name": "string", "gender": "string", "occasion": "string", "description": "string" }
-    ],
-    "fashionIndustry": "string",
-    "famousDesigners": [
-      { "name": "string", "style": "string", "achievements": "string" }
-    ],
-    "fashionWeeks": ["string"],
-    "streetStyle": "string",
-    "fashionExports": "string"
-  },
-
-  "architecture": {
-    "overview": "string",
-    "historicalStyles": [
-      { "style": "string", "era": "string", "characteristics": ["string"], "examples": ["string"] }
-    ],
-    "iconicBuildings": [
-      { "name": "string", "city": "string", "year": "string", "architect": "string", "style": "string", "significance": "string" }
-    ],
-    "contemporaryArchitecture": "string",
-    "urbanPlanning": "string"
-  },
-
-  "folklore": {
-    "mythology": "string",
-    "famousMythsFolktales": [
-      { "title": "string", "type": "string", "summary": "string", "significance": "string" }
-    ],
-    "legendaryFigures": ["string"],
-    "tricksterFigures": ["string"],
-    "heroicEpics": ["string"],
-    "ghostStories": ["string"],
-    "supernaturalBeliefs": "string"
-  },
-
-  "culturalExports": {
-    "softPower": "string",
-    "globalInfluence": "string",
-    "culturalBrands": ["string"],
-    "diasporaInfluence": "string",
-    "tourism Cultural Draw": "string",
-    "languageInfluence": "string"
-  }
-}
 ${getLanguageInstruction()}
+
+You are POLI. Generate the COMPLETE cultural profile of ${countryName}.
+
+============================================================
+SECTION 1: CULTURAL OVERVIEW
+============================================================
+- Cultural identity narrative (500+ words): what defines this culture
+- Major cultural influences (indigenous, colonial, migration, globalization)
+- UNESCO Intangible Cultural Heritage items (list ALL)
+- UNESCO World Heritage Cultural Sites (list ALL with year inscribed)
+
+============================================================
+SECTION 2: ARTS & LITERATURE
+============================================================
+A. LITERATURE:
+   - Major literary traditions, literary movements
+   - Nobel Prize winners in literature (if any)
+   - 20+ most important authors/poets with key works, years, significance
+   - Major literary prizes in the country
+   - Publishing industry overview
+
+B. VISUAL ARTS:
+   - Major art movements, art schools
+   - 15+ most important visual artists
+   - Major museums and galleries (list ALL major ones with location, website)
+   - Contemporary art scene
+
+C. PERFORMING ARTS:
+   - Theater traditions (traditional and modern)
+   - Dance forms (list ALL traditional dances with description)
+   - Major performing arts venues, festivals
+
+D. MUSIC:
+   - Traditional music genres and instruments
+   - Popular music genres, major artists (list 20+)
+   - National music institutions, conservatories
+   - Major music festivals
+
+E. CINEMA & MEDIA:
+   - Film industry overview: major studios, annual production, international recognition
+   - 10+ most important directors and films
+   - Major film festivals in the country
+   - Animation/gaming industry
+
+============================================================
+SECTION 3: CUISINE & GASTRONOMY
+============================================================
+- National dishes (list 20+ with description, origin, ingredients)
+- Regional culinary traditions
+- Street food culture
+- Beverages (traditional and modern)
+- Food festivals, food heritage designations
+- Famous chefs and restaurants
+- Dining customs and etiquette
+
+============================================================
+SECTION 4: TRADITIONS & CUSTOMS
+============================================================
+- Major festivals and celebrations (list ALL with dates, description, significance)
+- Religious practices and their cultural impact
+- Marriage customs, birth traditions, funeral rites
+- Social etiquette and taboos
+- Traditional clothing/costumes (describe each)
+- Handicrafts and artisan traditions
+- Oral traditions, folklore, mythology
+
+============================================================
+SECTION 5: SPORTS & RECREATION
+============================================================
+- National sport(s), most popular sports
+- Olympic medal count, notable athletes (list 15+)
+- Major sports leagues and teams
+- Traditional/indigenous sports and games
+- Sports venues and stadiums (list major ones)
+- International sporting events hosted
+
+============================================================
+SECTION 6: ARCHITECTURE
+============================================================
+- Major architectural styles and periods
+- Most important buildings and structures (list 20+ with description, architect, year)
+- Traditional housing styles
+- Modern architectural landmarks
+- Urban planning traditions
+
+RETURN VALID JSON ONLY:
+{
+    "overview": "string (500+ words)",
+    "culturalInfluences": ["string"],
+    "unescoIntangible": [{ "name": "string", "year": "string", "description": "string" }],
+    "unescoWorldHeritage": [{ "name": "string", "year": "string", "type": "string", "description": "string" }],
+    "literature": {
+        "overview": "string",
+        "nobelWinners": [{ "name": "string", "year": "string", "work": "string" }],
+        "majorAuthors": [{ "name": "string", "years": "string", "keyWorks": ["string"], "significance": "string" }],
+        "literaryPrizes": [{ "name": "string", "focus": "string" }]
+    },
+    "visualArts": {
+        "movements": ["string"],
+        "majorArtists": [{ "name": "string", "medium": "string", "significance": "string" }],
+        "museums": [{ "name": "string", "location": "string", "website": "string", "description": "string" }]
+    },
+    "performingArts": {
+        "theater": ["string"],
+        "dances": [{ "name": "string", "type": "string", "description": "string", "region": "string" }],
+        "venues": [{ "name": "string", "location": "string", "capacity": "string" }]
+    },
+    "music": {
+        "genres": ["string"],
+        "instruments": [{ "name": "string", "type": "string", "description": "string" }],
+        "majorArtists": [{ "name": "string", "genre": "string", "significance": "string" }],
+        "festivals": [{ "name": "string", "location": "string", "month": "string" }]
+    },
+    "cinema": {
+        "overview": "string",
+        "majorDirectors": [{ "name": "string", "keyFilms": ["string"], "awards": "string" }],
+        "filmFestivals": [{ "name": "string", "location": "string" }]
+    },
+    "cuisine": {
+        "nationalDishes": [{ "name": "string", "description": "string", "origin": "string", "ingredients": ["string"] }],
+        "streetFood": [{ "name": "string", "description": "string" }],
+        "beverages": [{ "name": "string", "type": "string", "description": "string" }],
+        "foodFestivals": [{ "name": "string", "location": "string", "month": "string" }]
+    },
+    "traditions": {
+        "festivals": [{ "name": "string", "date": "string", "description": "string", "significance": "string" }],
+        "customs": [{ "type": "string", "description": "string" }],
+        "clothing": [{ "name": "string", "gender": "string", "occasion": "string", "description": "string" }],
+        "folklore": [{ "name": "string", "type": "string", "description": "string" }]
+    },
+    "sports": {
+        "nationalSport": "string",
+        "popularSports": ["string"],
+        "olympicMedals": { "gold": 0, "silver": 0, "bronze": 0, "total": 0 },
+        "notableAthletes": [{ "name": "string", "sport": "string", "achievements": "string" }],
+        "leagues": [{ "name": "string", "sport": "string", "teams": 0 }],
+        "venues": [{ "name": "string", "location": "string", "capacity": "string", "sport": "string" }]
+    },
+    "architecture": {
+        "styles": ["string"],
+        "landmarks": [{ "name": "string", "location": "string", "architect": "string", "year": "string", "style": "string", "description": "string" }],
+        "traditionalHousing": "string"
+    }
+}
     `;
 
-    const response = await generateWithFallback({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: { responseMimeType: "application/json", maxOutputTokens: 32768 }
-    });
-
+    const response = await generateWithFallback({ contents: prompt, maxTokens: 8000 });
     return safeParse(response.text || '{}', {});
 };

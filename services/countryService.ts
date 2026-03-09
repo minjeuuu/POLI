@@ -171,6 +171,116 @@ export const fetchCountryDeepDive = async (countryName: string): Promise<Country
     });
 };
 
-export const fetchSubDivisions = async (name: string, type: string) => { return []; }; 
-export const fetchSpecificList = async (countryName: string, listType: string) => { return []; };
-export const fetchElectionDetail = async (country: string, year: string, type: string) => { return {} as ElectionDetail; };
+/**
+ * DRILL-DOWN: Fetch subdivisions of a given parent administrative unit.
+ * e.g. fetchSubDivisions("Philippines", "Region", "National Capital Region")
+ */
+export const fetchSubDivisions = async (countryName: string, parentType: string, parentName?: string): Promise<any[]> => {
+    const cacheKey = `subdiv_poli_v2_${countryName}_${parentType}_${parentName || 'root'}`.replace(/\s+/g, '_');
+    return withCache(cacheKey, async () => {
+        const prompt = `
+POLI ARCHIVE — ADMINISTRATIVE SUBDIVISION DRILL-DOWN: ${countryName}
+PARENT LEVEL: ${parentType}
+${parentName ? `PARENT UNIT: ${parentName}` : 'ROOT LEVEL — list all top-level divisions'}
+
+You are POLI. Provide the COMPLETE list of ALL administrative subdivisions under the specified parent.
+
+RULES:
+- List EVERY SINGLE subdivision. If there are 80 provinces, list ALL 80. If there are 1500 municipalities, list ALL 1500.
+- Do NOT summarize, abbreviate, or say "and X more". List them ALL.
+- For each subdivision provide: name, type (province/city/municipality/district/barangay/county/state etc.), population (approximate), capital/center, area, current chief executive (governor/mayor/head), their party affiliation.
+- If this is the lowest level (e.g., barangays), just list name, population, and barangay captain/chief.
+- Include any special status designations (independent city, highly urbanized city, component city, etc.)
+
+RETURN VALID JSON ONLY:
+{
+    "parentName": "${parentName || countryName}",
+    "parentType": "${parentType}",
+    "subdivisionType": "string (what type the children are)",
+    "totalCount": 0,
+    "hasNextLevel": true,
+    "nextLevelType": "string (what the next drill-down level is called)",
+    "subdivisions": [
+        {
+            "name": "string",
+            "type": "string",
+            "population": "string",
+            "area": "string",
+            "capital": "string",
+            "head": { "name": "string", "title": "string", "party": "string" },
+            "status": "string",
+            "code": "string"
+        }
+    ]
+}`;
+        const response = await generateWithFallback({ contents: prompt, maxTokens: 8000 });
+        const parsed = safeParse(response.text || '[]', []) as any;
+        return parsed.subdivisions || (Array.isArray(parsed) ? parsed : []);
+    });
+};
+
+/**
+ * DRILL-DOWN: Fetch a specific list of items (legislators, agencies, universities, etc.)
+ */
+export const fetchSpecificList = async (countryName: string, listType: string): Promise<any[]> => {
+    const cacheKey = `speclist_poli_v2_${countryName}_${listType}`.replace(/\s+/g, '_');
+    return withCache(cacheKey, async () => {
+        const prompt = `
+POLI ARCHIVE — COMPLETE ${listType.toUpperCase()} LIST: ${countryName}
+CLASSIFICATION: EXHAUSTIVE ROSTER
+
+You are POLI. Provide the COMPLETE, EXHAUSTIVE list of ALL ${listType} for ${countryName}.
+
+CRITICAL: List EVERY SINGLE entry. Do NOT summarize or abbreviate. If there are 300 members, list ALL 300. If there are 50 universities, list ALL 50.
+
+For each entry, provide as much detail as possible: full name, title/position, party/affiliation, district/location, date appointed/elected, website URL (real, verified), logo/seal description, contact info if public.
+
+RETURN VALID JSON ONLY — array of objects:
+[
+    {
+        "name": "string",
+        "title": "string",
+        "detail": "string",
+        "party": "string",
+        "district": "string",
+        "since": "string",
+        "website": "string",
+        "logoUrl": "string",
+        "description": "string"
+    }
+]`;
+        const response = await generateWithFallback({ contents: prompt, maxTokens: 8000 });
+        const parsed = safeParse(response.text || '[]', []);
+        return Array.isArray(parsed) ? parsed : [];
+    });
+};
+
+export const fetchElectionDetail = async (country: string, year: string, type: string): Promise<ElectionDetail> => {
+    const cacheKey = `election_poli_v2_${country}_${year}_${type}`.replace(/\s+/g, '_');
+    return withCache(cacheKey, async () => {
+        const prompt = `
+POLI ARCHIVE — COMPLETE ELECTION DETAIL: ${country} ${year} ${type}
+
+Provide the COMPLETE results of the ${year} ${type} election in ${country}.
+List ALL candidates, their parties, vote counts, vote percentages, districts won.
+Include turnout, electoral system used, controversies, international observers' assessment.
+
+RETURN VALID JSON:
+{
+    "country": "${country}",
+    "year": "${year}",
+    "type": "${type}",
+    "electoralSystem": "string",
+    "turnout": "string",
+    "totalVoters": "string",
+    "registeredVoters": "string",
+    "results": [{ "candidate": "string", "party": "string", "votes": "string", "percentage": "string", "status": "string" }],
+    "districtResults": [{ "district": "string", "winner": "string", "party": "string" }],
+    "analysis": "string (500+ words)",
+    "controversies": ["string"],
+    "observers": [{ "org": "string", "assessment": "string" }]
+}`;
+        const response = await generateWithFallback({ contents: prompt, maxTokens: 8000 });
+        return safeParse(response.text || '{}', {} as ElectionDetail);
+    });
+};

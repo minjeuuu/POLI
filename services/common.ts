@@ -18,17 +18,28 @@ export const withCache = async <T>(key: string, fetcher: () => Promise<T>): Prom
   }
 };
 
+/** Reactive AI status — set true when any generateWithFallback call succeeds */
+export let globalAiOnline = false;
+
 /**
- * AI Wrapper — Claude is the sole AI provider. No offline fallback.
- * Throws if Claude is unavailable so callers can handle the error cleanly.
+ * AI Wrapper — Claude is the sole AI provider.
+ * Returns the AI response. On failure returns { text: '' } instead of throwing
+ * so individual services can degrade gracefully while the rest keep loading.
  */
 export const generateWithFallback = async (params: any, _fallbackModel?: string): Promise<{ text: string }> => {
     const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
 
-    const claudeResponse = await generateWithClaude(prompt);
-    if (claudeResponse) return { text: claudeResponse };
-
-    throw new Error("Claude AI unavailable. Please check your API key.");
+    try {
+        const claudeResponse = await generateWithClaude(prompt, undefined, params.maxTokens);
+        if (claudeResponse) {
+            globalAiOnline = true;
+            return { text: claudeResponse };
+        }
+    } catch (e) {
+        console.error("generateWithFallback error:", e);
+    }
+    globalAiOnline = false;
+    return { text: '' };
 };
 
 export class JSONRepair {

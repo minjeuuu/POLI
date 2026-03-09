@@ -1,8 +1,8 @@
 
-import { generateWithFallback, withCache, getLanguageInstruction, safeParse } from "./common";
+import { generateWithFallback, withCache, getLanguageInstruction, safeParse, globalAiOnline } from "./common";
 import { DailyContext, HighlightedEntity, HighlightDetail } from "../types";
 
-// Reactive AI status — true when the last daily fetch got real AI data, false on error
+// Reactive AI status — mirrors globalAiOnline from common.ts
 export let aiOnline = false;
 
 // Helper to parse year strings like "3200 BCE", "1945", "c. 500" into numbers
@@ -45,53 +45,11 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
                 ${getLanguageInstruction()}
                 `;
 
-        try {
-            const response = await generateWithFallback({ contents });
-            // If generateWithFallback succeeded, Claude is online
-            aiOnline = true;
-            const parsed = safeParse(response.text || '{}', {}) as any;
+        const response = await generateWithFallback({ contents });
+        // Sync from global status
+        aiOnline = globalAiOnline;
 
-            if (!parsed || !parsed.synthesis) {
-                // AI responded but data was malformed - still online
-                return {
-                    date: date.toDateString(),
-                    synthesis: "Daily briefing is being compiled. The POLI research engine is online and operational.",
-                    quote: { text: "Knowledge is power.", author: "Francis Bacon", year: "1597", region: "England" },
-                    news: [],
-                    historicalEvents: [],
-                    highlightedPerson: null as any,
-                    highlightedCountry: null as any,
-                    highlightedIdeology: null as any,
-                    highlightedDiscipline: null as any,
-                    highlightedOrg: null as any,
-                    dailyFact: null as any,
-                    dailyTrivia: null as any,
-                    otherHighlights: [],
-                };
-            }
-
-            const events = (parsed.historicalEvents || []).slice().sort(
-                (a: any, b: any) => parseYear(a.year) - parseYear(b.year)
-            );
-
-            return {
-                date: date.toDateString(),
-                quote: parsed.quote,
-                news: parsed.news || [],
-                highlightedPerson: parsed.highlightedPerson,
-                highlightedCountry: parsed.highlightedCountry,
-                highlightedIdeology: parsed.highlightedIdeology,
-                highlightedDiscipline: parsed.highlightedDiscipline,
-                highlightedOrg: parsed.highlightedOrg,
-                dailyFact: parsed.dailyFact,
-                dailyTrivia: parsed.dailyTrivia,
-                historicalEvents: events,
-                otherHighlights: parsed.otherHighlights || [],
-                synthesis: parsed.synthesis,
-            } as DailyContext;
-        } catch (e) {
-            console.error("Home Service: AI unavailable:", e);
-            aiOnline = false;
+        if (!response.text) {
             return {
                 date: date.toDateString(),
                 synthesis: "",
@@ -108,6 +66,46 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
                 otherHighlights: [],
             };
         }
+
+        const parsed = safeParse(response.text, {}) as any;
+
+        if (!parsed || !parsed.synthesis) {
+            return {
+                date: date.toDateString(),
+                synthesis: "Daily briefing is being compiled. The POLI research engine is online and operational.",
+                quote: { text: "Knowledge is power.", author: "Francis Bacon", year: "1597", region: "England" },
+                news: [],
+                historicalEvents: [],
+                highlightedPerson: null as any,
+                highlightedCountry: null as any,
+                highlightedIdeology: null as any,
+                highlightedDiscipline: null as any,
+                highlightedOrg: null as any,
+                dailyFact: null as any,
+                dailyTrivia: null as any,
+                otherHighlights: [],
+            };
+        }
+
+        const events = (parsed.historicalEvents || []).slice().sort(
+            (a: any, b: any) => parseYear(a.year) - parseYear(b.year)
+        );
+
+        return {
+            date: date.toDateString(),
+            quote: parsed.quote,
+            news: parsed.news || [],
+            highlightedPerson: parsed.highlightedPerson,
+            highlightedCountry: parsed.highlightedCountry,
+            highlightedIdeology: parsed.highlightedIdeology,
+            highlightedDiscipline: parsed.highlightedDiscipline,
+            highlightedOrg: parsed.highlightedOrg,
+            dailyFact: parsed.dailyFact,
+            dailyTrivia: parsed.dailyTrivia,
+            historicalEvents: events,
+            otherHighlights: parsed.otherHighlights || [],
+            synthesis: parsed.synthesis,
+        } as DailyContext;
     });
 };
 

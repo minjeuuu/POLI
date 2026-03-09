@@ -10,8 +10,7 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     const cacheKey = `translate_poli_v2_claude_${text.substring(0, 32)}_${targetLanguage}`;
 
     return withCache(cacheKey, async () => {
-        try {
-            const response = await generateWithFallback({ contents: `
+        const response = await generateWithFallback({ contents: `
 You are POLI's Universal Translation Engine — the world's most precise political and diplomatic translator.
 
 TASK: Translate the following text into ${targetLanguage} with forensic precision.
@@ -38,23 +37,24 @@ RETURN VALID JSON ONLY — NO MARKDOWN, NO PREAMBLE:
     "targetLanguage": "${targetLanguage}",
     "nuanceAnalysis": "Detailed paragraph (minimum 200 words) explaining cultural context, untranslatable concepts, political implications of word choices, register adjustments, and any potential ambiguities in the translation. Include specific examples from the text."
 }
-            ` });
-            return safeParse(response.text || '{}', {
-                original: text,
-                translated: "Translation unavailable.",
-                sourceLanguage: "Unknown",
-                targetLanguage: targetLanguage,
-                nuanceAnalysis: "Analysis unavailable."
-            }) as TranslationResult;
-        } catch (e) {
-            console.error("Translation error:", e);
+        ` });
+
+        if (!response.text) {
             return {
                 original: text,
-                translated: "Translation error — Claude AI may be temporarily unavailable. Please check your API key in Settings.",
+                translated: "Translation unavailable — Claude AI may be temporarily unavailable. Please check your API key in Settings.",
                 sourceLanguage: "Unknown",
                 targetLanguage: targetLanguage,
-                nuanceAnalysis: "The translation engine encountered an error. Please verify your Claude API key is configured in Settings."
+                nuanceAnalysis: "The translation engine could not reach the AI service. Please verify your Claude API key is configured in Settings (Profile tab)."
             };
         }
+
+        return safeParse(response.text, {
+            original: text,
+            translated: "Translation unavailable.",
+            sourceLanguage: "Unknown",
+            targetLanguage: targetLanguage,
+            nuanceAnalysis: "Analysis unavailable."
+        }) as TranslationResult;
     });
 };
