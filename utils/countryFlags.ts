@@ -14,7 +14,7 @@ export const COUNTRY_ISO2: Record<string, string> = {
   "Cabo Verde": "cv", "Cape Verde": "cv", "Cambodia": "kh", "Cameroon": "cm",
   "Canada": "ca", "Central African Republic": "cf", "Chad": "td", "Chile": "cl",
   "China": "cn", "Colombia": "co", "Comoros": "km",
-  "Congo (Democratic Republic)": "cd", "Democratic Republic of Congo": "cd",
+  "Congo (Democratic Republic)": "cd", "Democratic Republic of Congo": "cd", "DR Congo": "cd",
   "Congo (Republic)": "cg", "Republic of Congo": "cg", "Costa Rica": "cr",
   "Côte d'Ivoire": "ci", "Cote d'Ivoire": "ci", "Ivory Coast": "ci",
   "Croatia": "hr", "Cuba": "cu", "Cyprus": "cy", "Czech Republic": "cz",
@@ -93,7 +93,31 @@ export const COUNTRY_ISO2: Record<string, string> = {
   "Zambia": "zm", "Zimbabwe": "zw",
 };
 
-/** Returns a flagcdn.com image URL for a given country name, or null if unknown. */
+/**
+ * Multi-source flag URL generator with cascading fallbacks.
+ * Returns an array of URLs to try in order — the UI component should
+ * try each one and fall through on error.
+ */
+export const getFlagUrls = (countryName: string): string[] => {
+    const urls: string[] = [];
+    const iso = COUNTRY_ISO2[countryName];
+
+    if (iso) {
+        // Primary: flagcdn.com (most reliable, fast CDN)
+        urls.push(`https://flagcdn.com/w320/${iso}.png`);
+        // Secondary: hatscripts circle-flags (SVG, works for Kosovo etc.)
+        urls.push(`https://hatscripts.github.io/circle-flags/flags/${iso}.svg`);
+        // Tertiary: countryflagsapi
+        urls.push(`https://flagsapi.com/${iso.toUpperCase()}/flat/64.png`);
+    }
+
+    // Quaternary: REST Countries API flag (fetched at runtime by countryService)
+    // This is handled separately in CountryHero and countryService
+
+    return urls;
+};
+
+/** Returns the primary flag URL, or null if unknown. */
 export const getFlagUrl = (countryName: string, size: 40 | 80 | 160 = 80): string | null => {
   const iso = COUNTRY_ISO2[countryName];
   if (!iso) return null;
@@ -105,4 +129,38 @@ export const getFlagUrl2x = (countryName: string, size: 40 | 80 | 160 = 80): str
   const iso = COUNTRY_ISO2[countryName];
   if (!iso) return null;
   return `https://flagcdn.com/w${size * 2}/${iso}.png`;
+};
+
+/**
+ * Generates a simple procedural flag SVG data URI for countries
+ * that have no ISO code (fictional, historical, disputed territories).
+ * Uses a hash of the country name to generate consistent colors.
+ */
+export const generateProceduralFlag = (countryName: string): string => {
+    // Simple hash function for consistent colors
+    let hash = 0;
+    for (let i = 0; i < countryName.length; i++) {
+        const char = countryName.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+
+    const hue1 = Math.abs(hash % 360);
+    const hue2 = (hue1 + 120) % 360;
+    const hue3 = (hue1 + 240) % 360;
+
+    // Generate a simple tricolor flag
+    const patterns = [
+        // Horizontal tricolor
+        `<rect width="900" height="200" fill="hsl(${hue1},70%,45%)"/><rect y="200" width="900" height="200" fill="hsl(${hue2},70%,95%)"/><rect y="400" width="900" height="200" fill="hsl(${hue3},70%,45%)"/>`,
+        // Vertical tricolor
+        `<rect width="300" height="600" fill="hsl(${hue1},70%,45%)"/><rect x="300" width="300" height="600" fill="hsl(${hue2},70%,95%)"/><rect x="600" width="300" height="600" fill="hsl(${hue3},70%,45%)"/>`,
+        // Two-band horizontal
+        `<rect width="900" height="300" fill="hsl(${hue1},70%,45%)"/><rect y="300" width="900" height="300" fill="hsl(${hue2},70%,45%)"/>`,
+    ];
+
+    const patternIndex = Math.abs(hash >> 8) % patterns.length;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">${patterns[patternIndex]}<circle cx="450" cy="300" r="80" fill="hsl(${hue1},60%,35%)" opacity="0.3"/></svg>`;
+
+    return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 };

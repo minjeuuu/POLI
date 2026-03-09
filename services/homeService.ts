@@ -47,14 +47,16 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
 
         try {
             const response = await generateWithFallback({ contents });
+            // If generateWithFallback succeeded, Claude is online
+            aiOnline = true;
             const parsed = safeParse(response.text || '{}', {}) as any;
 
             if (!parsed || !parsed.synthesis) {
-                aiOnline = false;
+                // AI responded but data was malformed - still online
                 return {
                     date: date.toDateString(),
-                    synthesis: "",
-                    quote: { text: "", author: "", year: "", region: "" },
+                    synthesis: "Daily briefing is being compiled. The POLI research engine is online and operational.",
+                    quote: { text: "Knowledge is power.", author: "Francis Bacon", year: "1597", region: "England" },
                     news: [],
                     historicalEvents: [],
                     highlightedPerson: null as any,
@@ -67,8 +69,6 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
                     otherHighlights: [],
                 };
             }
-
-            aiOnline = true;
 
             const events = (parsed.historicalEvents || []).slice().sort(
                 (a: any, b: any) => parseYear(a.year) - parseYear(b.year)

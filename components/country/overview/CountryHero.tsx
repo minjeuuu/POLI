@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Flag } from 'lucide-react';
 import { CountryDeepDive } from '../../../types';
+import { getFlagUrls, generateProceduralFlag } from '../../../utils/countryFlags';
 
 interface FlagImageProps {
     imageUrl?: string;
@@ -10,46 +11,38 @@ interface FlagImageProps {
 }
 
 const FlagImage: React.FC<FlagImageProps> = ({ imageUrl, alpha2, countryName }) => {
-    const [src, setSrc] = useState<string | null>(null);
     const [stage, setStage] = useState(0);
-    const [failed, setFailed] = useState(false);
 
-    const getSrc = (s: number): string | null => {
-        if (s === 0 && imageUrl) return imageUrl;
-        if (s <= 1 && alpha2) return `https://flagcdn.com/w320/${alpha2.toLowerCase()}.png`;
-        if (s <= 2 && alpha2) return `https://hatscripts.github.io/circle-flags/flags/${alpha2.toLowerCase()}.svg`;
-        return null;
-    };
+    // Build comprehensive fallback chain — always ends with a procedural flag
+    const sources: string[] = [];
+    if (imageUrl) sources.push(imageUrl);
+    const flagUrls = getFlagUrls(countryName);
+    flagUrls.forEach(u => { if (!sources.includes(u)) sources.push(u); });
+    if (alpha2) {
+        const a2 = alpha2.toLowerCase();
+        const extra = [
+            `https://flagcdn.com/w320/${a2}.png`,
+            `https://hatscripts.github.io/circle-flags/flags/${a2}.svg`,
+            `https://flagsapi.com/${a2.toUpperCase()}/flat/64.png`,
+        ];
+        extra.forEach(u => { if (!sources.includes(u)) sources.push(u); });
+    }
+    // Procedural flag as ultimate fallback — always renders
+    sources.push(generateProceduralFlag(countryName));
 
-    useEffect(() => {
-        setStage(0);
-        setFailed(false);
-        const initial = getSrc(0);
-        setSrc(initial || (alpha2 ? `https://flagcdn.com/w320/${alpha2.toLowerCase()}.png` : null));
-    }, [imageUrl, alpha2]);
+    useEffect(() => { setStage(0); }, [imageUrl, alpha2, countryName]);
+
+    const currentSrc = sources[stage] || sources[sources.length - 1];
 
     const handleError = () => {
-        const nextStage = stage + 1;
-        const nextSrc = getSrc(nextStage);
-        if (nextSrc) {
-            setStage(nextStage);
-            setSrc(nextSrc);
-        } else {
-            setFailed(true);
+        if (stage + 1 < sources.length) {
+            setStage(s => s + 1);
         }
     };
 
-    if (failed || !src) {
-        return (
-            <div className="w-full h-full flex items-center justify-center bg-stone-200 dark:bg-stone-700 text-stone-400">
-                <Flag className="w-8 h-8" />
-            </div>
-        );
-    }
-
     return (
         <img
-            src={src}
+            src={currentSrc}
             className="w-full h-full object-cover"
             alt={`Flag of ${countryName}`}
             onError={handleError}
