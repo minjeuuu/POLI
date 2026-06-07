@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, ExternalLink } from 'lucide-react';
+import { Activity, ExternalLink, Rocket } from 'lucide-react';
 
 interface SpaceXWidgetProps {
-    limit?: parseInt;
+    limit?: number;
 }
 
 export const SpaceXWidget: React.FC<SpaceXWidgetProps> = ({ limit = 3 }) => {

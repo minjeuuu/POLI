@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
           workbox: {
             maximumFileSizeToCacheInBytes: 5000000
           },
-          manifest: {
+          manifest: ({
             name: 'POLI',
             short_name: 'POLI',
             description: 'Political Academic Tool',
@@ -67,7 +67,7 @@ export default defineConfig(({ mode }) => {
               { name: "Political Spectrum Quiz", short_name: "Spectrum", description: "Daily alignment questions", tag: "spectrum_widget", ms_ac_h_store_logo: "/icon.svg" },
               { name: "United Nations SDG Monitor", short_name: "UN SDG", description: "Development goals progress", tag: "sdg_widget", ms_ac_h_store_logo: "/icon.svg" }
             ]
-          }
+          } as any)
         })
       ],
       define: {

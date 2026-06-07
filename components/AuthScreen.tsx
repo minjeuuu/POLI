@@ -109,13 +109,17 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin, onGuest }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-academic-bg dark:bg-stone-950 flex flex-col items-center justify-center p-6 transition-colors duration-700">
-       
+    <div className="fixed inset-0 z-[100] bg-stone-50 dark:bg-stone-950 flex flex-col items-center justify-center p-6 transition-colors duration-700 overflow-hidden">
+       {/* Ambient Premium Blobs */}
+       <div className="absolute -top-32 -left-32 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none animate-pulse" style={{ animationDuration: '8s' }}></div>
+       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-sky-500/5 dark:bg-sky-500/5 rounded-full blur-[120px] pointer-events-none animate-pulse" style={{ animationDuration: '12s' }}></div>
+       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-rose-500/10 dark:bg-rose-500/5 rounded-full blur-[100px] pointer-events-none animate-pulse" style={{ animationDuration: '10s' }}></div>
+
        <motion.div 
-           initial={{ opacity: 0, y: 30 }}
-           animate={{ opacity: 1, y: 0 }}
+           initial={{ opacity: 0, y: 30, scale: 0.95 }}
+           animate={{ opacity: 1, y: 0, scale: 1 }}
            transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-           className="w-full max-w-md"
+           className="w-full max-w-md relative z-10"
        >
            <div className="text-center mb-10">
                <motion.div

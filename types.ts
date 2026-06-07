@@ -163,8 +163,10 @@ export interface UserPreferences {
     density: string;
     fontSize: number;
     fontFamily: string;
+    typography?: string;
     reduceMotion: boolean;
     highContrast: boolean;
+    colorBlindMode?: string;
     saturation: number;
     blurEffects: boolean;
     showGridLines: boolean;
@@ -173,6 +175,9 @@ export interface UserPreferences {
     emailDigest: string;
     emailMarketing: boolean;
     emailSecurity: boolean;
+    pushNotifications?: boolean;
+    emailNotifications?: boolean;
+    digestFrequency?: string;
     pushAlerts: boolean;
     pushMentions: boolean;
     pushReplies: boolean;

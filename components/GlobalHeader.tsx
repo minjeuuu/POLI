@@ -55,7 +55,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ toggleTheme, isDark, onNavi
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 pt-[env(safe-area-inset-top)] bg-white/95 dark:bg-stone-950/95 backdrop-blur-xl border-b border-stone-200 dark:border-stone-800 z-[100] shadow-sm transition-colors duration-500 box-content">
+    <header className="fixed top-0 left-0 right-0 h-16 pt-[env(safe-area-inset-top)] bg-white/70 dark:bg-stone-950/70 backdrop-blur-2xl border-b border-stone-200/50 dark:border-stone-800/50 z-[100] shadow-sm transition-colors duration-500 box-content">
       <div className="h-16 px-4 md:px-6 flex items-center justify-between">
         
         {/* LEFT: BRANDING */}
