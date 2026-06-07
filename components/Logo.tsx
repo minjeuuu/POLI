@@ -8,11 +8,11 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({ className = '', size = 'md' }) => {
   const sizeClasses = {
-    sm: 'w-6 h-6',
-    md: 'w-10 h-10',
-    lg: 'w-20 h-20',
-    xl: 'w-32 h-32',
-    '2xl': 'w-48 h-48'
+    sm: 'w-5 h-5 md:w-6 md:h-6',
+    md: 'w-8 h-8 md:w-10 md:h-10',
+    lg: 'w-16 h-16 md:w-20 md:h-20',
+    xl: 'w-24 h-24 md:w-32 md:h-32',
+    '2xl': 'w-32 h-32 md:w-48 md:h-48'
   };
 
   return (

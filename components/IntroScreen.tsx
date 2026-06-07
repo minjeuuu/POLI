@@ -119,13 +119,13 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onContinue }) => {
             {/* Quote Text - Spacer for Layout Stability */}
             <div className="relative min-h-[100px] flex justify-center">
                  {/* Invisible full text to reserve height/width and prevent jumping */}
-                 <p className="invisible font-serif text-2xl md:text-3xl leading-snug tracking-wide text-academic-text max-w-3xl">
+                 <p className="invisible font-serif text-3xl md:text-5xl leading-snug tracking-wide text-academic-text max-w-3xl">
                     “{quote.text}”
                  </p>
                  
                  {/* Visible typing text positioned absolutely over the invisible one if needed, or just centered */}
                  <div className="absolute top-0 left-0 right-0 flex justify-center">
-                    <p className="font-serif text-2xl md:text-3xl leading-snug tracking-wide text-academic-text max-w-3xl">
+                    <p className="font-serif text-3xl md:text-5xl leading-snug tracking-wide text-academic-text max-w-3xl">
                         {displayedText}
                     </p>
                  </div>

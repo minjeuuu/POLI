@@ -44,7 +44,7 @@ const RegionalDetailScreen: React.FC<RegionalDetailScreenProps> = ({ region, dis
     <div className="fixed inset-0 z-[60] bg-academic-bg flex flex-col animate-in slide-in-from-right duration-500 overflow-y-auto">
       
       {/* HEADER */}
-      <div className="sticky top-0 z-10 bg-academic-paper/95 backdrop-blur-md border-b border-academic-line p-4 flex items-center justify-between gap-4">
+      <div className="bg-academic-paper/95 backdrop-blur-md border-b border-academic-line p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
               <button onClick={onClose} className="p-2 -ml-2 text-stone-500 hover:text-academic-accent transition-colors">
                   <ArrowLeft className="w-6 h-6" />

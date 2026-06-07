@@ -16,9 +16,6 @@ const APPS = [
     { id: 'sim', label: 'Simulate', icon: Gamepad2, color: 'text-red-500', bg: 'bg-red-500/10' },
     { id: 'games', label: 'Games', icon: Brain, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
     { id: 'learn', label: 'Learn', icon: GraduationCap, color: 'text-teal-500', bg: 'bg-teal-500/10' },
-    { id: 'rates', label: 'Markets', icon: DollarSign, color: 'text-green-500', bg: 'bg-green-500/10' },
-    { id: 'social', label: 'Feed', icon: MessageSquare, color: 'text-sky-500', bg: 'bg-sky-500/10' },
-    { id: 'messages', label: 'Chat', icon: Mail, color: 'text-orange-500', bg: 'bg-orange-500/10' },
     { id: 'translate', label: 'Translate', icon: Languages, color: 'text-pink-500', bg: 'bg-pink-500/10' },
 ];
 

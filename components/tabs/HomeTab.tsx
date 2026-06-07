@@ -175,7 +175,7 @@ const HomeTab: React.FC<HomeTabProps> = ({
 
   const renderHistory = () => {
       if (!data) return null;
-      return <HistoryFeed events={data.historicalEvents} onNavigate={onNavigate} />;
+      return <HistoryFeed events={data.historicalEvents} onNavigate={onNavigate} currentDate={currentDate} />;
   };
 
   const renderSaved = () => {
@@ -233,7 +233,7 @@ const HomeTab: React.FC<HomeTabProps> = ({
 
   // Standard View
   return (
-    <div className="h-full overflow-y-auto bg-academic-bg dark:bg-stone-950 transition-colors p-4 md:p-8">
+    <div className="h-full overflow-y-auto scroll-smooth bg-academic-bg dark:bg-stone-950 transition-colors relative pb-32">
       {/* TOAST */}
       <div 
         className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[70] flex items-center gap-3 px-6 py-3 bg-academic-accent dark:bg-indigo-600 text-white rounded-full shadow-xl transition-all duration-500 ease-out pointer-events-none
@@ -242,34 +242,38 @@ const HomeTab: React.FC<HomeTabProps> = ({
         <span className="text-[10px] font-bold uppercase tracking-widest">{toast.message}</span>
       </div>
 
-      <div className="flex items-center justify-between mb-6 px-1">
-          <button onClick={handlePrevDay} className="p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"><ChevronLeft className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
-          <div className="flex flex-col items-center cursor-pointer group" onClick={() => onDateChange(new Date())}>
-               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors">{isLoading ? 'Loading...' : 'Daily Briefing'}</span>
-               <h2 className="font-serif text-lg font-bold text-academic-text dark:text-stone-100">{currentDate.toLocaleDateString(undefined, {month:'long', day:'numeric'})}</h2>
-          </div>
-          <button onClick={handleNextDay} className="p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"><ChevronRight className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
+      <div className="px-4 md:px-8 pt-4 pb-2 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between mb-4">
+            <button onClick={handlePrevDay} className="p-2 -ml-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors active:scale-95"><ChevronLeft className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
+            <div className="flex flex-col items-center cursor-pointer group px-4 py-1 rounded-xl active:bg-stone-100 dark:active:bg-stone-800 transition-all" onClick={() => onDateChange(new Date())}>
+                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors">{isLoading ? 'Loading...' : 'Daily Briefing'}</span>
+                 <h2 className="font-serif text-lg font-bold text-academic-text dark:text-stone-100">{currentDate.toLocaleDateString(undefined, {month:'long', day:'numeric'})}</h2>
+            </div>
+            <button onClick={handleNextDay} className="p-2 -mr-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors active:scale-95"><ChevronRight className="w-5 h-5 text-stone-400 dark:text-stone-500" /></button>
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            {['Today', 'Highlights', 'History', 'Saved'].map((tab) => (
+                <button key={tab} onClick={() => setSubTab(tab as any)} className={`px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest rounded-full border transition-all duration-300 whitespace-nowrap active:scale-95
+                ${subTab === tab ? 'bg-academic-text dark:bg-stone-100 text-white dark:text-stone-900 border-academic-text dark:border-stone-100 shadow-md' : 'bg-transparent text-stone-400 dark:text-stone-500 border-transparent hover:bg-stone-100 dark:hover:bg-stone-800'}`}>{tab}</button>
+            ))}
+        </div>
       </div>
 
-      <div className="sticky top-0 bg-academic-bg dark:bg-stone-950 z-10 pt-2 pb-4 -mx-4 px-4 border-b border-stone-100 dark:border-stone-800 mb-6 flex gap-2 overflow-x-auto no-scrollbar backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 transition-all duration-300">
-          {['Today', 'Highlights', 'History', 'Saved'].map((tab) => (
-              <button key={tab} onClick={() => setSubTab(tab as any)} className={`px-5 py-2 text-xs font-bold uppercase tracking-widest rounded-full border transition-all duration-300
-              ${subTab === tab ? 'bg-academic-text dark:bg-stone-100 text-white dark:text-stone-900 border-academic-text dark:border-stone-100 shadow-md' : 'bg-transparent text-stone-400 dark:text-stone-500 border-transparent hover:bg-stone-100 dark:hover:bg-stone-800'}`}>{tab}</button>
-          ))}
+      <div className="p-4 md:p-8 pt-6">
+          {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-20 h-full">
+                   <LoadingScreen message="Synthesizing Global Archive..." />
+              </div>
+          ) : (
+              <div className="min-h-full">
+                {subTab === 'Today' && renderToday()}
+                {subTab === 'History' && renderHistory()}
+                {subTab === 'Saved' && renderSaved()}
+                {subTab === 'Highlights' && <div className="text-center text-stone-400 dark:text-stone-600 py-10 font-serif italic flex items-center justify-center h-40">Curated highlights from global archives.</div>}
+              </div>
+          )}
       </div>
-
-      {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 h-96">
-               <LoadingScreen message="Synthesizing Global Archive..." />
-          </div>
-      ) : (
-          <div className="min-h-[50vh] pb-24">
-            {subTab === 'Today' && renderToday()}
-            {subTab === 'History' && renderHistory()}
-            {subTab === 'Saved' && renderSaved()}
-            {subTab === 'Highlights' && <div className="text-center text-stone-400 dark:text-stone-600 py-10 font-serif italic">Curated highlights from global archives.</div>}
-          </div>
-      )}
     </div>
   );
 };

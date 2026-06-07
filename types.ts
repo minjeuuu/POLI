@@ -228,6 +228,68 @@ export interface UserPreferences {
     animateTransitions?: boolean;
 }
 
+export const DEFAULT_PREFS: UserPreferences = {
+    language: 'English',
+    secondaryLanguage: 'None',
+    timezone: 'UTC',
+    dateFormat: 'YYYY-MM-DD',
+    timeFormat: '24h',
+    startOfWeek: 'Monday',
+    currency: 'USD',
+    measurementSystem: 'Metric',
+    themeMode: 'Default',
+    themeScope: 'None',
+    density: 'Comfortable',
+    fontSize: 16,
+    fontFamily: 'Serif',
+    reduceMotion: false,
+    highContrast: false,
+    colorBlindMode: 'None',
+    pushNotifications: true,
+    emailNotifications: false,
+    digestFrequency: 'Daily',
+    saturation: 100,
+    blurEffects: true,
+    showGridLines: false,
+    borderRadius: 'Medium',
+    emailDigest: 'Weekly',
+    emailMarketing: false,
+    emailSecurity: true,
+    pushAlerts: true,
+    pushMentions: true,
+    pushReplies: true,
+    pushTrending: false,
+    pushSystem: true,
+    pushNewContent: true,
+    soundEffects: true,
+    hapticFeedback: true,
+    publicProfile: true,
+    showOnlineStatus: true,
+    showActivityLog: true,
+    allowIndexing: false,
+    shareAnalytics: true,
+    allowPersonalization: true,
+    dataRetentionPeriod: '1 Year',
+    readerTypeface: 'Serif',
+    readerLineHeight: 1.6,
+    readerWidth: 'Standard',
+    autoBookmark: true,
+    highlightStyle: 'Yellow',
+    showCitationOnCopy: true,
+    citationStyle: 'APA',
+    textToSpeechVoice: 'Kore',
+    textToSpeechSpeed: 1.0,
+    autoPlayMedia: false,
+    backgroundAudio: false,
+    developerMode: false,
+    betaFeatures: false,
+    offlineMode: true,
+    dataSaver: false,
+    cacheSize: 124,
+    apiEndpoint: 'https://api.poli.ai/v1',
+    debugLogging: false
+};
+
 export interface DetailedStats {
     totalXp: number;
     currentLevel: number;
@@ -257,6 +319,31 @@ export interface DetailedStats {
     lastActive?: string; 
     accuracy?: number; 
 }
+
+export const DEFAULT_STATS: DetailedStats = {
+    totalXp: 0,
+    currentLevel: 1,
+    nextLevelThreshold: 1000,
+    streakDays: 1,
+    longestStreak: 1,
+    articlesRead: 0,
+    booksArchived: 0,
+    simulationsRun: 0,
+    debatesWon: 0,
+    pollsVoted: 0,
+    quizzesTaken: 0,
+    quizzesPerfect: 0,
+    flashcardsReviewed: 0,
+    accuracyRate: 0,
+    postsCreated: 0,
+    commentsWritten: 0,
+    likesReceived: 0,
+    citationsReceived: 0,
+    gamesPlayed: 0,
+    quizzesMastered: 0,
+    flashcardsReview: 0,
+    accuracy: 0
+};
 
 export interface UserProfile {
     id: string;

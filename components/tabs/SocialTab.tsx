@@ -395,7 +395,7 @@ const SocialTab: React.FC<SocialTabProps> = ({ onNavigate, user }) => {
     {reelMode && renderReelViewer()}
 
     <div className="h-full flex flex-col bg-stone-50/50 dark:bg-black/20 relative">
-        <div className="sticky top-0 z-30 bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-md border-b border-academic-line dark:border-stone-800 transition-colors">
+        <div className="bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-md border-b border-academic-line dark:border-stone-800 transition-colors">
             <div className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-academic-accent text-white rounded-lg shadow-sm"><MessageSquare className="w-5 h-5" /></div>

@@ -319,58 +319,77 @@ const ExploreTab: React.FC<ExploreTabProps> = ({ onNavigate, onAddToCompare, onT
 
   return (
     <>
-    <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 relative" onClick={() => setActiveMenu(null)}>
+    <div className="h-full overflow-y-auto scroll-smooth bg-academic-bg dark:bg-stone-950 pb-32" onClick={() => setActiveMenu(null)}>
         
         {/* 1. HERO HEADER (Search & Breadcrumbs) */}
-        <div className="bg-academic-paper dark:bg-stone-900 border-b border-academic-line dark:border-stone-800 p-4 shadow-sm z-20 sticky top-0 transition-colors">
-            <div className="flex items-center gap-4 mb-3">
-                {navStack.length > 0 ? (
-                    <button onClick={goBack} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 transition-colors">
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
-                ) : (
-                    <div className="p-2">
-                        <Home className="w-5 h-5 text-academic-accent dark:text-indigo-400" />
+        <div className="bg-academic-paper dark:bg-stone-900 border-b border-academic-line dark:border-stone-800 pt-4 pb-2 shadow-sm transition-colors">
+            <div className="px-4">
+                <div className="flex items-center gap-4 mb-3">
+                    {navStack.length > 0 ? (
+                        <button onClick={goBack} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 transition-colors active:scale-95">
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                    ) : (
+                        <div className="p-2">
+                            <Home className="w-5 h-5 text-academic-accent dark:text-indigo-400" />
+                        </div>
+                    )}
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
+                        <input 
+                            type="text" 
+                            placeholder={`Filter ${currentTitle}...`}
+                            className="w-full pl-10 pr-4 py-2 bg-stone-50 dark:bg-stone-800 border border-academic-line dark:border-stone-700 rounded-md text-sm font-serif focus:border-academic-accent dark:focus:border-indigo-500 outline-none transition-all focus:bg-white dark:focus:bg-stone-800 text-academic-text dark:text-stone-200 placeholder-stone-400"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
                     </div>
-                )}
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
-                    <input 
-                        type="text" 
-                        placeholder={`Filter ${currentTitle}...`}
-                        className="w-full pl-10 pr-4 py-2 bg-stone-50 dark:bg-stone-800 border border-academic-line dark:border-stone-700 rounded-md text-sm font-serif focus:border-academic-accent dark:focus:border-indigo-500 outline-none transition-all focus:bg-white dark:focus:bg-stone-800 text-academic-text dark:text-stone-200 placeholder-stone-400"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                </div>
+                
+                {/* Breadcrumbs */}
+                <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-stone-400 dark:text-stone-500 overflow-x-auto no-scrollbar whitespace-nowrap px-1 pb-3">
+                    <span onClick={() => { setNavStack([]); setSearchQuery(''); }} className="cursor-pointer hover:text-academic-accent dark:hover:text-indigo-400">Directory</span>
+                    <ChevronRight className="w-3 h-3" />
+                    <span onClick={() => setNavStack([])} className={`cursor-pointer hover:text-academic-accent dark:hover:text-indigo-400 ${navStack.length === 0 ? 'text-academic-gold font-bold' : ''}`}>
+                        {activeRootTab}
+                    </span>
+                    {navStack.map((item, i) => (
+                        <React.Fragment key={i}>
+                            <ChevronRight className="w-3 h-3" />
+                            <span 
+                                onClick={() => setNavStack(navStack.slice(0, i + 1))}
+                                className={`cursor-pointer hover:text-academic-accent dark:hover:text-indigo-400 ${i === navStack.length - 1 ? 'text-academic-gold font-bold' : ''}`}
+                            >
+                                {item.name}
+                            </span>
+                        </React.Fragment>
+                    ))}
                 </div>
             </div>
-            
-            {/* Breadcrumbs */}
-            <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-stone-400 dark:text-stone-500 overflow-x-auto no-scrollbar whitespace-nowrap px-1">
-                <span onClick={() => { setNavStack([]); setSearchQuery(''); }} className="cursor-pointer hover:text-academic-accent dark:hover:text-indigo-400">Directory</span>
-                <ChevronRight className="w-3 h-3" />
-                <span onClick={() => setNavStack([])} className={`cursor-pointer hover:text-academic-accent dark:hover:text-indigo-400 ${navStack.length === 0 ? 'text-academic-gold font-bold' : ''}`}>
-                    {activeRootTab}
-                </span>
-                {navStack.map((item, i) => (
-                    <React.Fragment key={i}>
-                        <ChevronRight className="w-3 h-3" />
-                        <span 
-                            onClick={() => setNavStack(navStack.slice(0, i + 1))}
-                            className={`cursor-pointer hover:text-academic-accent dark:hover:text-indigo-400 ${i === navStack.length - 1 ? 'text-academic-gold font-bold' : ''}`}
+
+            {/* Mobile Root Category Selector */}
+            {navStack.length === 0 && (
+                <div className="lg:hidden border-t border-stone-100 dark:border-stone-800 px-4 pt-2 overflow-x-auto no-scrollbar flex gap-2">
+                     {EXPLORE_CATS.map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => handleRootTabChange(cat.id)}
+                            className={`flex-none flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors active:scale-95
+                            ${activeRootTab === cat.id ? 'bg-academic-accent dark:bg-indigo-600 text-white shadow-sm' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}
                         >
-                            {item.name}
-                        </span>
-                    </React.Fragment>
-                ))}
-            </div>
+                            <cat.icon className="w-3 h-3" />
+                            {cat.label}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
 
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex relative">
             
             {/* 2. SIDEBAR (Desktop) */}
             {navStack.length === 0 && (
-                <div className="w-64 bg-white dark:bg-stone-900 border-r border-academic-line dark:border-stone-800 overflow-y-auto flex-shrink-0 hidden lg:block h-full">
+                <div className="w-64 bg-white dark:bg-stone-900 border-r border-academic-line dark:border-stone-800 flex-shrink-0 hidden lg:block border-b">
                     <div className="p-4 space-y-1">
                         {EXPLORE_CATS.map((cat) => (
                             <button
@@ -388,7 +407,7 @@ const ExploreTab: React.FC<ExploreTabProps> = ({ onNavigate, onAddToCompare, onT
             )}
 
             {/* 3. MAIN CONTENT GRID */}
-            <div className="flex-1 overflow-y-auto bg-stone-50/30 dark:bg-black/30 p-4 md:p-8 pb-32">
+            <div className="flex-1 bg-stone-50/30 dark:bg-black/30 p-4 md:p-8">
                 <div className="max-w-7xl mx-auto">
                     
                     {/* Root Header */}
@@ -401,23 +420,6 @@ const ExploreTab: React.FC<ExploreTabProps> = ({ onNavigate, onAddToCompare, onT
                                 <h1 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100">{EXPLORE_CATS.find(c => c.id === activeRootTab)?.label}</h1>
                                 <p className="text-stone-500 dark:text-stone-400 font-serif italic text-sm">{EXPLORE_CATS.find(c => c.id === activeRootTab)?.desc}</p>
                             </div>
-                        </div>
-                    )}
-
-                    {/* Mobile Root Category Selector (Visible only on mobile root) */}
-                    {navStack.length === 0 && (
-                        <div className="lg:hidden mb-6 overflow-x-auto no-scrollbar flex gap-2 pb-2">
-                             {EXPLORE_CATS.map((cat) => (
-                                <button
-                                    key={cat.id}
-                                    onClick={() => handleRootTabChange(cat.id)}
-                                    className={`flex-none flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-full border whitespace-nowrap transition-colors
-                                    ${activeRootTab === cat.id ? 'bg-academic-accent dark:bg-indigo-600 text-white border-academic-accent dark:border-indigo-600' : 'bg-white dark:bg-stone-900 text-stone-500 dark:text-stone-400 border-stone-200 dark:border-stone-700'}`}
-                                >
-                                    <cat.icon className="w-3 h-3" />
-                                    {cat.label}
-                                </button>
-                            ))}
                         </div>
                     )}
 

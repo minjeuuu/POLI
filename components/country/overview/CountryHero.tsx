@@ -23,11 +23,7 @@ export const CountryHero: React.FC<CountryHeroProps> = ({ data, onBack }) => (
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 flex flex-col md:flex-row items-end md:items-center justify-between gap-6 z-10">
             <div className="flex items-end gap-6">
                 <div className="w-32 h-20 bg-stone-800 rounded-lg shadow-2xl border-2 border-white dark:border-stone-700 overflow-hidden relative group-hover:scale-105 transition-transform duration-500">
-                    {data.identity.flag?.imageUrl ? (
-                        <ImageWithFallback src={data.identity.flag.imageUrl} className="w-full h-full object-cover" alt="Flag" />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-stone-200 text-stone-400"><Flag className="w-8 h-8" /></div>
-                    )}
+                    <CountryFlag countryName={data.identity.commonName} alt={`${data.identity.commonName} Flag`} />
                 </div>
                 <div>
                     <h1 className="text-4xl md:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 leading-none mb-2 drop-shadow-sm tracking-tight">{data.identity.commonName}</h1>

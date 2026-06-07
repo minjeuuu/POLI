@@ -157,17 +157,13 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
 
   return (
     <>
-    <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 relative overflow-hidden transition-colors duration-500" onClick={() => setActiveMenu(null)}>
+    <div className="h-full overflow-y-auto scroll-smooth bg-academic-bg dark:bg-stone-950 relative pb-32 transition-colors duration-500" onClick={() => setActiveMenu(null)} ref={containerRef}>
          
          {/* 1. HERO HEADER */}
          {navStack.length === 0 && (
-            <div className="p-10 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors flex-none">
+            <div className="p-10 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors">
                 <div className="max-w-5xl mx-auto">
-                    <div className="flex items-center gap-3 mb-6 text-academic-gold">
-                        <Hexagon className="w-10 h-10 fill-academic-gold/10" />
-                        <h1 className="text-sm font-bold uppercase tracking-[0.3em]">Knowledge Graph</h1>
-                    </div>
-                    <h2 className="text-5xl md:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">Profiles & Leaders</h2>
+                <h2 className="text-5xl md:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">Profiles & Leaders</h2>
                     <p className="text-xl font-serif text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed">
                         Explore the key figures shaping history, theory, and fiction. From presidents to philosophers.
                     </p>
@@ -176,7 +172,7 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
          )}
 
          {/* 2. NAVIGATION BAR */}
-         <div className="relative md:sticky md:top-0 z-20 bg-academic-paper dark:bg-stone-900 border-b border-academic-line dark:border-stone-800 p-3 sm:p-4 shadow-sm transition-colors flex-none">
+         <div className="relative z-20 bg-academic-paper dark:bg-stone-900 border-b border-academic-line dark:border-stone-800 p-3 sm:p-4 shadow-sm transition-colors">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                   <div className="flex items-center gap-2 sm:gap-4 flex-1">
                        {navStack.length > 0 && (
@@ -217,8 +213,8 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
          </div>
 
          {/* 3. LIST CONTENT */}
-         <div className="flex-1 overflow-hidden flex bg-stone-50/50 dark:bg-black/20">
-            <div ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-8 pb-32 scroll-smooth">
+         <div className="flex bg-stone-50/50 dark:bg-black/20">
+            <div className="flex-1 p-6 md:p-8">
                 
                 {filteredItems.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 opacity-50 h-full">
@@ -232,8 +228,8 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
                             <div className="space-y-12">
                                 {sortedKeys.map(letter => (
                                     <div key={letter} ref={el => { sectionRefs.current[letter] = el; }} className="scroll-mt-40">
-                                        <div className="sticky top-0 z-10 py-2 sm:py-3 border-b border-stone-200 dark:border-stone-800 mb-4 sm:mb-6 bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-sm flex items-center">
-                                            <span className="text-xl sm:text-3xl font-serif font-bold text-academic-gold">{letter}</span>
+                                        <div className="py-2 sm:py-4 border-b border-stone-200 dark:border-stone-800 mb-4 sm:mb-6 flex items-center">
+                                            <span className="text-xl sm:text-4xl font-serif font-bold text-academic-gold/80">{letter}</span>
                                         </div>
                                         <div className={`
                                             ${viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'flex flex-col gap-2'}

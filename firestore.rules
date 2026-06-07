@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /messages/{messageId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['id', 'chatId', 'senderId', 'senderName', 'text', 'createdAt'])
+        && request.resource.data.id is string
+        && request.resource.data.chatId is string
+        && request.resource.data.senderId is string
+        && request.resource.data.senderName is string
+        && request.resource.data.text is string
+        && request.resource.data.createdAt is number;
+      // no update/delete for simplicity right now
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['id', 'authorId', 'authorName', 'content', 'likes', 'comments', 'createdAt'])
+        && request.resource.data.id is string
+        && request.resource.data.authorId is string
+        && request.resource.data.authorName is string
+        && request.resource.data.content is string
+        && request.resource.data.likes is number
+        && request.resource.data.comments is list
+        && request.resource.data.createdAt is number;
+      
+      allow update: if true; // allow like/comment updates for now to keep demo working seamlessly
+    }
+  }
+}

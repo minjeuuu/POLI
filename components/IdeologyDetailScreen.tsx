@@ -18,8 +18,16 @@ import { ArXivWidget } from './external/ArXivWidget';
 import { RedditWidget } from './external/RedditWidget';
 import { DOAJWidget } from './external/DOAJWidget';
 import { SemanticScholarWidget } from './external/SemanticScholarWidget';
+import { WikiquoteWidget } from './external/WikiquoteWidget';
+import { OpenAlexWidget } from './external/OpenAlexWidget';
+import { InternetArchiveWidget } from './external/InternetArchiveWidget';
 import { ArtInstituteChicagoWidget } from './external/ArtInstituteChicagoWidget';
-import { TVMazeWidget } from './external/TVMazeWidget';
+import { CrossrefWidget } from './external/CrossrefWidget';
+import { GutendexWidget } from './external/GutendexWidget';
+import { DictionaryWidget } from './external/DictionaryWidget';
+import { GovTrackWidget } from './external/GovTrackWidget';
+import { DBpediaWidget } from './external/DBpediaWidget';
+import { UKPetitionsWidget } from './external/UKPetitionsWidget';
 import jsPDF from 'jspdf';
 import { playSFX } from '../services/soundService';
 
@@ -190,7 +198,7 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
                       <Lightbulb className="w-12 h-12" />
                   </div>
                   <div>
-                       <h1 className="text-4xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100 leading-tight">{data.name}</h1>
+                       <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 leading-tight">{data.name}</h1>
                   </div>
               </div>
               <div className="mb-8 font-serif text-lg leading-loose text-stone-700 dark:text-stone-200">{renderProse(data.definition)}</div>
@@ -352,6 +360,15 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
             </div>
             
             <div className="mt-12 space-y-8">
+                <DBpediaWidget queryText={data.name} />
+                <GovTrackWidget />
+                <UKPetitionsWidget />
+                <WikiquoteWidget queryText={data.name} />
+                <OpenAlexWidget queryText={data.name} />
+                <InternetArchiveWidget queryText={data.name} />
+                <DictionaryWidget queryText={data.name} />
+                <CrossrefWidget queryText={data.name} />
+                <GutendexWidget queryText={data.name} />
                 <RedditWidget queryText={`${data.name} politics`} />
                 <SemanticScholarWidget queryText={data.name} />
                 <DOAJWidget queryText={data.name} />

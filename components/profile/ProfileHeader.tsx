@@ -33,7 +33,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, onEdit })
 
                 {/* Info */}
                 <div className="flex-1 pb-2">
-                    <h1 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100">{profile.displayName}</h1>
+                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100">{profile.displayName}</h1>
                     <p className="text-stone-500 dark:text-stone-400 font-mono text-xs uppercase tracking-widest mb-2">@{profile.username} • {profile.title}</p>
                     <p className="text-stone-600 dark:text-stone-300 font-serif italic max-w-2xl">{profile.bio || "No biography set."}</p>
                     

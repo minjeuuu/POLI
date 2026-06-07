@@ -12,6 +12,16 @@ import ReaderView from './ReaderView';
 import { TVMazeWidget } from './external/TVMazeWidget';
 import { FederalRegisterWidget } from './external/FederalRegisterWidget';
 import { SpaceflightNewsWidget } from './external/SpaceflightNewsWidget';
+import { WikipediaWidget } from './external/WikipediaWidget';
+import { NobelPrizeWidget } from './external/NobelPrizeWidget';
+import { WikiquoteWidget } from './external/WikiquoteWidget';
+import { OpenAlexWidget } from './external/OpenAlexWidget';
+import { InternetArchiveWidget } from './external/InternetArchiveWidget';
+import { GutendexWidget } from './external/GutendexWidget';
+import { CrossrefWidget } from './external/CrossrefWidget';
+import { OpenFECWidget } from './external/OpenFECWidget';
+import { UKParliamentWidget } from './external/UKParliamentWidget';
+import { FBIWantedWidget } from './external/FBIWantedWidget';
 import { playSFX } from '../services/soundService';
 import { IconRenderer } from './IconMap';
 
@@ -87,7 +97,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
     <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden relative">
       
       {/* HEADER */}
-      <div className="sticky top-0 z-50 bg-academic-paper/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-academic-line dark:border-stone-800 shadow-sm">
+      <div className="bg-academic-paper/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-academic-line dark:border-stone-800 shadow-sm">
           <div className="flex items-center justify-between px-4 h-16">
             <div className="flex items-center gap-4">
                 <button onClick={() => { playSFX('close'); onClose(); }} className="p-2 -ml-2 text-stone-500 hover:text-academic-accent dark:text-stone-400 dark:hover:text-indigo-400 transition-colors">
@@ -121,6 +131,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
           <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-12">
               
               <WikidataWidget queryText={data.name} />
+              <WikipediaWidget title={data.name} />
 
               {/* HERO SECTION */}
               <div id="biography" ref={el => { sectionRefs.current['biography'] = el; }} className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -158,7 +169,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                   </div>
 
                   <div className="md:col-span-2">
-                      <h1 className="text-4xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">{data.name}</h1>
+                      <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">{data.name}</h1>
                       <div className="prose prose-stone dark:prose-invert font-serif text-lg leading-relaxed max-w-none">
                            {data.bio.split('\n\n').map((para, i) => (
                                <p key={i} className="mb-4">{para}</p>
@@ -401,6 +412,15 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
               </div>
               
               <div className="mt-12 space-y-8">
+                  <OpenFECWidget queryText={data.name} />
+                  <UKParliamentWidget queryText={data.name} />
+                  <FBIWantedWidget queryText={data.name} />
+                  <NobelPrizeWidget countryName={data.country} />
+                  <WikiquoteWidget queryText={data.name} />
+                  <OpenAlexWidget queryText={data.name} />
+                  <InternetArchiveWidget queryText={data.name} />
+                  <CrossrefWidget queryText={data.name} />
+                  <GutendexWidget queryText={data.name} />
                   <RedditWidget queryText={data.name} />
                   <FederalRegisterWidget queryText={data.name} />
                   <SpaceflightNewsWidget queryText={data.name} />

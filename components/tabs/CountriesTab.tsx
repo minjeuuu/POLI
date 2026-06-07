@@ -5,6 +5,7 @@ import {
   Search, Globe, Clock, MapPin, MoreHorizontal, Bookmark, 
   ArrowRightLeft, ArrowDownAZ, ArrowUpAZ, Shuffle, LayoutGrid, List, Table as TableIcon, Flag, Layers, ArrowUp
 } from 'lucide-react';
+import { CountryFlag } from '../country/CountryFlag';
 
 type ViewMode = 'grid' | 'list' | 'table';
 type SortOrder = 'asc' | 'desc';
@@ -159,11 +160,10 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
   };
   
   const renderIcon = (country: any, size: 'sm' | 'md' | 'lg' = 'md') => {
-      const Icon = Flag;
       const iconSize = size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-12 h-12' : 'w-8 h-8';
       return (
         <div className="w-full h-full flex items-center justify-center bg-stone-100 dark:bg-stone-800 group-hover:bg-stone-200 dark:group-hover:bg-stone-700 transition-colors">
-            <Icon className={`${iconSize} text-stone-300 dark:text-stone-600 opacity-80 group-hover:scale-110 transition-transform duration-500`} />
+            <CountryFlag countryName={country.name} iconSize={iconSize} className="group-hover:scale-110 transition-transform duration-500" />
         </div>
       );
   };
@@ -237,9 +237,9 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
       <div 
         key={`${country.name}-${i}`} 
         onClick={() => onNavigate('Country', country.name)}
-        className="group flex items-center gap-4 p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-academic-accent dark:hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer relative active:scale-[0.99]"
+        className="group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-academic-accent dark:hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer relative active:scale-[0.99]"
       >
-          <div className="w-16 h-10 rounded-lg border border-stone-200 dark:border-stone-700 overflow-hidden flex-shrink-0 shadow-sm">
+          <div className="w-12 h-8 sm:w-16 sm:h-10 rounded-lg border border-stone-200 dark:border-stone-700 overflow-hidden flex-shrink-0 shadow-sm">
               {renderIcon(country, 'sm')}
           </div>
           
@@ -282,10 +282,10 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
   );
 
   return (
-    <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 relative overflow-hidden transition-colors duration-500" onClick={() => setActiveMenu(null)}>
+    <div className="h-full overflow-y-auto scroll-smooth bg-academic-bg dark:bg-stone-950 relative pb-32 transition-colors duration-500" onClick={() => setActiveMenu(null)} ref={containerRef}>
       
       {/* 1. ADVANCED HEADER */}
-      <div className="flex-none px-4 pt-4 pb-3 space-y-3 sm:px-6 sm:pt-6 sm:pb-4 sm:space-y-4 bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-xl z-20 border-b border-academic-line dark:border-stone-800 transition-colors duration-500 shadow-sm relative">
+      <div className="px-4 pt-4 pb-3 space-y-3 sm:px-6 sm:pt-6 sm:pb-4 sm:space-y-4 bg-academic-bg/95 dark:bg-stone-950/95 border-b border-academic-line dark:border-stone-800 transition-colors duration-500 shadow-sm relative">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -381,8 +381,8 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
       </div>
 
       {/* 2. CONTENT AREA */}
-      <div className="flex-1 overflow-hidden flex bg-stone-50/50 dark:bg-black/20">
-            <div ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-8 pb-32 scroll-smooth">
+      <div className="flex bg-stone-50/50 dark:bg-black/20 relative">
+            <div className="flex-1 p-4 sm:p-6 md:p-8">
                 
                 {filteredList.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 opacity-50 h-full">
@@ -396,8 +396,8 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
                             <div className="space-y-12">
                                 {sortedKeys.map(letter => (
                                     <div key={letter} ref={el => { sectionRefs.current[letter] = el; }} className="scroll-mt-40">
-                                        <div className="sticky top-0 z-10 py-2 sm:py-3 border-b border-stone-200 dark:border-stone-800 mb-4 sm:mb-6 bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-sm flex items-center">
-                                            <span className="text-xl sm:text-3xl font-serif font-bold text-academic-gold">{letter}</span>
+                                        <div className="py-2 sm:py-4 border-b border-stone-200 dark:border-stone-800 mb-4 sm:mb-6 flex items-center">
+                                            <span className="text-xl sm:text-4xl font-serif font-bold text-academic-gold/80">{letter}</span>
                                         </div>
                                         <div className={`
                                             ${viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'flex flex-col gap-2'}

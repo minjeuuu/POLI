@@ -107,7 +107,7 @@ const HighlightDetailScreen: React.FC<HighlightDetailScreenProps> = ({ highlight
                    {highlight.meta}
                  </span>
              </div>
-             <h1 className="text-3xl md:text-4xl font-serif font-bold text-academic-text leading-tight">
+             <h1 className="text-4xl font-serif font-bold text-academic-text leading-tight">
                {highlight.title}
              </h1>
              <p className="text-lg font-serif text-stone-500 italic">

@@ -496,7 +496,7 @@ const LibraryTab: React.FC<LibraryTabProps> = ({ onNavigate, onAddToCompare, onT
     <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 relative" onClick={() => setActiveMenu(null)}>
         
         {/* 1. HEADER (Search & Breadcrumbs) */}
-        <div className="bg-academic-paper dark:bg-stone-900 border-b border-academic-line dark:border-stone-800 p-3 sm:p-4 shadow-sm z-20 sticky top-0 transition-colors">
+        <div className="bg-academic-paper dark:bg-stone-900 border-b border-academic-line dark:border-stone-800 p-3 sm:p-4 shadow-sm transition-colors">
             <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
                 <div className="p-2 bg-academic-gold/10 rounded-lg text-academic-gold hidden sm:block">
                     <Library className="w-5 h-5" />

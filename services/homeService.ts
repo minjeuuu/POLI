@@ -2,7 +2,6 @@
 import { generateWithRetry, withCache, getLanguageInstruction, safeParse } from "./common";
 import { DailyContext, HighlightedEntity, HighlightDetail, DailyHistoryEvent } from "../types";
 import { FALLBACK_DAILY_CONTEXT } from "../data/homeData";
-import { generateMassiveHistory, getMassiveArchive } from "../data/archives/massiveHistory";
 import { Type } from "@google/genai";
 
 // Helper to parse year strings like "3200 BCE", "1945", "c. 500" into numbers
@@ -16,17 +15,19 @@ const parseYear = (yearStr: string): number => {
     return val;
 };
 
-export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
-    return withCache(`daily_poli_v2_${date.toDateString()}_${getLanguageInstruction()}`, async () => {
+export const fetchDailyContext = async (date: Date, userCountry?: string): Promise<DailyContext> => {
+    const countryStr = userCountry && userCountry !== 'Global Citizen' ? userCountry : 'Global';
+    return withCache(`daily_poli_v4_${date.toDateString()}_${countryStr}_${getLanguageInstruction()}`, async () => {
         const contents = `
                 ROLE: POLI Chief Historian.
-                TASK: Daily Briefing for ${date.toDateString()}.
+                TASK: Daily Briefing for ${date.toDateString()} with a focus for a citizen of: ${countryStr}.
                 PROTOCOL: POLI ARCHIVE V1.
                 
                 INSTRUCTIONS:
-                - **History**: Provide 2 major historical events for context. Local archives will supply the rest. Focus strictly on political, governmental, diplomatic, or military history.
+                - **History**: Provide at least 4 major historical events that occurred EXACTLY ON THIS DAY IN HISTORY (${date.toLocaleString('default', { month: 'long' })} ${date.getDate()}). If a specific country is provided (${countryStr}), ensure AT LEAST 2 events are directly tied to that country's history. Focus strictly on political, governmental, diplomatic, or military history.
                 - **News**: You MUST use the Google Search tool to fetch today's top 8 global political headlines. The news MUST span all major continents (Asia, Europe, Africa, Americas, Oceania). Include news from diverse global outlets. For EACH news item, you MUST provide the REAL, EXACT, functioning URL (e.g., https://www.bbc.com/news/..., not a search string). DO NOT invent URLs. If the search tool fails, just use accurate historical headlines with their real source URLs. Must be strictly political.
                 - **Trivia**: Provide 3 distinct obscure facts. ALL FACTS AND TRIVIA MUST BE STRICTLY RELATED TO POLITICAL SCIENCE, GOVERNANCE, GEOPOLITICS, ELECTIONS, STATECRAFT, OR INTERNATIONAL RELATIONS. Do NOT provide biology, animal, or random pop-culture trivia unless it has direct, undeniable political significance.
+
                 
                 JSON SCHEMA:
                 {
@@ -74,10 +75,6 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
                 console.warn("Failed to fetch real news from /api/news", newsErr);
             }
 
-            // Generate local massive history
-            const proceduralEvents = generateMassiveHistory(date);
-            const archiveEvents = getMassiveArchive();
-            
             // FETCH WIKIPEDIA "ON THIS DAY"
             let wikiEvents: DailyHistoryEvent[] = [];
             try {
@@ -106,11 +103,11 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
                     if (wikiData.deaths) wikiEvents.push(...wikiData.deaths.map((d: any) => ({ ...mapWikiEvent(d), event: `Death: ${d.text}` })));
                 }
             } catch (wikiErr) {
-                console.warn("Wikipedia API failed, continuing with local archives.", wikiErr);
+                console.warn("Wikipedia API failed.", wikiErr);
             }
             
             // Combine all events
-            const allEvents = [...(parsed.historicalEvents || []), ...archiveEvents, ...proceduralEvents, ...wikiEvents];
+            const allEvents = [...(parsed.historicalEvents || []), ...wikiEvents];
             
             // Deduplicate based on title/event
             const seen = new Set();
@@ -145,10 +142,9 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
             return merged;
         } catch (e) {
             console.error("Home Service Critical Failure:", e);
-            const proceduralEvents = generateMassiveHistory(date);
             return { 
                 ...FALLBACK_DAILY_CONTEXT, 
-                historicalEvents: proceduralEvents.sort((a, b) => parseYear(a.year) - parseYear(b.year)),
+                historicalEvents: [],
                 synthesis: "Archive systems offline. Displaying local cache."
             };
         }

@@ -239,7 +239,7 @@ const CITATION_FORMATS = [
     { id: 'JSON', name: 'CSL JSON', category: 'Data' },
     { id: 'Wikipedia', name: 'Wikipedia Citation', category: 'Web' },
     { id: 'Reddit', name: 'Reddit Markdown', category: 'Web' },
-    { id: 'Twitter', name: 'Twitter Link', category: 'Web' }
+    { id: 'X', name: 'X (Twitter) Link', category: 'Web' }
 ];
 
 const ReaderView: React.FC<ReaderViewProps> = ({ title, author, onClose, onNavigate, type = 'Book' }) => {
@@ -475,7 +475,7 @@ const ReaderView: React.FC<ReaderViewProps> = ({ title, author, onClose, onNavig
     <div className={`fixed inset-0 top-16 z-[60] flex flex-col animate-in slide-in-from-right duration-500 ${currentTheme.bg} ${currentTheme.text} ${currentTheme.selection} transition-colors duration-500`}>
        
        {/* READER ACTION BAR */}
-       <div className={`sticky top-0 z-40 flex items-center justify-between px-4 h-14 border-b ${currentTheme.ui} backdrop-blur-md bg-opacity-90 ${currentTheme.bg} transition-colors`}>
+       <div className={`flex items-center justify-between px-4 h-14 border-b ${currentTheme.ui} backdrop-blur-md bg-opacity-90 ${currentTheme.bg} transition-colors`}>
            <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
                <button onClick={onClose} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0">
                    <ArrowLeft className="w-5 h-5" />
@@ -666,7 +666,7 @@ const ReaderView: React.FC<ReaderViewProps> = ({ title, author, onClose, onNavig
        {/* TOC DRAWER */}
        {showTOC && structure && (
            <div className={`absolute top-14 left-0 bottom-0 w-72 ${currentTheme.bg} border-r ${currentTheme.ui} z-30 overflow-y-auto shadow-2xl animate-in slide-in-from-left duration-300`}>
-               <div className={`p-4 border-b ${currentTheme.ui} font-bold text-xs uppercase tracking-widest opacity-50 sticky top-0 ${currentTheme.bg} z-10`}>Table of Contents</div>
+               <div className={`p-4 border-b ${currentTheme.ui} font-bold text-xs uppercase tracking-widest opacity-50 ${currentTheme.bg}`}>Table of Contents</div>
                {structure.chapters.map((chap, i) => (
                    <button 
                     key={i}
@@ -764,7 +764,7 @@ const ReaderView: React.FC<ReaderViewProps> = ({ title, author, onClose, onNavig
             style={{ fontSize: `${fontSize}px`, lineHeight: lineHeight }}
            >
                 <div className={`mb-12 text-center border-b ${currentTheme.ui} pb-8`}>
-                    <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight">{structure?.chapters[currentChapterIndex] || title}</h1>
+                    <h1 className="text-5xl font-bold mb-4 leading-tight tracking-tight">{structure?.chapters[currentChapterIndex] || title}</h1>
                     <p className="opacity-60 text-lg">{author}</p>
                 </div>
 

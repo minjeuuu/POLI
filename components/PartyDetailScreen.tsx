@@ -171,7 +171,7 @@ const PartyDetailScreen: React.FC<PartyDetailScreenProps> = ({ partyName, countr
                    )}
               </div>
               <div className="flex-1">
-                  <h1 className="text-3xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 leading-tight">{data.name}</h1>
+                  <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 leading-tight">{data.name}</h1>
                   <div className="flex flex-wrap gap-2 mb-6">
                       <span className="px-3 py-1 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] font-bold uppercase tracking-widest text-stone-600 dark:text-stone-400 rounded-full">{data.politicalPosition}</span>
                       <span onClick={() => onNavigate && onNavigate('Ideology', data.ideology)} className="cursor-pointer hover:bg-indigo-700 transition-colors px-3 py-1 bg-academic-accent dark:bg-indigo-600 text-[10px] font-bold uppercase tracking-widest text-white rounded-full shadow-sm">{data.ideology}</span>

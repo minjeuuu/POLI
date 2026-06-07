@@ -21,9 +21,14 @@ import { OpenLibraryWidget } from './external/OpenLibraryWidget';
 import { ArXivWidget } from './external/ArXivWidget';
 import { RedditWidget } from './external/RedditWidget';
 import { CrossrefWidget } from './external/CrossrefWidget';
+import { OpenAlexWidget } from './external/OpenAlexWidget';
+import { InternetArchiveWidget } from './external/InternetArchiveWidget';
+import { DictionaryWidget } from './external/DictionaryWidget';
 import { SemanticScholarWidget } from './external/SemanticScholarWidget';
 import { DOAJWidget } from './external/DOAJWidget';
 import { LibraryOfCongressWidget } from './external/LibraryOfCongressWidget';
+import { DBpediaWidget } from './external/DBpediaWidget';
+import { PubMedWidget } from './external/PubMedWidget';
 import { playSFX } from '../services/soundService';
 
 interface DisciplineDetailScreenProps {
@@ -233,7 +238,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
                         <IconRenderer name={currentIconName} className="w-10 h-10" />
                     </div>
                     <div className="flex-1">
-                        <h1 className="text-4xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 leading-tight">{data.name}</h1>
+                        <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 leading-tight">{data.name}</h1>
                         <p className="text-lg font-serif text-stone-600 dark:text-stone-300 leading-relaxed mb-6">
                             {data.overview?.definition || "Definition currently unavailable."}
                         </p>
@@ -431,6 +436,11 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
             </div>
 
             <div className="mt-12 space-y-8">
+                <DBpediaWidget queryText={disciplineName} />
+                <PubMedWidget queryText={disciplineName} />
+                <OpenAlexWidget queryText={disciplineName} />
+                <InternetArchiveWidget queryText={disciplineName} />
+                <DictionaryWidget queryText={disciplineName} />
                 <RedditWidget queryText={`${disciplineName} study`} />
                 <CrossrefWidget queryText={disciplineName} />
                 <SemanticScholarWidget queryText={disciplineName} />

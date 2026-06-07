@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { UserProfile, SavedItem, ThemeScope, UserPreferences, DetailedStats, SpecialTheme } from '../../types';
+import { UserProfile, SavedItem, ThemeScope, UserPreferences, DetailedStats, SpecialTheme, DEFAULT_STATS, DEFAULT_PREFS } from '../../types';
 import { Settings, BarChart2, Edit3, Bookmark, LogOut } from 'lucide-react';
 import { ProfileHeader } from '../profile/ProfileHeader';
 import { ProfileStats } from '../profile/ProfileStats';
@@ -24,85 +24,8 @@ interface ProfileTabProps {
     user: UserProfile | null;
 }
 
-const DEFAULT_STATS: DetailedStats = {
-    totalXp: 15400,
-    currentLevel: 42,
-    nextLevelThreshold: 16000,
-    streakDays: 15,
-    longestStreak: 45,
-    articlesRead: 342,
-    booksArchived: 12,
-    simulationsRun: 89,
-    debatesWon: 14,
-    pollsVoted: 156,
-    quizzesTaken: 60,
-    quizzesPerfect: 22,
-    flashcardsReviewed: 2500,
-    accuracyRate: 88,
-    postsCreated: 45,
-    commentsWritten: 320,
-    likesReceived: 1205,
-    citationsReceived: 45
-};
-
 // Initial prefs to seed state
-const DEFAULT_PREFS: UserPreferences = {
-    language: 'English',
-    secondaryLanguage: 'None',
-    timezone: 'UTC',
-    dateFormat: 'YYYY-MM-DD',
-    timeFormat: '24h',
-    startOfWeek: 'Monday',
-    currency: 'USD',
-    measurementSystem: 'Metric',
-    themeMode: 'Default',
-    themeScope: 'None',
-    density: 'Comfortable',
-    fontSize: 16,
-    fontFamily: 'Serif',
-    reduceMotion: false,
-    highContrast: false,
-    saturation: 100,
-    blurEffects: true,
-    showGridLines: false,
-    borderRadius: 'Medium',
-    emailDigest: 'Weekly',
-    emailMarketing: false,
-    emailSecurity: true,
-    pushAlerts: true,
-    pushMentions: true,
-    pushReplies: true,
-    pushTrending: false,
-    pushSystem: true,
-    pushNewContent: true,
-    soundEffects: true,
-    hapticFeedback: true,
-    publicProfile: true,
-    showOnlineStatus: true,
-    showActivityLog: true,
-    allowIndexing: false,
-    shareAnalytics: true,
-    allowPersonalization: true,
-    dataRetentionPeriod: '1 Year',
-    readerTypeface: 'Serif',
-    readerLineHeight: 1.6,
-    readerWidth: 'Standard',
-    autoBookmark: true,
-    highlightStyle: 'Yellow',
-    showCitationOnCopy: true,
-    citationStyle: 'APA',
-    textToSpeechVoice: 'Kore',
-    textToSpeechSpeed: 1.0,
-    autoPlayMedia: false,
-    backgroundAudio: false,
-    developerMode: false,
-    betaFeatures: false,
-    offlineMode: true,
-    dataSaver: false,
-    cacheSize: 124,
-    apiEndpoint: 'https://api.poli.ai/v1',
-    debugLogging: false
-};
+// ... migrated to types.ts
 
 const ProfileTab: React.FC<ProfileTabProps> = ({ 
     onNavigate, 
@@ -176,10 +99,10 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
     ];
 
     return (
-        <div className="h-full flex flex-col bg-stone-50/50 dark:bg-black/20 overflow-hidden">
+        <div className="h-full overflow-y-auto bg-stone-50/50 dark:bg-black/20 scroll-smooth pb-32">
             
             {/* 1. VIEW SWITCHER (Sub-nav) */}
-            <div className="flex-none bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-3 sm:px-6 py-2 sticky top-0 z-30 flex justify-between items-center">
+            <div className="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-3 sm:px-6 py-2 flex justify-between items-center">
                  <div className="flex gap-1 sm:gap-2 overflow-x-auto no-scrollbar">
                      {navItems.map(item => (
                          <button
@@ -207,7 +130,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             </div>
 
             {/* 2. MAIN SCROLL AREA */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-12 scroll-smooth pb-32">
+            <div className="p-6 md:p-12">
                 <div className="max-w-6xl mx-auto">
                     
                     {view === 'Overview' && (
@@ -228,7 +151,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                     {view === 'Settings' && (
                         <div className="animate-in fade-in slide-in-from-right duration-500">
                              <div className="mb-8">
-                                 <h1 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100 mb-2">System Configuration</h1>
+                                 <h1 className="text-4xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-2">System Configuration</h1>
                                  <p className="text-stone-500 font-serif italic">Manage your POLI experience protocol.</p>
                              </div>
                              <SettingsView prefs={profile.preferences} onUpdate={handleUpdatePrefs} />

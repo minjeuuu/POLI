@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { UserProfile, SocialLinks, AcademicCredentials, EducationEntry, ExperienceEntry, PublicationEntry } from '../../types';
-import { Save, X, Globe, MapPin, Building, GraduationCap, Link as LinkIcon, Twitter, Github, Linkedin, BookOpen, AtSign, FileText, User, Plus, Trash2, Calendar, Briefcase, Youtube, Facebook, Instagram, MessageCircle, Clock } from 'lucide-react';
+import { Save, X, Globe, MapPin, Building, GraduationCap, Link as LinkIcon, Github, Linkedin, BookOpen, AtSign, FileText, User, Plus, Trash2, Calendar, Briefcase, Youtube, Facebook, Instagram, MessageCircle, Clock } from 'lucide-react';
 import { playSFX } from '../../services/soundService';
 
 interface EditProfileFormProps {
@@ -111,7 +111,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ profile, onSav
         <form onSubmit={handleSubmit} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 animate-in fade-in slide-in-from-right shadow-sm max-w-4xl mx-auto">
             
             {/* HEADER */}
-            <div className="flex justify-between items-center mb-8 border-b border-stone-100 dark:border-stone-800 pb-4 sticky top-0 bg-white dark:bg-stone-900 z-10 pt-2">
+            <div className="flex justify-between items-center mb-8 border-b border-stone-100 dark:border-stone-800 pb-4 bg-white dark:bg-stone-900 pt-2">
                 <div>
                     <h2 className="text-2xl font-serif font-bold text-academic-text dark:text-stone-100">Edit Scholar Profile</h2>
                     <p className="text-xs text-stone-400 font-mono mt-1">Update your archival metadata.</p>
@@ -237,7 +237,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ profile, onSav
                         <InputGroup label="Personal Website" icon={Globe}>
                             <input type="url" value={socials.website || ''} onChange={(e) => handleSocialChange('website', e.target.value)} className={inputClass} placeholder="https://" />
                         </InputGroup>
-                        <InputGroup label="Twitter / X" icon={Twitter}>
+                        <InputGroup label="X (formerly Twitter)" icon={AtSign}>
                             <input type="text" value={socials.twitter || ''} onChange={(e) => handleSocialChange('twitter', e.target.value)} className={inputClass} placeholder="@handle" />
                         </InputGroup>
                         <InputGroup label="LinkedIn" icon={Linkedin}>
@@ -322,7 +322,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ profile, onSav
 
             </div>
 
-            <div className="flex justify-end gap-4 pt-8 mt-8 border-t border-stone-100 dark:border-stone-800 sticky bottom-0 bg-white dark:bg-stone-900 pb-2 z-10">
+            <div className="flex justify-end gap-4 pt-8 mt-8 border-t border-stone-100 dark:border-stone-800 pb-2">
                 <button 
                     type="button" 
                     onClick={onCancel}

@@ -5,6 +5,18 @@ import { fetchGenericTopic } from '../services/searchService';
 import LoadingScreen from './LoadingScreen';
 import { IconRenderer } from './IconMap';
 
+import MiniKnowledgeGraph from './MiniKnowledgeGraph';
+import { WikipediaWidget } from './external/WikipediaWidget';
+import { NasaImageWidget } from './external/NasaImageWidget';
+import { SpaceXWidget } from './external/SpaceXWidget';
+import { CoinGeckoWidget } from './external/CoinGeckoWidget';
+import { HackerNewsWidget } from './external/HackerNewsWidget';
+import { DictionaryWidget } from './external/DictionaryWidget';
+import { UNSDGWidget } from './external/UNSDGWidget';
+import { UKPoliceDataWidget } from './external/UKPoliceDataWidget';
+import { ChicagoCrimesWidget } from './external/ChicagoCrimesWidget';
+import { APIAggregatorWidget } from './external/APIAggregatorWidget';
+
 interface GenericKnowledgeScreenProps {
   query: string;
   onClose: () => void;
@@ -89,6 +101,22 @@ const GenericKnowledgeScreen: React.FC<GenericKnowledgeScreenProps> = ({ query, 
                        {data.overview}
                    </p>
               </section>
+
+              <WikipediaWidget title={data.title} />
+              <DictionaryWidget queryText={data.title} />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <NasaImageWidget queryText={data.title} />
+                  <SpaceXWidget limit={3} />
+              </div>
+              <APIAggregatorWidget query={data.title} />
+              <HackerNewsWidget />
+              <UNSDGWidget />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ChicagoCrimesWidget />
+                  <UKPoliceDataWidget />
+              </div>
+              <CoinGeckoWidget />
 
               {/* DATA STRIP */}
               {data.statistics && data.statistics.length > 0 && (
@@ -184,20 +212,25 @@ const GenericKnowledgeScreen: React.FC<GenericKnowledgeScreenProps> = ({ query, 
                   </section>
               )}
 
-              {/* RELATED ENTITIES */}
+              {/* RELATED ENTITIES (KNOWLEDGE GRAPH) */}
               {data.relatedEntities && (
                   <section>
-                       <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4 flex items-center gap-2">
-                          <Globe className="w-4 h-4" /> Knowledge Graph Connections
+                       <h3 className="text-xs font-bold uppercase tracking-widest text-academic-gold mb-4 flex items-center gap-2">
+                          <Globe className="w-4 h-4" /> Interactive Knowledge Graph
                        </h3>
-                       <div className="flex flex-wrap gap-2">
+                       <MiniKnowledgeGraph 
+                            coreEntity={data.title}
+                            relatedEntities={data.relatedEntities}
+                            onNodeClick={handleLinkClick}
+                       />
+                       <div className="flex flex-wrap gap-2 mt-6">
                            {data.relatedEntities.map((entity: string, i: number) => (
                                <button 
                                 key={i} 
                                 onClick={() => handleLinkClick(entity)}
-                                className="px-4 py-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-md text-xs font-bold text-stone-600 dark:text-stone-300 hover:border-academic-accent dark:hover:border-indigo-500 hover:text-academic-accent dark:hover:text-indigo-400 transition-all shadow-sm"
+                                className="px-4 py-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-md text-[10px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 hover:border-academic-accent dark:hover:border-indigo-500 hover:text-academic-accent dark:hover:text-indigo-400 transition-all shadow-sm flex items-center gap-2"
                                >
-                                   {entity}
+                                   <Globe className="w-3 h-3 opacity-50" /> {entity}
                                </button>
                            ))}
                        </div>

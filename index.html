@@ -85,18 +85,28 @@
         .typography-serif * { font-family: 'Merriweather', serif !important; }
 
         /* User Preference: Border Radius */
-        :root[data-radius="None"] * { border-radius: 0px !important; }
-        :root[data-radius="Small"] * { border-radius: 2px !important; }
-        /* Medium is default */
-        :root[data-radius="Large"] * { border-radius: 12px !important; }
-        :root[data-radius="Full"] * { border-radius: 9999px !important; }
+        :root[data-radius="None"] .rounded-sm, :root[data-radius="None"] .rounded, :root[data-radius="None"] .rounded-md, :root[data-radius="None"] .rounded-lg, :root[data-radius="None"] .rounded-xl, :root[data-radius="None"] .rounded-2xl, :root[data-radius="None"] .rounded-3xl, :root[data-radius="None"] .rounded-full { border-radius: 0px !important; }
+        
+        :root[data-radius="Small"] .rounded-md, :root[data-radius="Small"] .rounded-lg, :root[data-radius="Small"] .rounded-xl, :root[data-radius="Small"] .rounded-2xl { border-radius: 4px !important; }
+        
+        :root[data-radius="Large"] .rounded-sm, :root[data-radius="Large"] .rounded, :root[data-radius="Large"] .rounded-md, :root[data-radius="Large"] .rounded-lg, :root[data-radius="Large"] .rounded-xl { border-radius: 16px !important; }
+        
+        :root[data-radius="Full"] .rounded-sm, :root[data-radius="Full"] .rounded, :root[data-radius="Full"] .rounded-md, :root[data-radius="Full"] .rounded-lg, :root[data-radius="Full"] .rounded-xl, :root[data-radius="Full"] .rounded-2xl { border-radius: 9999px !important; }
 
         /* User Preference: Density */
         :root[data-density="Compact"] .p-6 { padding: 1rem !important; }
+        :root[data-density="Compact"] .p-8 { padding: 1.5rem !important; }
         :root[data-density="Compact"] .gap-4 { gap: 0.5rem !important; }
+        :root[data-density="Compact"] .gap-6 { gap: 1rem !important; }
+        :root[data-density="Compact"] .gap-8 { gap: 1.5rem !important; }
         :root[data-density="Compact"] .py-4 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+        
         :root[data-density="Spacious"] .p-6 { padding: 2.5rem !important; }
+        :root[data-density="Spacious"] .p-8 { padding: 3rem !important; }
+        :root[data-density="Spacious"] .p-12 { padding: 4rem !important; }
         :root[data-density="Spacious"] .gap-4 { gap: 1.5rem !important; }
+        :root[data-density="Spacious"] .gap-6 { gap: 2.5rem !important; }
+        :root[data-density="Spacious"] .gap-8 { gap: 3.5rem !important; }
         /* User Preference: Blur Effects */
         :root[data-blur="false"] {
              --tw-backdrop-blur: blur(0px) !important;

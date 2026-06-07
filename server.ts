@@ -55,6 +55,70 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 });
 
 import RSSParser from 'rss-parser';
+import https from 'https';
+
+app.get('/api/open-data', async (req, res) => {
+    try {
+        const query = (req.query.q as string) || 'politics';
+        
+        // Fetch from multiple civic/political APIs concurrently
+        const fetchJSON = (url: string) => fetch(url).then(r => r.ok ? r.json() : null).catch(() => null);
+        
+        const [
+            openFec,
+            openUsa,
+            ukParli,
+            reliefWeb,
+            guardianOpen,
+            crossref,
+            openAlex,
+            spaceflight,
+            loc,
+            artInstitute,
+            fbiWanted,
+            openLibrary,
+            tvMaze,
+            publicHolidays,
+            openMeteo
+        ] = await Promise.all([
+            fetchJSON(`https://api.open.fec.gov/v1/candidates/?api_key=DEMO_KEY&q=${encodeURIComponent(query)}&per_page=5`),
+            fetchJSON(`https://api.usaspending.gov/api/v2/references/toptier_agencies/`),
+            fetchJSON(`https://members-api.parliament.uk/api/Members/Search?Name=${encodeURIComponent(query)}&take=5`),
+            fetchJSON(`https://api.reliefweb.int/v1/reports?appname=apidoc&query[value]=${encodeURIComponent(query)}&limit=5`),
+            fetchJSON(`https://content.guardianapis.com/search?q=${encodeURIComponent(query)}&api-key=test`),
+            fetchJSON(`https://api.crossref.org/works?query=${encodeURIComponent(query)}&rows=5`),
+            fetchJSON(`https://api.openalex.org/works?search=${encodeURIComponent(query)}&per-page=5`),
+            fetchJSON(`https://api.spaceflightnewsapi.net/v4/articles/?title_contains=${encodeURIComponent(query)}&limit=5`),
+            fetchJSON(`https://www.loc.gov/search/?q=${encodeURIComponent(query)}&fo=json&c=5`),
+            fetchJSON(`https://api.artic.edu/api/v1/artworks/search?q=${encodeURIComponent(query)}&limit=5`),
+            fetchJSON(`https://api.fbi.gov/@wanted?title=${encodeURIComponent(query)}`),
+            fetchJSON(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`),
+            fetchJSON(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(query)}`),
+            fetchJSON(`https://date.nager.at/api/v3/NextPublicHolidaysWorldwide`),
+            fetchJSON(`https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true`)
+        ]);
+
+        res.json({
+            fecData: openFec ? openFec.results : [],
+            usaSpending: openUsa ? openUsa.results.slice(0, 5) : [],
+            ukParliament: ukParli && ukParli.items ? ukParli.items : [],
+            reliefWebReports: reliefWeb && reliefWeb.data ? reliefWeb.data : [],
+            guardianNews: guardianOpen && guardianOpen.response ? guardianOpen.response.results : [],
+            academicResearch: crossref && crossref.message ? crossref.message.items : [],
+            openAlex: openAlex && openAlex.results ? openAlex.results : [],
+            spaceflight: spaceflight && spaceflight.results ? spaceflight.results : [],
+            loc: loc && loc.results ? loc.results : [],
+            artInstitute: artInstitute && artInstitute.data ? artInstitute.data : [],
+            fbiWanted: fbiWanted && fbiWanted.items ? fbiWanted.items.slice(0, 5) : [],
+            openLibrary: openLibrary && openLibrary.docs ? openLibrary.docs : [],
+            tvMaze: tvMaze ? tvMaze.slice(0, 5) : [],
+            publicHolidays: publicHolidays ? publicHolidays.slice(0, 5) : [],
+            openMeteo: openMeteo && openMeteo.current_weather ? [openMeteo.current_weather] : []
+        });
+    } catch(err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 app.get('/api/news', async (req, res) => {
     try {

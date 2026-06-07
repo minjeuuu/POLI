@@ -157,7 +157,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({ item1, item2, onClose, 
 
   const renderMatrix = () => (
       <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
-          <div className="sticky top-0 z-20 bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-md py-4 border-b border-stone-200 dark:border-stone-800 shadow-sm flex justify-between px-4 text-[10px] font-bold uppercase tracking-widest text-stone-400">
+          <div className="bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-md py-4 border-b border-stone-200 dark:border-stone-800 shadow-sm flex justify-between px-4 text-[10px] font-bold uppercase tracking-widest text-stone-400">
               <span className="w-1/4">Metric</span>
               <span className="w-1/3 text-center truncate px-2 text-academic-accent dark:text-indigo-400">{item1.name}</span>
               <span className="w-1/3 text-center truncate px-2 text-academic-gold">{item2.name}</span>
@@ -305,7 +305,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({ item1, item2, onClose, 
                         className="text-center flex-1 w-full group cursor-pointer p-6 rounded-2xl hover:bg-white dark:hover:bg-stone-900 transition-all border border-transparent hover:border-stone-200 dark:hover:border-stone-800 hover:shadow-lg"
                     >
                         <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500 mb-2">{item1.type}</div>
-                        <h1 className="text-3xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors flex items-center justify-center gap-2">
+                        <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors flex items-center justify-center gap-2">
                             {item1.name} <ArrowUpRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </h1>
                     </div>
@@ -317,7 +317,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({ item1, item2, onClose, 
                         className="text-center flex-1 w-full group cursor-pointer p-6 rounded-2xl hover:bg-white dark:hover:bg-stone-900 transition-all border border-transparent hover:border-stone-200 dark:hover:border-stone-800 hover:shadow-lg"
                     >
                         <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500 mb-2">{item2.type}</div>
-                        <h1 className="text-3xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors flex items-center justify-center gap-2">
+                        <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors flex items-center justify-center gap-2">
                             {item2.name} <ArrowUpRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </h1>
                     </div>

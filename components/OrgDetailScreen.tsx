@@ -2,6 +2,7 @@ import { ImageWithFallback } from './atoms/ImageWithFallback';
 
 import React, { useEffect, useState, useRef } from 'react';
 import { ArrowLeft, Globe, Building2, Users, FileText, History, X, Flag, Scale, Brain, Search, BookOpen, Bookmark, Download, ChevronRight, Target, Zap, LayoutGrid, Award, Printer, ArrowRightLeft, Crown, Coins, AlertCircle } from 'lucide-react';
+import { CountryFlag } from './country/CountryFlag';
 import { OrganizationDetail } from '../types';
 import { fetchOrganizationDetail } from '../services/orgService';
 import LoadingScreen from './LoadingScreen';
@@ -194,7 +195,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
                            )}
                       </div>
                       <div className="flex-1">
-                          <h1 className="text-3xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-3 leading-tight">{data.name}</h1>
+                          <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-3 leading-tight">{data.name}</h1>
                           {data.nativeName && <h2 className="text-lg font-serif text-stone-500 dark:text-stone-400 italic mb-6">{data.nativeName}</h2>}
                           
                           <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm mt-6 bg-stone-50 dark:bg-stone-800/50 p-4 rounded-lg border border-stone-100 dark:border-stone-800">
@@ -355,11 +356,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
                              className="flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-800/50 hover:bg-white dark:hover:bg-stone-800 border border-transparent hover:border-academic-accent dark:hover:border-indigo-500 rounded-xl transition-all group shadow-sm hover:shadow-md text-left"
                            >
                                <div className="w-8 h-6 bg-stone-200 dark:bg-stone-700 rounded overflow-hidden flex-shrink-0 shadow-sm border border-stone-300 dark:border-stone-600">
-                                   {member.isoCode ? (
-                                       <ImageWithFallback src={getFlagUrl(member.isoCode) || ''} alt={member.name} className="w-full h-full object-cover" />
-                                   ) : (
-                                       <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-stone-400">?</div>
-                                   )}
+                                   <CountryFlag countryName={member.name} alt={member.name} iconSize="w-4 h-4" />
                                </div>
                                <div className="min-w-0">
                                    <span className="block text-xs font-serif font-bold text-stone-800 dark:text-stone-200 truncate group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors">{member.name}</span>

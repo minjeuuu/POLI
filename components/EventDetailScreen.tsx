@@ -13,6 +13,10 @@ import { CrossrefWidget } from './external/CrossrefWidget';
 import { OpenLibraryWidget } from './external/OpenLibraryWidget';
 import { DOAJWidget } from './external/DOAJWidget';
 import { SemanticScholarWidget } from './external/SemanticScholarWidget';
+import { ReliefWebWidget } from './external/ReliefWebWidget';
+import { OpenAlexWidget } from './external/OpenAlexWidget';
+import { InternetArchiveWidget } from './external/InternetArchiveWidget';
+import { DBpediaWidget } from './external/DBpediaWidget';
 import { LibraryOfCongressWidget } from './external/LibraryOfCongressWidget';
 import { playSFX } from '../services/soundService';
 
@@ -82,7 +86,7 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
     <div className="fixed inset-0 z-[60] bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 relative">
       
       {/* HEADER */}
-      <div className="sticky top-0 z-50 bg-academic-paper/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-academic-line dark:border-stone-800 shadow-sm">
+      <div className="bg-academic-paper/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-academic-line dark:border-stone-800 shadow-sm">
           <div className="flex items-center justify-between px-4 h-16">
             <div className="flex items-center gap-4">
                 <button onClick={onClose} className="p-2 -ml-2 text-stone-500 hover:text-academic-accent dark:text-stone-400 dark:hover:text-indigo-400 transition-colors">
@@ -123,7 +127,7 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
                  )}
                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-8">
                      <div>
-                         <h1 className="text-3xl md:text-5xl font-serif font-bold text-white leading-tight mb-2 text-shadow-lg">{data.title || eventName}</h1>
+                         <h1 className="text-5xl font-serif font-bold text-white leading-tight mb-2 text-shadow-lg">{data.title || eventName}</h1>
                          <div className="flex flex-wrap items-center gap-6 text-white/90 text-sm font-mono font-bold">
                              <span className="flex items-center gap-2"><Calendar className="w-4 h-4" /> {data.date}</span>
                              <span className="flex items-center gap-2"><MapPin className="w-4 h-4" /> {data.location}</span>
@@ -221,6 +225,10 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
             </div>
 
             <div className="mt-12 space-y-8">
+                <DBpediaWidget queryText={data.title || eventName} />
+                <ReliefWebWidget queryText={data.title || eventName} />
+                <OpenAlexWidget queryText={data.title || eventName} />
+                <InternetArchiveWidget queryText={data.title || eventName} />
                 <GDELTWidget queryText={data.title || eventName} />
                 <RedditWidget queryText={data.title || eventName} />
                 <LibraryOfCongressWidget queryText={data.title || eventName} />

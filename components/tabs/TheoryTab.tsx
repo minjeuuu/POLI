@@ -173,7 +173,7 @@ const TheoryTab: React.FC<TheoryTabProps> = ({ onNavigate, onAddToCompare, onTog
       return (
           <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 relative animate-in slide-in-from-right duration-500" onClick={() => setActiveMenu(null)}>
               {/* HEADER */}
-              <div className="sticky top-0 z-20 bg-academic-paper dark:bg-stone-900 border-b border-academic-line dark:border-stone-800 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between shadow-sm transition-colors gap-3 sm:gap-4">
+              <div className="bg-academic-paper dark:bg-stone-900 border-b border-academic-line dark:border-stone-800 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between shadow-sm transition-colors gap-3 sm:gap-4">
                   <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
                       <button onClick={handleBack} className="p-1 sm:p-2 -ml-1 sm:-ml-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 transition-colors">
                           <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -201,8 +201,8 @@ const TheoryTab: React.FC<TheoryTabProps> = ({ onNavigate, onAddToCompare, onTog
                       <div className="space-y-10">
                           {sortedKeys.map(letter => (
                               <div key={letter} id={`section-${letter}`} className="scroll-mt-20">
-                                  <div className="flex items-center gap-4 mb-4 sm:mb-6 border-b border-stone-100 dark:border-stone-800 pb-2 sticky top-[10px] sm:top-0 bg-academic-bg/95 dark:bg-stone-950/95 backdrop-blur-sm z-10">
-                                      <span className="text-2xl sm:text-4xl font-serif font-bold text-stone-200 dark:text-stone-800">{letter}</span>
+                                  <div className="flex items-center gap-4 mb-4 sm:mb-6 border-b border-stone-100 dark:border-stone-800 pb-4">
+                                      <span className="text-xl sm:text-4xl font-serif font-bold text-academic-gold/80">{letter}</span>
                                   </div>
                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                       {groupedItems[letter].map((item, i) => {
@@ -266,10 +266,6 @@ const TheoryTab: React.FC<TheoryTabProps> = ({ onNavigate, onAddToCompare, onTog
         {/* HERO HEADER */}
         <div className="p-10 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors">
             <div className="max-w-5xl mx-auto">
-                <div className="flex items-center gap-3 mb-6 text-academic-gold">
-                    <Hexagon className="w-10 h-10 fill-academic-gold/10" />
-                    <h1 className="text-sm font-bold uppercase tracking-[0.3em]">Knowledge Graph</h1>
-                </div>
                 <h2 className="text-5xl md:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">Political Theory</h2>
                 <p className="text-xl font-serif text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed">
                     Explore the vast network of political thought, from ancient philosophies to contemporary critical theories.
@@ -299,10 +295,10 @@ const TheoryTab: React.FC<TheoryTabProps> = ({ onNavigate, onAddToCompare, onTog
                                 </div>
                             </div>
                             
-                            <h3 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors">
+                            <h3 className="text-4xl md:text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors leading-tight">
                                 {cat.category}
                             </h3>
-                            <p className="text-base text-stone-500 dark:text-stone-400 font-serif leading-relaxed mb-8 flex-1">
+                            <p className="text-xl md:text-2xl text-stone-500 dark:text-stone-400 font-serif leading-relaxed mb-8 flex-1">
                                 {cat.description}
                             </p>
 

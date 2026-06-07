@@ -88,7 +88,7 @@ const LawTab: React.FC = () => {
         
         {/* ROOT TABS (Only visible at root level) */}
         {navStack.length === 0 && (
-            <div className="sticky top-0 bg-academic-bg z-20 pt-2 pb-4 -mx-6 px-6 border-b border-academic-line mb-6 flex overflow-x-auto gap-2 no-scrollbar">
+            <div className="bg-academic-bg pt-2 pb-4 -mx-6 px-6 border-b border-academic-line mb-6 flex overflow-x-auto gap-2 no-scrollbar">
                 {LEGAL_CATS.map((tab) => (
                     <button 
                         key={tab.id}

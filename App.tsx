@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { MainTab, DailyContext, SavedItem, UserProfile, ThemeScope, SpecialTheme, UserPreferences } from './types';
+import { MainTab, DailyContext, SavedItem, UserProfile, ThemeScope, SpecialTheme, UserPreferences, DEFAULT_STATS, DEFAULT_PREFS } from './types';
 import { fetchDailyContext } from './services/homeService';
 import { FALLBACK_DAILY_CONTEXT } from './data/homeData';
 import { db } from './services/database';
@@ -11,7 +11,6 @@ import LaunchScreen from './components/LaunchScreen';
 import IntroScreen from './components/IntroScreen';
 import Layout from './components/Layout';
 import HomeTab from './components/tabs/HomeTab';
-import SocialTab from './components/tabs/SocialTab';
 import ExploreTab from './components/tabs/ExploreTab';
 import CountriesTab from './components/tabs/CountriesTab';
 import TranslateTab from './components/tabs/TranslateTab';
@@ -24,7 +23,6 @@ import GamesTab from './components/tabs/GamesTab';
 import RatesTab from './components/tabs/RatesTab';
 import ProfileTab from './components/tabs/ProfileTab';
 import LibraryTab from './components/tabs/LibraryTab';
-import MessageTab from './components/tabs/MessageTab';
 import AlmanacTab from './components/tabs/AlmanacTab';
 import { HubTab } from './components/tabs/HubTab';
 
@@ -105,7 +103,7 @@ export default function App() {
     const loadDaily = async () => {
       setIsDailyLoading(true);
       try {
-        const data = await fetchDailyContext(currentDate);
+        const data = await fetchDailyContext(currentDate, myCountry);
         setDailyData(data);
       } catch (e) {
         console.error("Failed to load daily context", e);
@@ -114,16 +112,20 @@ export default function App() {
       }
     };
     loadDaily();
-  }, [currentDate]);
+  }, [currentDate, myCountry]);
 
   // Handlers
   const handleLogin = (userData: any) => {
-    setUser(userData);
+    const finalUserData = { ...userData };
+    finalUserData.stats = { ...DEFAULT_STATS, ...(finalUserData.stats || {}) };
+    finalUserData.preferences = { ...DEFAULT_PREFS, ...(finalUserData.preferences || {}) };
+    
+    setUser(finalUserData);
     setIsAuthenticated(true);
-    if (userData.preferences) {
-        if (userData.preferences.themeMode) setThemeMode(userData.preferences.themeMode);
-        if (userData.preferences.themeScope) setThemeScope(userData.preferences.themeScope);
-        if (userData.preferences.language) setAppLang(userData.preferences.language);
+    if (finalUserData.preferences) {
+        if (finalUserData.preferences.themeMode) setThemeMode(finalUserData.preferences.themeMode);
+        if (finalUserData.preferences.themeScope) setThemeScope(finalUserData.preferences.themeScope);
+        if (finalUserData.preferences.language) setAppLang(finalUserData.preferences.language);
     }
   };
 
@@ -153,7 +155,7 @@ export default function App() {
     } else if (type === 'Logout') {
         handleLogout();
     } else {
-        if (['home','read','explore','messages','social','countries','sim','games','translate','comparative','theory','persons','learn','rates','profile', 'almanac'].includes(type.toLowerCase())) {
+        if (['home','read','explore','countries','sim','games','translate','comparative','theory','persons','learn','rates','profile', 'almanac'].includes(type.toLowerCase())) {
             setActiveTab(type.toLowerCase() as MainTab);
             setOverlayStack([]);
         }
@@ -330,12 +332,6 @@ export default function App() {
         )}
         {activeTab === 'explore' && (
             <ExploreTab {...commonTabProps} />
-        )}
-        {activeTab === 'messages' && (
-            <MessageTab onNavigate={handleNavigate} />
-        )}
-        {activeTab === 'social' && (
-            <SocialTab {...commonTabProps} />
         )}
         {activeTab === 'countries' && (
             <CountriesTab {...commonTabProps} />

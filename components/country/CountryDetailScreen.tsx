@@ -43,6 +43,19 @@ import { WorldBankWidget } from './economy/WorldBankWidget';
 import { RestCountriesWidget } from './external/RestCountriesWidget';
 import { OpenStreetMapWidget } from './external/OpenStreetMapWidget';
 import { OpenMeteoWidget } from '../external/OpenMeteoWidget';
+import { UniversitiesWidget } from '../external/UniversitiesWidget';
+import { PublicHolidaysWidget } from '../external/PublicHolidaysWidget';
+import { WikipediaWidget } from '../external/WikipediaWidget';
+import { FrankfurterWidget } from '../external/FrankfurterWidget';
+import { MetMuseumWidget } from '../external/MetMuseumWidget';
+import { OpenAlexWidget } from '../external/OpenAlexWidget';
+import { ReliefWebWidget } from '../external/ReliefWebWidget';
+import { WikiquoteWidget } from '../external/WikiquoteWidget';
+import { InternetArchiveWidget } from '../external/InternetArchiveWidget';
+import { OpenAQWidget } from '../external/OpenAQWidget';
+import { HackerNewsWidget } from '../external/HackerNewsWidget';
+import { WorldBankIndicatorsWidget } from '../external/WorldBankIndicatorsWidget';
+import { USASpendingWidget } from '../external/USASpendingWidget';
 import { GDELTWidget } from '../external/GDELTWidget';
 import { ArtInstituteChicagoWidget } from '../external/ArtInstituteChicagoWidget';
 import { DOAJWidget } from '../external/DOAJWidget';
@@ -155,7 +168,7 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
       <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth bg-stone-50/30 dark:bg-black/20 relative w-full">
           
           {/* MOBILE NAV */}
-          <div className="lg:hidden sticky top-0 z-30 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 overflow-x-auto no-scrollbar flex items-center gap-2 p-2 shadow-sm">
+          <div className="lg:hidden bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 overflow-x-auto no-scrollbar flex items-center gap-2 p-2 shadow-sm">
               {SECTIONS.map(s => (
                   <button
                       key={s.id}
@@ -332,6 +345,7 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
                    </div>
                    <TradePartners data={data.economy} onNavigate={onNavigate} />
                    <div className="mt-8">
+                       <FrankfurterWidget />
                        <RestCountriesWidget countryName={countryName} />
                        <WorldBankWidget countryName={countryName} />
                    </div>
@@ -345,6 +359,11 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
 
               {/* EXTERNAL NEWS & RESOURCES */}
               <SectionWrapper id="news" title="Extended Monitor & Archives" icon={Newspaper} isVisible={true}>
+                   <WorldBankIndicatorsWidget countryName={countryName} />
+                   <OpenAQWidget countryName={countryName} />
+                   <ReliefWebWidget queryText={countryName} />
+                   <OpenAlexWidget queryText={countryName} />
+                   <WikipediaWidget title={countryName} />
                    <GDELTWidget queryText={countryName} />
                    <LibraryOfCongressWidget queryText={countryName} />
                    <SemanticScholarWidget queryText={countryName} />
@@ -370,6 +389,8 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
               {/* CULTURE (NEW) */}
               <SectionWrapper id="Culture" title="Cultural Heritage" icon={Palette} subtitle="Arts, Cuisine, Traditions" setRef={setRef('Culture')}>
                   <CultureProfile data={data.culture} onNavigate={onNavigate} />
+                  <MetMuseumWidget queryText={countryName} />
+                  <PublicHolidaysWidget countryName={countryName} />
               </SectionWrapper>
 
               {/* HEALTH (NEW) */}
@@ -380,6 +401,7 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
               {/* EDUCATION (NEW) */}
               <SectionWrapper id="Education" title="Education System" icon={GraduationCap} subtitle="Literacy & Institutions" setRef={setRef('Education')}>
                   <EducationProfile data={data.education} onNavigate={onNavigate} />
+                  <UniversitiesWidget countryName={countryName} />
               </SectionWrapper>
 
               {/* TOURISM (NEW) */}
