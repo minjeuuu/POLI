@@ -328,7 +328,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <p><strong>Acquisition &amp; Licensing Terms:</strong><br>
-    I value the outright acquisition of POLI and all associated intellectual property at $850,000 USD. Alternatively, I am open to institution-wide site licensing agreements starting at $85,000 USD per annum. I am fully committed to providing 60 days of direct technical transition support and comprehensive documentation to ensure a seamless integration with your existing research or simulation systems.</p>
+    I value the outright acquisition of POLI and all associated intellectual property at $850,000 USD. Alternatively, I am open to institution-wide site licensing agreements starting at $85,000 USD per annum. Upon purchase, complete ownership and all legal rights transfer entirely to your organization. The application is fully self-contained, client-side execution ready, and comes with comprehensive code documentation to ensure a clean, independent transition.</p>
 
     <p>Thank you for your time and consideration of this proposal. If this aligns with your department's technological or research goals, I would welcome the opportunity to schedule a brief technical walkthrough.</p>
 
