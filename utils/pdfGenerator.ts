@@ -192,10 +192,13 @@ export const generateAestheticPDF = (
         doc.setFontSize(11);
         doc.setFont("times", "normal");
         doc.setTextColor(50, 45, 40);
-        const descLines = doc.splitTextToSize(description, 145);
-        checkPageBreak(descLines.length * 6);
-        doc.text(descLines, 30, y, { align: "justify", maxWidth: 145 });
-        y += (descLines.length * 6) + 15;
+        const descLines = doc.splitTextToSize(description, 145) as string[];
+        descLines.forEach(line => {
+            checkPageBreak(6);
+            doc.text(line, 30, y);
+            y += 6;
+        });
+        y += 10;
     }
 
     // Sections
@@ -228,24 +231,30 @@ export const generateAestheticPDF = (
         
         if (Array.isArray(section.content)) {
             section.content.forEach((item, i) => {
-                const textLines = doc.splitTextToSize(`• ${item}`, 145);
-                checkPageBreak(textLines.length * 6 + 4);
-                // Highlight bullet point text slightly
-                doc.setFont("times", "bold");
-                doc.setTextColor(180, 50, 50);
-                doc.text("•", 30, y);
-                doc.setFont("times", "normal");
-                doc.setTextColor(60, 55, 50);
-                doc.text(doc.splitTextToSize(`${item}`, 140), 34, y);
-
-                y += (textLines.length * 6) + 3;
+                const textLines = doc.splitTextToSize(item, 140) as string[];
+                textLines.forEach((line, lineIndex) => {
+                    checkPageBreak(6);
+                    if (lineIndex === 0) {
+                        doc.setFont("times", "bold");
+                        doc.setTextColor(180, 50, 50);
+                        doc.text("•", 30, y);
+                    }
+                    doc.setFont("times", "normal");
+                    doc.setTextColor(60, 55, 50);
+                    doc.text(line, 34, y);
+                    y += 6;
+                });
+                y += 2;
             });
             y += 8;
         } else {
-            const contentLines = doc.splitTextToSize(section.content, 145);
-            checkPageBreak(contentLines.length * 6 + 4);
-            doc.text(contentLines, 30, y, { align: "justify", maxWidth: 145 });
-            y += (contentLines.length * 6) + 12;
+            const contentLines = doc.splitTextToSize(section.content, 145) as string[];
+            contentLines.forEach(line => {
+                checkPageBreak(6);
+                doc.text(line, 30, y);
+                y += 6;
+            });
+            y += 8;
         }
     });
 

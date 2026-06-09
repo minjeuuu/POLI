@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Android Build Directories and Keys
+build_apk/
+release.keystore
+*.apk
+*.apk.idsig
+*.jar
+

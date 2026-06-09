@@ -230,6 +230,7 @@ export interface UserPreferences {
     streamQuality?: '4k' | '1080p' | '720p' | 'Auto';
     showBreadcrumbs?: boolean;
     animateTransitions?: boolean;
+    geminiApiKey?: string;
 }
 
 export const DEFAULT_PREFS: UserPreferences = {
@@ -290,7 +291,8 @@ export const DEFAULT_PREFS: UserPreferences = {
     dataSaver: false,
     cacheSize: 124,
     apiEndpoint: 'https://api.poli.ai/v1',
-    debugLogging: false
+    debugLogging: false,
+    geminiApiKey: ''
 };
 
 export interface DetailedStats {

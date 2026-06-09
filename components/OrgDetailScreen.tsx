@@ -94,11 +94,11 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
               sections.push({ title: "Strategic Analysis", content: data.analysis.strategicAnalysis });
           }
           if (data.history && data.history.keyEvents) {
-               const events = data.history.keyEvents.map((e: any) => `${e.date || ''}: ${e.event || ''} - ${e.impact || ''}`);
+              const events = data.history?.keyEvents?.map((e: any) => `${e.date || ''}: ${e.event || ''} - ${e.impact || ''}`);
                sections.push({ title: "Historical Context", content: events });
           }
           if (data.influence && data.influence.methods) {
-              const methods = data.influence.methods.map((m: any) => m.description || m.method || m);
+              const methods = data.influence?.methods?.map((m: any) => m.description || m.method || m);
               sections.push({ title: "Methods of Influence", content: methods });
           }
 
@@ -122,7 +122,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
   // Helper to normalize member data since it might be string or object depending on API version
   const getMembers = () => {
       if (!data?.members || !Array.isArray(data.members)) return [];
-      return data.members.map(m => {
+      return data.members?.map(m => {
           if (typeof m === 'string') return { name: m, role: 'Member', isoCode: '' };
           return m;
       });
@@ -219,7 +219,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
                   <div className="mt-8">
                       <span className="text-[10px] font-bold uppercase text-stone-400 dark:text-stone-500 block mb-3 flex items-center gap-2"><Globe className="w-3 h-3" /> Regional Presence</span>
                       <div className="flex flex-wrap gap-2">
-                          {data.satelliteOffices.map((off, i) => (
+                          {data.satelliteOffices?.map((off, i) => (
                               <span key={i} onClick={() => onNavigate && onNavigate('Regional', off)} className="cursor-pointer hover:border-academic-accent hover:text-academic-accent transition-colors px-3 py-1.5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-xs font-mono text-stone-600 dark:text-stone-300 rounded-md shadow-sm">{off}</span>
                           ))}
                       </div>
@@ -232,7 +232,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
               <div id="leadership" ref={el => { sectionRefs.current['leadership'] = el; }}>
                   <SectionTitle title="Executive Leadership" icon={Crown} subtitle="Key Figures" />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {data.leadership.map((leader, i) => (
+                      {data.leadership?.map((leader, i) => (
                           <div key={i} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 rounded-xl shadow-sm">
                               <div className="flex items-center gap-4 mb-3">
                                   <div className="w-12 h-12 bg-academic-gold/10 rounded-full flex items-center justify-center text-academic-gold font-bold text-xl">
@@ -285,7 +285,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
                               </tr>
                           </thead>
                           <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
-                              {data.finances.map((item, i) => (
+                              {data.finances?.map((item, i) => (
                                   <tr key={i} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                                       <td className="px-6 py-4 font-serif text-stone-800 dark:text-stone-200">{item.source}</td>
                                       <td className="px-6 py-4 font-mono text-stone-600 dark:text-stone-400 text-right">{item.amount}</td>
@@ -302,7 +302,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
               <div id="projects" ref={el => { sectionRefs.current['projects'] = el; }}>
                   <SectionTitle title="Strategic Initiatives" icon={Target} subtitle="Current Projects" />
                   <div className="space-y-4">
-                      {data.projects.map((project, i) => (
+                      {data.projects?.map((project, i) => (
                           <div key={i} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 rounded-xl shadow-sm hover:border-academic-accent dark:hover:border-indigo-500 transition-colors">
                               <div className="flex justify-between items-start mb-2">
                                   <h4 className="font-serif font-bold text-lg text-academic-text dark:text-stone-100">{project.name}</h4>
@@ -390,7 +390,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
                   <SectionTitle title="Controversies" icon={AlertCircle} subtitle="Criticisms & Issues" />
                   <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-2xl p-8">
                       <ul className="space-y-4">
-                          {data.controversies.map((item, i) => (
+                          {data.controversies?.map((item, i) => (
                               <li key={i} className="flex gap-3">
                                   <span className="text-red-400 font-bold">•</span>
                                   <span className="font-serif text-stone-800 dark:text-stone-200 leading-relaxed text-justify">{item}</span>

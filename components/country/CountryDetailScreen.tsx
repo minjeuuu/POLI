@@ -125,30 +125,32 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
       sectionRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const hasData = (obj: any) => obj && typeof obj === 'object' && Object.keys(obj).length > 0;
+
   const SECTIONS = [
       { id: 'Overview', icon: Globe },
-      { id: 'Live News', icon: MessageCircle },
+      { id: 'Live News', icon: MessageCircle, required: data?.today?.news },
       { id: 'Identity', icon: Flag },
       { id: 'Geography', icon: MapIcon },
-      { id: 'Environment', icon: Leaf },
+      { id: 'Environment', icon: Leaf, required: data?.environment },
       { id: 'Demographics', icon: Users },
       { id: 'Government', icon: Crown },
       { id: 'Politics', icon: Vote },
       { id: 'Legal', icon: Gavel },
       { id: 'Economy', icon: Coins },
-      { id: 'Technology', icon: Cpu },
-      { id: 'Infrastructure', icon: Truck },
-      { id: 'Society', icon: Music },
-      { id: 'Culture', icon: Palette },
-      { id: 'Health', icon: Heart },
-      { id: 'Education', icon: GraduationCap },
-      { id: 'Tourism', icon: Plane },
+      { id: 'Technology', icon: Cpu, required: data?.technology },
+      { id: 'Infrastructure', icon: Truck, required: data?.infrastructure },
+      { id: 'Society', icon: Music, required: data?.society },
+      { id: 'Culture', icon: Palette, required: data?.culture },
+      { id: 'Health', icon: Heart, required: data?.health },
+      { id: 'Education', icon: GraduationCap, required: data?.education },
+      { id: 'Tourism', icon: Plane, required: data?.tourism },
       { id: 'Military', icon: Shield },
       { id: 'History', icon: History },
       { id: 'Academic', icon: GraduationCap },
       { id: 'Analysis', icon: Brain },
       { id: 'Visuals', icon: ImageIcon },
-  ];
+  ].filter(s => s.required !== undefined ? hasData(s.required) || (Array.isArray(s.required) && s.required.length > 0) : true);
 
   if (loading) return (
       <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex items-center justify-center">
@@ -272,9 +274,11 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
               </SectionWrapper>
 
               {/* ENVIRONMENT (NEW) */}
+              {hasData(data.environment) && (
               <SectionWrapper id="Environment" title="Ecological Profile" icon={Leaf} subtitle="Climate & Sustainability" setRef={setRef('Environment')}>
                   <EnvironmentProfile data={data.environment} />
               </SectionWrapper>
+              )}
 
               {/* DEMOGRAPHICS */}
               <SectionWrapper id="Demographics" title="Demographics" icon={Users} subtitle="Population Structure" setRef={setRef('Demographics')}>
@@ -378,42 +382,53 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
               
 
               {/* TECHNOLOGY (NEW) */}
+              {hasData(data.technology) && (
               <SectionWrapper id="Technology" title="Innovation & Tech" icon={Cpu} subtitle="Digital Infrastructure" setRef={setRef('Technology')}>
                   <TechProfile data={data.technology} />
               </SectionWrapper>
+              )}
 
               {/* INFRASTRUCTURE */}
+              {hasData(data.infrastructure) && (
               <SectionWrapper id="Infrastructure" title="National Infrastructure" icon={Truck} subtitle="Transport, Energy, Digital" setRef={setRef('Infrastructure')}>
                   <InfrastructureGrid data={data.infrastructure} />
               </SectionWrapper>
+              )}
 
               {/* SOCIETY (NEW) */}
+              {hasData(data.society) && (
               <SectionWrapper id="Society" title="Society & Demographics" icon={Users} subtitle="Social Structure" setRef={setRef('Society')}>
                   <SocietyProfile data={data.society} onNavigate={onNavigate} />
               </SectionWrapper>
+              )}
 
               {/* CULTURE (NEW) */}
+              {hasData(data.culture) && (
               <SectionWrapper id="Culture" title="Cultural Heritage" icon={Palette} subtitle="Arts, Cuisine, Traditions" setRef={setRef('Culture')}>
                   <CultureProfile data={data.culture} onNavigate={onNavigate} />
-                  
-                  
               </SectionWrapper>
+              )}
 
               {/* HEALTH (NEW) */}
+              {hasData(data.health) && (
               <SectionWrapper id="Health" title="Public Health" icon={Heart} subtitle="Wellness & Systems" setRef={setRef('Health')}>
                   <HealthProfile data={data.health} onNavigate={onNavigate} />
               </SectionWrapper>
+              )}
 
               {/* EDUCATION (NEW) */}
+              {hasData(data.education) && (
               <SectionWrapper id="Education" title="Education System" icon={GraduationCap} subtitle="Literacy & Institutions" setRef={setRef('Education')}>
                   <EducationProfile data={data.education} onNavigate={onNavigate} />
-                  
               </SectionWrapper>
+              )}
 
               {/* TOURISM (NEW) */}
+              {hasData(data.tourism) && (
               <SectionWrapper id="Tourism" title="Tourism & Visitation" icon={Plane} subtitle="Attractions & Visa" setRef={setRef('Tourism')}>
                   <TourismProfile data={data.tourism} onNavigate={onNavigate} />
               </SectionWrapper>
+              )}
 
               {/* MILITARY */}
               <SectionWrapper id="Military" title="Defense Apparatus" icon={Shield} subtitle="Forces & Security" setRef={setRef('Military')}>

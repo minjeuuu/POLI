@@ -57,6 +57,18 @@ const Select = ({ value, options, onChange }: any) => (
 export const SettingsView: React.FC<SettingsViewProps> = ({ prefs, onUpdate }) => {
     const [activeSection, setActiveSection] = useState('appearance');
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+    const [geminiKey, setGeminiKey] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return prefs.geminiApiKey || localStorage.getItem('poli_gemini_api_key') || '';
+        }
+        return prefs.geminiApiKey || '';
+    });
+
+    React.useEffect(() => {
+        if (prefs.geminiApiKey !== undefined) {
+            setGeminiKey(prefs.geminiApiKey || '');
+        }
+    }, [prefs.geminiApiKey]);
 
     React.useEffect(() => {
         const handler = (e: any) => {
@@ -132,6 +144,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ prefs, onUpdate }) =
                         >
                             {deferredPrompt ? 'Install App' : 'How to Install'}
                         </button>
+                    </SettingRow>
+                    <SettingRow label="Gemini API Key" desc="Provide your Google Gemini API Key to enable real-time AI generation. Leave empty to use offline mock fallbacks.">
+                        <input 
+                            type="password" 
+                            placeholder="AIzaSy..."
+                            value={geminiKey}
+                            onChange={(e) => {
+                                const newKey = e.target.value;
+                                setGeminiKey(newKey);
+                                if (typeof window !== 'undefined') {
+                                    localStorage.setItem('poli_gemini_api_key', newKey);
+                                }
+                            }}
+                            onBlur={() => {
+                                update('geminiApiKey', geminiKey);
+                            }}
+                            className="p-2 bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg text-xs font-mono text-stone-700 dark:text-stone-300 outline-none focus:border-academic-accent w-48"
+                        />
                     </SettingRow>
                     <SettingRow label="Primary Language" desc="Main interface language (Uses Google Translate engine).">
                         <Select value={prefs.language} options={LANGUAGES} onChange={(v: string) => update('language', v)} />

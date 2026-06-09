@@ -7,15 +7,12 @@ import { IconRenderer } from './IconMap';
 
 import MiniKnowledgeGraph from './MiniKnowledgeGraph';
 import { WikipediaWidget } from './external/WikipediaWidget';
-import { NasaImageWidget } from './external/NasaImageWidget';
-import { SpaceXWidget } from './external/SpaceXWidget';
-import { CoinGeckoWidget } from './external/CoinGeckoWidget';
-import { HackerNewsWidget } from './external/HackerNewsWidget';
 import { DictionaryWidget } from './external/DictionaryWidget';
 import { UNSDGWidget } from './external/UNSDGWidget';
-import { UKPoliceDataWidget } from './external/UKPoliceDataWidget';
-import { ChicagoCrimesWidget } from './external/ChicagoCrimesWidget';
 import { APIAggregatorWidget } from './external/APIAggregatorWidget';
+import { RedditWidget } from './external/RedditWidget';
+import { CrossrefWidget } from './external/CrossrefWidget';
+import { OpenAlexWidget } from './external/OpenAlexWidget';
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -149,14 +146,11 @@ const GenericKnowledgeScreen: React.FC<GenericKnowledgeScreenProps> = ({ query, 
                   <div className="space-y-6 flex flex-col">
                       <WikipediaWidget title={data.title} />
                       <DictionaryWidget queryText={data.title} />
-                      <HackerNewsWidget />
-                      <CoinGeckoWidget />
+                      <RedditWidget queryText={data.title} />
                   </div>
                   <div className="space-y-6 flex flex-col">
-                      <NasaImageWidget queryText={data.title} />
-                      <SpaceXWidget limit={3} />
-                      <ChicagoCrimesWidget />
-                      <UKPoliceDataWidget />
+                      <CrossrefWidget queryText={data.title} />
+                      <OpenAlexWidget queryText={data.title} />
                       <UNSDGWidget />
                   </div>
               </div>

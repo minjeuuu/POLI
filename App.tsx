@@ -13,32 +13,32 @@ import LaunchScreen from './components/LaunchScreen';
 import IntroScreen from './components/IntroScreen';
 import Layout from './components/Layout';
 import HomeTab from './components/tabs/HomeTab';
-import ExploreTab from './components/tabs/ExploreTab';
-import CountriesTab from './components/tabs/CountriesTab';
-import TranslateTab from './components/tabs/TranslateTab';
-import ComparativeTab from './components/tabs/ComparativeTab';
-import TheoryTab from './components/tabs/TheoryTab';
-import PersonsTab from './components/tabs/PersonsTab';
-import LearnTab from './components/tabs/LearnTab';
-import SimTab from './components/tabs/SimTab';
-import GamesTab from './components/tabs/GamesTab';
-import RatesTab from './components/tabs/RatesTab';
-import ProfileTab from './components/tabs/ProfileTab';
-import LibraryTab from './components/tabs/LibraryTab';
-import AlmanacTab from './components/tabs/AlmanacTab';
-import { HubTab } from './components/tabs/HubTab';
+const ExploreTab = React.lazy(() => import('./components/tabs/ExploreTab'));
+const CountriesTab = React.lazy(() => import('./components/tabs/CountriesTab'));
+const TranslateTab = React.lazy(() => import('./components/tabs/TranslateTab'));
+const ComparativeTab = React.lazy(() => import('./components/tabs/ComparativeTab'));
+const TheoryTab = React.lazy(() => import('./components/tabs/TheoryTab'));
+const PersonsTab = React.lazy(() => import('./components/tabs/PersonsTab'));
+const LearnTab = React.lazy(() => import('./components/tabs/LearnTab'));
+const SimTab = React.lazy(() => import('./components/tabs/SimTab'));
+const GamesTab = React.lazy(() => import('./components/tabs/GamesTab'));
+const RatesTab = React.lazy(() => import('./components/tabs/RatesTab'));
+const ProfileTab = React.lazy(() => import('./components/tabs/ProfileTab'));
+const LibraryTab = React.lazy(() => import('./components/tabs/LibraryTab'));
+const AlmanacTab = React.lazy(() => import('./components/tabs/AlmanacTab'));
+const HubTab = React.lazy(() => import('./components/tabs/HubTab').then(m => ({ default: m.HubTab })));
 
 // Detail Screens
-import CountryDetailScreen from './components/country/CountryDetailScreen';
-import PersonDetailScreen from './components/PersonDetailScreen';
-import EventDetailScreen from './components/EventDetailScreen';
-import IdeologyDetailScreen from './components/IdeologyDetailScreen';
-import OrgDetailScreen from './components/OrgDetailScreen';
-import PartyDetailScreen from './components/PartyDetailScreen';
-import ReaderView from './components/ReaderView';
-import ConceptDetailModal from './components/ConceptDetailModal';
-import DisciplineDetailScreen from './components/DisciplineDetailScreen';
-import GenericKnowledgeScreen from './components/GenericKnowledgeScreen';
+const CountryDetailScreen = React.lazy(() => import('./components/country/CountryDetailScreen'));
+const PersonDetailScreen = React.lazy(() => import('./components/PersonDetailScreen'));
+const EventDetailScreen = React.lazy(() => import('./components/EventDetailScreen'));
+const IdeologyDetailScreen = React.lazy(() => import('./components/IdeologyDetailScreen'));
+const OrgDetailScreen = React.lazy(() => import('./components/OrgDetailScreen'));
+const PartyDetailScreen = React.lazy(() => import('./components/PartyDetailScreen'));
+const ReaderView = React.lazy(() => import('./components/ReaderView'));
+const ConceptDetailModal = React.lazy(() => import('./components/ConceptDetailModal'));
+const DisciplineDetailScreen = React.lazy(() => import('./components/DisciplineDetailScreen'));
+const GenericKnowledgeScreen = React.lazy(() => import('./components/GenericKnowledgeScreen'));
 
 type OverlayItem = { type: string; payload: any; id: string };
 
@@ -68,10 +68,14 @@ export default function App() {
   // Initialize DB and Load Data
   useEffect(() => {
     const initApp = async () => {
-        await db.init();
-        const saved = await db.execute("SELECT * FROM saved_items");
-        if (saved.success) {
-            setSavedItems(saved.rows);
+        try {
+            await db.init();
+            const saved = await db.execute("SELECT * FROM saved_items");
+            if (saved.success) {
+                setSavedItems(saved.rows);
+            }
+        } catch (e) {
+            console.error("Failed to initialize database in App:", e);
         }
     };
     initApp();
@@ -80,28 +84,35 @@ export default function App() {
   // Auth State Listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-        if (firebaseUser) {
-            await db.init();
-            const res = await db.execute(`SELECT * FROM users WHERE email = '${firebaseUser.email}'`);
-            if (res.rows.length > 0) {
-                handleLogin(res.rows[0]);
+        try {
+            if (firebaseUser) {
+                await db.init();
+                await db.syncFromFirestore();
+                const res = await db.execute(`SELECT * FROM users WHERE email = '${firebaseUser.email}'`);
+                if (res.rows.length > 0) {
+                    handleLogin(res.rows[0]);
+                } else {
+                    handleLogin({
+                        id: firebaseUser.uid,
+                        username: firebaseUser.displayName || 'Scholar',
+                        email: firebaseUser.email,
+                        level: 1,
+                        xp: 0,
+                        coins: 100,
+                    });
+                }
             } else {
-                handleLogin({
-                    id: firebaseUser.uid,
-                    username: firebaseUser.displayName || 'Scholar',
-                    email: firebaseUser.email,
-                    level: 1,
-                    xp: 0,
-                    coins: 100,
-                });
+                const isGuest = localStorage.getItem('poli_guest');
+                if (isGuest === 'true') {
+                    setIsAuthenticated(true);
+                } else {
+                    setIsAuthenticated(false);
+                }
             }
-        } else {
-            const isGuest = localStorage.getItem('poli_guest');
-            if (isGuest === 'true') {
-                setIsAuthenticated(true);
-            } else {
-                setIsAuthenticated(false);
-            }
+        } catch (e) {
+            console.error("Auth state db lookup failed:", e);
+            // Default to guest or unauthenticated rather than crashing the app
+            setIsAuthenticated(localStorage.getItem('poli_guest') === 'true');
         }
     });
     return () => unsubscribe();
@@ -162,6 +173,9 @@ export default function App() {
         if (finalUserData.preferences.themeMode) setThemeMode(finalUserData.preferences.themeMode);
         if (finalUserData.preferences.themeScope) setThemeScope(finalUserData.preferences.themeScope);
         if (finalUserData.preferences.language) setAppLang(finalUserData.preferences.language);
+        if (finalUserData.preferences.geminiApiKey) {
+            localStorage.setItem('poli_gemini_api_key', finalUserData.preferences.geminiApiKey);
+        }
     }
   };
 
@@ -176,6 +190,7 @@ export default function App() {
   const handleLogout = async () => {
     await signOut(auth);
     localStorage.removeItem('poli_guest');
+    localStorage.removeItem('poli_gemini_api_key');
     setUser(null);
     setIsAuthenticated(false);
     setHasLaunched(false);
@@ -356,9 +371,11 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} onTabChange={(t) => { setActiveTab(t); setOverlayStack([]); }} onNavigate={handleNavigate} themeMode={currentTheme} userPrefs={user?.preferences}>
-      {renderOverlay()}
+      <React.Suspense fallback={<div className="fixed inset-0 z-[60] bg-academic-bg dark:bg-stone-950 flex justify-center items-center"><div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div></div>}>
+        {renderOverlay()}
+      </React.Suspense>
 
-      <div className="h-full w-full relative">
+      <div className="h-full w-full relative"><React.Suspense fallback={<div className="flex-1 flex justify-center items-center h-full w-full"><div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div></div>}>
         {activeTab === 'home' && (
             <HomeTab 
                 data={dailyData} 
@@ -434,7 +451,7 @@ export default function App() {
         {activeTab === 'hub' && (
             <HubTab onNavigate={(t) => { setActiveTab(t); setOverlayStack([]); }} />
         )}
-      </div>
+      </React.Suspense></div>
     </Layout>
   );
 }

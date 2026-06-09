@@ -65,6 +65,20 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onNav
     if (isDark) root.classList.add('dark');
     else root.classList.remove('dark');
 
+    // Attempt to dynamically update meta theme color to eliminate black/white status bar spots
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    let tc = isDark ? '#0c0a09' : '#FDFBF7';
+    if (['War', 'Steampunk', 'Coffee', 'Volcanic'].includes(themeMode)) {
+      tc = '#1c1917'; // dark stone
+    } else if (['Tech', 'Cyberpunk', 'Matrix'].includes(themeMode)) {
+      tc = '#020617'; // slate 950
+    }
+    
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', tc);
+    }
+    root.style.backgroundColor = tc;
+
     const accentMap: Record<string, string> = {
         'War': '#ef4444', 'Tech': '#06b6d4', 'Christmas': '#166534',
         'Neon': '#ec4899', 'Nature': '#22c55e', 'Ocean': '#0ea5e9',

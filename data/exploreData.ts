@@ -2725,22 +2725,15 @@ EXPLORE_HIERARCHY["Scandals & Crises"] = [
 
 EXPLORE_HIERARCHY["Think Tanks"] = [
     {
-        category: "Global Policy Institutes",
+        category: "Americas - North & Latin America",
         icon: "Lightbulb",
         items: [
             { name: "Brookings Institution", type: "ThinkTank" },
-            { name: "Chatham House", type: "ThinkTank" },
             { name: "Carnegie Endowment for International Peace", type: "ThinkTank" },
             { name: "Council on Foreign Relations", type: "ThinkTank" },
             { name: "RAND Corporation", type: "ThinkTank" },
             { name: "Center for Strategic and International Studies (CSIS)", type: "ThinkTank" },
-            { name: "Bruegel", type: "ThinkTank" },
-            { name: "French Institute of International Relations (Ifri)", type: "ThinkTank" },
-            { name: "Stockholm International Peace Research Institute (SIPRI)", type: "ThinkTank" },
             { name: "Heritage Foundation", type: "ThinkTank" },
-            { name: "Amnesty International", type: "ThinkTank" },
-            { name: "Human Rights Watch", type: "ThinkTank" },
-            { name: "Transparency International", type: "ThinkTank" },
             { name: "Center for American Progress", type: "ThinkTank" },
             { name: "Woodrow Wilson International Center for Scholars", type: "ThinkTank" },
             { name: "Peterson Institute for International Economics", type: "ThinkTank" },
@@ -2749,6 +2742,22 @@ EXPLORE_HIERARCHY["Think Tanks"] = [
             { name: "Hoover Institution", type: "ThinkTank" },
             { name: "Urban Institute", type: "ThinkTank" },
             { name: "Belfer Center for Science and International Affairs", type: "ThinkTank" },
+            { name: "Fundação Getulio Vargas (FGV)", type: "ThinkTank" },
+            { name: "Centro de Implementación de Políticas Públicas (CIPPEC)", type: "ThinkTank" },
+            { name: "Consejo Argentino para las Relaciones Internacionales (CARI)", type: "ThinkTank" },
+            { name: "Mexican Council on Foreign Relations (COMEXI)", type: "ThinkTank" },
+            { name: "C.D. Howe Institute", type: "ThinkTank" },
+            { name: "Fraser Institute", type: "ThinkTank" }
+        ]
+    },
+    {
+        category: "Europe",
+        icon: "Lightbulb",
+        items: [
+            { name: "Chatham House", type: "ThinkTank" },
+            { name: "Bruegel", type: "ThinkTank" },
+            { name: "French Institute of International Relations (Ifri)", type: "ThinkTank" },
+            { name: "Stockholm International Peace Research Institute (SIPRI)", type: "ThinkTank" },
             { name: "International Institute for Strategic Studies (IISS)", type: "ThinkTank" },
             { name: "European Council on Foreign Relations (ECFR)", type: "ThinkTank" },
             { name: "Centre for European Policy Studies (CEPS)", type: "ThinkTank" },
@@ -2758,6 +2767,15 @@ EXPLORE_HIERARCHY["Think Tanks"] = [
             { name: "Italian Institute for International Political Studies (ISPI)", type: "ThinkTank" },
             { name: "Institute of World Economy and International Relations (IMEMO)", type: "ThinkTank" },
             { name: "Valdai Discussion Club", type: "ThinkTank" },
+            { name: "Konrad-Adenauer-Stiftung (KAS)", type: "ThinkTank" },
+            { name: "Friedrich-Ebert-Stiftung (FES)", type: "ThinkTank" },
+            { name: "Royal United Services Institute (RUSI)", type: "ThinkTank" }
+        ]
+    },
+    {
+        category: "Asia & Oceania",
+        icon: "Lightbulb",
+        items: [
             { name: "China Institutes of Contemporary International Relations (CICIR)", type: "ThinkTank" },
             { name: "Chinese Academy of Social Sciences (CASS)", type: "ThinkTank" },
             { name: "Shanghai Institutes for International Studies (SIIS)", type: "ThinkTank" },
@@ -2777,38 +2795,51 @@ EXPLORE_HIERARCHY["Think Tanks"] = [
             { name: "Ateneo School of Government", type: "ThinkTank" },
             { name: "Stratbase ADR Institute", type: "ThinkTank" },
             { name: "Philippine Political Science Association", type: "ThinkTank" },
-            { name: "Center for Public Policy Studies (Malaysia)", type: "ThinkTank" },
             { name: "Thailand Development Research Institute (TDRI)", type: "ThinkTank" },
+            { name: "Center for Public Policy Studies (Malaysia)", type: "ThinkTank" }
+        ]
+    },
+    {
+        category: "Middle East & Africa",
+        icon: "Lightbulb",
+        items: [
             { name: "Institute for Security Studies (ISS Africa)", type: "ThinkTank" },
             { name: "South African Institute of International Affairs (SAIIA)", type: "ThinkTank" },
             { name: "Al Ahram Center for Political and Strategic Studies (ACPSS)", type: "ThinkTank" },
             { name: "King Faisal Center for Research and Islamic Studies", type: "ThinkTank" },
             { name: "Gulf Research Center", type: "ThinkTank" },
             { name: "Institute for National Security Studies (INSS Israel)", type: "ThinkTank" },
-            { name: "Fundação Getulio Vargas (FGV)", type: "ThinkTank" },
-            { name: "Centro de Implementación de Políticas Públicas para la Equidad y el Crecimiento (CIPPEC)", type: "ThinkTank" },
-            { name: "Consejo Argentino para las Relaciones Internacionales (CARI)", type: "ThinkTank" },
-            { name: "Mexican Council on Foreign Relations (COMEXI)", type: "ThinkTank" },
-            { name: "ECLAC (Economic Commission for Latin America and the Caribbean)", type: "ThinkTank" }
+            { name: "Emirates Policy Center", type: "ThinkTank" },
+            { name: "Brookings Doha Center", type: "ThinkTank" },
+            { name: "Institute for Global Dialogue (South Africa)", type: "ThinkTank" }
+        ]
+    },
+    {
+        category: "International & Advocacy NGOs",
+        icon: "Lightbulb",
+        items: [
+            { name: "Amnesty International", type: "ThinkTank" },
+            { name: "Human Rights Watch", type: "ThinkTank" },
+            { name: "Transparency International", type: "ThinkTank" },
+            { name: "ECLAC", type: "ThinkTank" },
+            { name: "International Crisis Group", type: "ThinkTank" },
+            { name: "Oxfam International", type: "ThinkTank" },
+            { name: "World Economic Forum (WEF)", type: "ThinkTank" }
         ]
     }
 ];
 
 EXPLORE_HIERARCHY["Universities"] = [
     {
-        category: "Top Global Universities",
+        category: "Americas - North & Latin America",
         icon: "GraduationCap",
         items: [
             { name: "Harvard University", type: "University" },
-            { name: "University of Oxford", type: "University" },
             { name: "Stanford University", type: "University" },
             { name: "Massachusetts Institute of Technology (MIT)", type: "University" },
-            { name: "University of Cambridge", type: "University" },
             { name: "Princeton University", type: "University" },
             { name: "Yale University", type: "University" },
             { name: "Columbia University", type: "University" },
-            { name: "Sciences Po Paris", type: "University" },
-            { name: "London School of Economics and Political Science (LSE)", type: "University" },
             { name: "University of Chicago", type: "University" },
             { name: "University of Pennsylvania", type: "University" },
             { name: "Johns Hopkins University", type: "University" },
@@ -2819,12 +2850,53 @@ EXPLORE_HIERARCHY["Universities"] = [
             { name: "American University", type: "University" },
             { name: "Tufts University (Fletcher School)", type: "University" },
             { name: "New York University (NYU)", type: "University" },
-            { name: "King's College London", type: "University" },
-            { name: "UCL (University College London)", type: "University" },
-            { name: "University of Edinburgh", type: "University" },
+            { name: "University of Michigan", type: "University" },
+            { name: "Duke University", type: "University" },
             { name: "University of Toronto", type: "University" },
             { name: "McGill University", type: "University" },
             { name: "University of British Columbia", type: "University" },
+            { name: "Universidad Nacional Autónoma de México (UNAM)", type: "University" },
+            { name: "Tecnológico de Monterrey", type: "University" },
+            { name: "Universidade de São Paulo (USP)", type: "University" },
+            { name: "Pontificia Universidad Católica de Chile", type: "University" },
+            { name: "Universidad de Buenos Aires (UBA)", type: "University" },
+            { name: "Universidad de los Andes (Colombia)", type: "University" }
+        ]
+    },
+    {
+        category: "Europe",
+        icon: "GraduationCap",
+        items: [
+            { name: "University of Oxford", type: "University" },
+            { name: "University of Cambridge", type: "University" },
+            { name: "London School of Economics and Political Science (LSE)", type: "University" },
+            { name: "King's College London", type: "University" },
+            { name: "UCL (University College London)", type: "University" },
+            { name: "University of Edinburgh", type: "University" },
+            { name: "Sciences Po Paris", type: "University" },
+            { name: "Sorbonne University", type: "University" },
+            { name: "Freie Universität Berlin", type: "University" },
+            { name: "Humboldt-Universität zu Berlin", type: "University" },
+            { name: "Ludwig-Maximilians-Universität München", type: "University" },
+            { name: "Bocconi University", type: "University" },
+            { name: "Sapienza University of Rome", type: "University" },
+            { name: "University of Amsterdam", type: "University" },
+            { name: "Leiden University", type: "University" },
+            { name: "KU Leuven", type: "University" },
+            { name: "ETH Zurich", type: "University" },
+            { name: "Graduate Institute of International and Development Studies (Geneva)", type: "University" },
+            { name: "University of Copenhagen", type: "University" },
+            { name: "Lomonosov Moscow State University", type: "University" },
+            { name: "Moscow State Institute of International Relations (MGIMO)", type: "University" },
+            { name: "Saint Petersburg State University", type: "University" },
+            { name: "Central European University (CEU)", type: "University" },
+            { name: "Stockholm University", type: "University" }
+        ]
+    },
+    {
+        category: "Asia & Oceania",
+        icon: "GraduationCap",
+        items: [
             { name: "National University of Singapore (NUS)", type: "University" },
             { name: "Nanyang Technological University (NTU)", type: "University" },
             { name: "Tsinghua University", type: "University" },
@@ -2852,31 +2924,24 @@ EXPLORE_HIERARCHY["Universities"] = [
             { name: "Thammasat University", type: "University" },
             { name: "Universiti Malaya", type: "University" },
             { name: "Universitas Indonesia", type: "University" },
+            { name: "Kyushu University", type: "University" },
+            { name: "Waseda University", type: "University" }
+        ]
+    },
+    {
+        category: "Middle East & Africa",
+        icon: "GraduationCap",
+        items: [
             { name: "University of Cape Town", type: "University" },
             { name: "University of the Witwatersrand", type: "University" },
             { name: "American University in Cairo", type: "University" },
             { name: "Hebrew University of Jerusalem", type: "University" },
             { name: "Tel Aviv University", type: "University" },
-            { name: "Universidad Nacional Autónoma de México (UNAM)", type: "University" },
-            { name: "Tecnológico de Monterrey", type: "University" },
-            { name: "Universidade de São Paulo (USP)", type: "University" },
-            { name: "Pontificia Universidad Católica de Chile", type: "University" },
-            { name: "Universidad de Buenos Aires (UBA)", type: "University" },
-            { name: "Sorbonne University", type: "University" },
-            { name: "Freie Universität Berlin", type: "University" },
-            { name: "Humboldt-Universität zu Berlin", type: "University" },
-            { name: "Ludwig-Maximilians-Universität München", type: "University" },
-            { name: "Bocconi University", type: "University" },
-            { name: "Sapienza University of Rome", type: "University" },
-            { name: "University of Amsterdam", type: "University" },
-            { name: "Leiden University", type: "University" },
-            { name: "KU Leuven", type: "University" },
-            { name: "ETH Zurich", type: "University" },
-            { name: "Graduate Institute of International and Development Studies (Geneva)", type: "University" },
-            { name: "University of Copenhagen", type: "University" },
-            { name: "Lomonosov Moscow State University", type: "University" },
-            { name: "Moscow State Institute of International Relations (MGIMO)", type: "University" },
-            { name: "Saint Petersburg State University", type: "University" }
+            { name: "University of Pretoria", type: "University" },
+            { name: "Cairo University", type: "University" },
+            { name: "King Abdulaziz University", type: "University" },
+            { name: "University of Jordan", type: "University" },
+            { name: "University of Tehran", type: "University" }
         ]
     }
 ];

@@ -38,6 +38,10 @@ const upload = multer({ storage: storage });
 
 app.use(express.json());
 app.use(cors());
+app.post('/api/log-error', (req, res) => {
+    console.error("BROWSER ERROR REPORTED:", req.body);
+    res.sendStatus(200);
+});
 app.use('/uploads', express.static(uploadDir));
 
 // --- IN-MEMORY DATA STORE (For Real-Time Demo) ---
