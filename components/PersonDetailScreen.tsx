@@ -167,9 +167,8 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
       <div className="flex-1 overflow-y-auto scroll-smooth pb-32 bg-stone-50/30 dark:bg-black/20">
           <div className="max-w-5xl mx-auto p-4 sm:p-6 md:p-10 space-y-12">
               
-              {/* HERO SECTION */}
-              <div id="biography" ref={el => { sectionRefs.current['biography'] = el; }} className="flex flex-col gap-8">
-                  <div className="">
+              <div id="biography" ref={el => { sectionRefs.current['biography'] = el; }} className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-10">
+                  <div className="md:col-span-1">
                       <div className="aspect-[3/4] bg-stone-200 dark:bg-stone-800 rounded-2xl overflow-hidden shadow-lg border border-stone-200 dark:border-stone-700 relative group">
                           {data.imageUrl ? (
                               <ImageWithFallback src={data.imageUrl} alt={data.name} className="w-full h-full object-cover" />
@@ -403,7 +402,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                           {(Array.isArray(data.controversies) ? data.controversies : []).map((item, i) => (
                               <li key={i} className="flex gap-3">
                                   <span className="text-red-400 font-bold">•</span>
-                                  <span className="font-serif text-stone-800 dark:text-stone-200">{item}</span>
+                                  <span className="font-serif text-stone-800 dark:text-stone-200 text-justify leading-relaxed">{item}</span>
                               </li>
                           ))}
                       </ul>

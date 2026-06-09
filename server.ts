@@ -15,6 +15,11 @@ async function startServer() {
     res.json({ status: 'ok' });
   });
 
+  app.post('/api/log-error', (req, res) => {
+    console.error("BROWSER ERROR REPORTED:", req.body);
+    res.sendStatus(200);
+  });
+
   app.get('/api/posts', (req, res) => {
     res.json([]);
   });
@@ -56,7 +61,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*all', (req, res) => {
+    app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

@@ -164,16 +164,16 @@ const UniversityDetailScreen: React.FC<UniversityDetailScreenProps> = ({ entityN
                     </div>
 
                     <div className=" space-y-8">
-                        <div className="bg-academic-paper dark:bg-stone-800/50 p-8 rounded-2xl border border-academic-line dark:border-stone-700 print:bg-stone-100 print:border-black">
+                        <div className="bg-academic-paper dark:bg-stone-800/50 p-6 sm:p-8 rounded-2xl border border-academic-line dark:border-stone-700 print:bg-stone-100 print:border-black">
                             <h3 className="text-xl font-serif font-bold border-b border-academic-line dark:border-stone-800 pb-2 text-stone-900 dark:text-white mb-6 flex items-center gap-3">
                                 <BookOpen className="w-6 h-6 text-stone-500" /> Academic Overview
                             </h3>
-                            <p className="font-serif text-lg leading-relaxed text-stone-800 dark:text-stone-200 mb-6">{data.overview}</p>
+                            <p className="font-serif text-lg leading-relaxed text-justify text-stone-800 dark:text-stone-200 mb-6">{data.overview}</p>
                             
                             <h4 className="font-bold uppercase tracking-widest text-xs text-stone-500 dark:text-stone-400 mb-2 mt-6 flex items-center gap-2">
                                 <Compass className="w-4 h-4" /> Geopolitical & Historical Impact
                             </h4>
-                            <p className="font-serif text-md leading-relaxed text-stone-700 dark:text-stone-300">{data.historicalImpact}</p>
+                            <p className="font-serif text-md leading-relaxed text-justify text-stone-700 dark:text-stone-300">{data.historicalImpact}</p>
                         </div>
                     </div>
                 </div>

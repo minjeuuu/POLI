@@ -28,40 +28,61 @@ const SCHEMA = {
 
 class DatabaseService {
     private db: IDBDatabase | null = null;
+    private isInMemory = false;
+    private inMemoryStore: Record<string, Record<string, any>> = {
+        users: {},
+        saved_items: {},
+        chats: {},
+        messages: {},
+        history_logs: {},
+        posts: {}
+    };
 
     constructor() {
         this.init();
     }
 
     async init(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, DB_VERSION);
+        if (typeof indexedDB === 'undefined') {
+            console.warn("IndexedDB not supported. Falling back to In-Memory DB.");
+            this.isInMemory = true;
+            return;
+        }
+        return new Promise((resolve) => {
+            try {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-            request.onerror = (event) => {
-                console.error("Database error:", event);
-                reject("Database failed to open");
-            };
+                request.onerror = (event) => {
+                    console.warn("Database error, falling back to In-Memory DB:", event);
+                    this.isInMemory = true;
+                    resolve();
+                };
 
-            request.onsuccess = (event) => {
-                this.db = (event.target as IDBOpenDBRequest).result;
-                console.log("POLI Database: Online");
+                request.onsuccess = (event) => {
+                    this.db = (event.target as IDBOpenDBRequest).result;
+                    console.log("POLI Database: Online");
+                    resolve();
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const db = (event.target as IDBOpenDBRequest).result;
+                    
+                    // Create Object Stores (Tables)
+                    if (!db.objectStoreNames.contains('users')) db.createObjectStore('users', { keyPath: 'id' });
+                    if (!db.objectStoreNames.contains('saved_items')) db.createObjectStore('saved_items', { keyPath: 'id' });
+                    if (!db.objectStoreNames.contains('chats')) db.createObjectStore('chats', { keyPath: 'id' });
+                    if (!db.objectStoreNames.contains('messages')) {
+                        const msgStore = db.createObjectStore('messages', { keyPath: 'id' });
+                        msgStore.createIndex('conversationId', 'conversationId', { unique: false });
+                    }
+                    if (!db.objectStoreNames.contains('history_logs')) db.createObjectStore('history_logs', { keyPath: 'id', autoIncrement: true });
+                    if (!db.objectStoreNames.contains('posts')) db.createObjectStore('posts', { keyPath: 'id' });
+                };
+            } catch (e) {
+                console.warn("IndexedDB block error, falling back to In-Memory DB:", e);
+                this.isInMemory = true;
                 resolve();
-            };
-
-            request.onupgradeneeded = (event) => {
-                const db = (event.target as IDBOpenDBRequest).result;
-                
-                // Create Object Stores (Tables)
-                if (!db.objectStoreNames.contains('users')) db.createObjectStore('users', { keyPath: 'id' });
-                if (!db.objectStoreNames.contains('saved_items')) db.createObjectStore('saved_items', { keyPath: 'id' });
-                if (!db.objectStoreNames.contains('chats')) db.createObjectStore('chats', { keyPath: 'id' });
-                if (!db.objectStoreNames.contains('messages')) {
-                    const msgStore = db.createObjectStore('messages', { keyPath: 'id' });
-                    msgStore.createIndex('conversationId', 'conversationId', { unique: false });
-                }
-                if (!db.objectStoreNames.contains('history_logs')) db.createObjectStore('history_logs', { keyPath: 'id', autoIncrement: true });
-                if (!db.objectStoreNames.contains('posts')) db.createObjectStore('posts', { keyPath: 'id' });
-            };
+            }
         });
     }
 
@@ -69,7 +90,18 @@ class DatabaseService {
     // Allows developers to write pseudo-SQL to interact with IndexedDB
     
     async execute(query: string, params: any[] = []): Promise<DBResult> {
-        if (!this.db) await this.init();
+        if (this.isInMemory) {
+            return this.executeInMemory(query, params);
+        }
+        if (!this.db) {
+            try {
+                await this.init();
+                if (this.isInMemory) return this.executeInMemory(query, params);
+            } catch (e) {
+                this.isInMemory = true;
+                return this.executeInMemory(query, params);
+            }
+        }
         
         const q = query.trim();
         const upperQ = q.toUpperCase();
@@ -83,6 +115,70 @@ class DatabaseService {
             return { success: false, rows: [], message: "Syntax Error: Unsupported Command" };
         } catch (e) {
             console.error("SQL Execution Error:", e);
+            return { success: false, rows: [], message: (e as Error).message };
+        }
+    }
+
+    private executeInMemory(query: string, params: any[]): DBResult {
+        const q = query.trim();
+        const upperQ = q.toUpperCase();
+        
+        try {
+            if (upperQ.startsWith("SELECT")) {
+                const fromMatch = q.match(/FROM\s+(\w+)/i);
+                if (!fromMatch) throw new Error("Invalid SQL: Missing FROM table");
+                const table = fromMatch[1];
+                const whereMatch = q.match(/WHERE\s+(.+)/i);
+                
+                let results = Object.values(this.inMemoryStore[table] || {});
+                if (whereMatch) {
+                    const conditions = whereMatch[1].split('AND').map(c => c.trim());
+                    results = results.filter(row => {
+                        return conditions.every(cond => {
+                            if (cond.includes('=')) {
+                                const [key, val] = cond.split('=').map(s => s.trim().replace(/['"]/g, ''));
+                                return String(row[key]) === String(val);
+                            }
+                            return true;
+                        });
+                    });
+                }
+                return { success: true, rows: results };
+            }
+            if (upperQ.startsWith("INSERT")) {
+                const intoMatch = q.match(/INTO\s+(\w+)/i);
+                if (!intoMatch) throw new Error("Invalid SQL: Missing INTO table");
+                const table = intoMatch[1];
+                const data = params[0];
+                if (!this.inMemoryStore[table]) this.inMemoryStore[table] = {};
+                const id = data.id || Date.now().toString();
+                this.inMemoryStore[table][id] = data;
+                return { success: true, rows: [data], message: "Inserted 1 row" };
+            }
+            if (upperQ.startsWith("DELETE")) {
+                const fromMatch = q.match(/FROM\s+(\w+)/i);
+                if (!fromMatch) throw new Error("Invalid SQL: Missing FROM table");
+                const table = fromMatch[1];
+                const idMatch = q.match(/WHERE\s+id\s*=\s*['"]?([^'"]+)['"]?/i);
+                if (!idMatch) throw new Error("Unsafe Delete: Must specify ID");
+                const id = idMatch[1];
+                if (this.inMemoryStore[table]) {
+                    delete this.inMemoryStore[table][id];
+                }
+                return { success: true, rows: [], message: `Deleted row ${id}` };
+            }
+            if (upperQ.startsWith("UPDATE")) {
+                const tableMatch = q.match(/UPDATE\s+(\w+)/i);
+                if (!tableMatch) throw new Error("Invalid SQL");
+                const table = tableMatch[1];
+                const data = params[0];
+                if (!this.inMemoryStore[table]) this.inMemoryStore[table] = {};
+                const id = data.id;
+                this.inMemoryStore[table][id] = data;
+                return { success: true, rows: [data], message: "Updated 1 row" };
+            }
+            return { success: false, rows: [], message: "Syntax Error: Unsupported Command" };
+        } catch (e) {
             return { success: false, rows: [], message: (e as Error).message };
         }
     }

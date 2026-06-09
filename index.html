@@ -7,6 +7,33 @@
     <meta name="theme-color" content="#FDFBF7" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0C0A09" media="(prefers-color-scheme: dark)" />
     <title>POLI</title>
+    <script>
+      window.addEventListener('error', function(event) {
+        fetch('/api/log-error', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: event.message,
+            source: 'window.onerror',
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+            error: event.error ? event.error.stack : (event.message || 'Unknown error')
+          })
+        }).catch(function() {});
+      });
+      window.addEventListener('unhandledrejection', function(event) {
+        fetch('/api/log-error', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: event.reason ? event.reason.message || String(event.reason) : 'Unhandled promise rejection',
+            source: 'window.onunhandledrejection',
+            error: event.reason && event.reason.stack ? event.reason.stack : String(event.reason)
+          })
+        }).catch(function() {});
+      });
+    </script>
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icon.svg" />
     <link rel="manifest" href="/manifest.json" />
@@ -15,7 +42,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="POLI" />
     <meta name="format-detection" content="telephone=no" />
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script>
@@ -122,26 +148,10 @@
         :root[data-reader-width="Wide"] .max-w-4xl { max-width: 1200px !important; }
         :root[data-reader-width="Full"] .max-w-4xl { max-width: 100% !important; }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@18.3.1",
-    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
-    "react-dom": "https://esm.sh/react-dom@18.3.1?deps=react@18.3.1",
-    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client?deps=react@18.3.1",
-    "@google/genai": "https://esm.sh/@google/genai",
-    "lucide-react": "https://esm.sh/lucide-react@0.469.0?deps=react@18.3.1",
-    "react-confetti": "https://esm.sh/react-confetti@6.1.0?deps=react@18.3.1",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/"
-  }
-}
-</script>
 <link rel="stylesheet" href="/index.css">
 </head>
   <body class="bg-academic-bg text-academic-text antialiased selection:bg-stone-200 dark:bg-stone-950 dark:text-stone-100 dark:selection:bg-indigo-900 transition-colors duration-700 ease-flow h-[100dvh] w-[100dvw] m-0 p-0 overflow-hidden overscroll-none">
     <div id="root" class="w-full h-full bg-transparent overflow-hidden overscroll-none"></div>
-    <script type="module" src="./index.tsx"></script>
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>
