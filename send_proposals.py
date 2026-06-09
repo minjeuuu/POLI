@@ -5,7 +5,7 @@ import getpass
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# Define target recipients (100+ organizations)
+# Define target recipients (115 organizations)
 RECIPIENTS = [
     # --- IVY LEAGUE & TOP US DEPARTMENTS ---
     {"org": "Harvard University (Department of Government)", "email": "government@wjh.harvard.edu"},
@@ -114,28 +114,31 @@ RECIPIENTS = [
     {"org": "Defense Advanced Research Projects Agency (DARPA)", "email": "publicrelations@darpa.mil"},
 ]
 
-EMAIL_TEMPLATE_SUBJECT = "Acquisition Proposal: POLI - Professional Geopolitical Simulation & Academic Curation Workspace"
+EMAIL_TEMPLATE_SUBJECT = "Formal Proposal: Intellectual Property Acquisition & Site Licensing - POLI Geopolitical Simulation & Research Suite"
 
 EMAIL_TEMPLATE_BODY = """Dear members of the {org} team,
 
-My name is Matthew Cesar Corpuz. I hold a Bachelor of Arts in Political Science from Baguio City. I am writing to you today to present a formal acquisition proposal for my application, POLI (https://github.com/minjeuuu/POLI).
+My name is Matthew Cesar Corpuz. I hold a Bachelor of Arts in Political Science from Baguio City. I am writing to you today to present a formal acquisition and licensing proposal for POLI (https://github.com/minjeuuu/POLI), a modern, high-density geopolitical simulation, cabinet-building, and academic research workspace.
 
-POLI is a high-density, professional geopolitical simulation, cabinet-building, and academic research workspace designed to bridge the gap between structured historical data, political science taxonomies, and interactive learning. 
+POLI represents the synthesis of political theory, comparative government frameworks, and specialized client-side software engineering. It was built to solve the high operating costs and latency of traditional web-based research portals by running entirely client-side.
 
-I deeply want to keep this app and continue expanding its capabilities, but I currently do not have the necessary funding to continue maintaining and hosting it. As a result, I have made the decision to sell the software. Upon purchase, the acquiring party will receive complete ownership and all legal rights to the application, including the source code, custom relational engine IP, and simulator databases.
+As the independent developer of POLI, I deeply want to see this application continue to be maintained and expand its capabilities. However, I currently lack the institutional funding and infrastructure required to maintain and host it at scale. Consequently, I have made the decision to offer the software for complete acquisition. The acquiring party will receive 100% intellectual property ownership, the codebase, relational database schemas, and all legal rights to the application.
 
-Core Features & IP Included in the Sale:
-1. POLIverse Simulation Engine: A cabinet-building framework that calculates Structural Integrity, Ideological Alignment, and Economic Viability using custom structural equations.
-2. Relational Database Layer (PADE): An emulated SQL database running over IndexedDB with an automated in-memory fallback state machine to guarantee zero-crash app boot.
-3. Decoupled Architecture: A React 19 + Vite client-side single-page application integrated with an Express API gateway acting as a secure RSS parser and proxy.
-4. Professional Scholar Reader: Supports dynamic text-justified layouts, print optimization media queries, and an inline citation compiler supporting over 50 formats (APSA, Chicago, Bluebook, IEEE, BibTeX).
+Core Value Propositions & IP Included in the Sale:
 
-Visual materials, including high-fidelity screenshots of the Home Dashboard, the Cabinet Builder, the Comparative Indicator Matrix, and the Citation modal, can be viewed directly on our GitHub repository:
+1. Offline-First Zero-Operating-Cost Architecture: Built over PADE (Proprietary Academic Database Engine), which runs an emulated SQL query engine directly over IndexedDB on the client browser. Features a redundant in-memory fallback state machine ensuring zero-crash boots and zero backend database scaling overhead.
+2. Academic Reader & Citation Compiler: A typography-optimized reading interface with custom print stylesheets for document generation. Features a bibliographic citation engine supporting over 50 regional academic formats (including APSA, Chicago, Bluebook, IEEE, BibTeX, and Harvard).
+3. The POLIverse Simulation Engine: An interactive cabinet-building framework that uses structural political equations to calculate Cabinet Cohesion, Structural Integrity, and Ideological Alignment, moving beyond simplistic heuristics.
+4. Comprehensive Geopolitical Taxonomies: Pre-loaded relational database modules mapping 15+ distinct categories including state agencies, national elections, legal case briefs, treaties, political parties, social movements, and regional demographic variables.
+5. Custom Scholarly Design System: A clean, warm off-white (book-like) user interface optimized for high information density, long research sessions, and detailed comparative matrices.
+
+To demonstrate the depth of the application, we have compiled a visual catalog documenting the tabs and detail screens (including the Cabinet Builder, Geopolitical Indicator Matrix, Citation reader, and International Org profile). These materials, along with the full codebase, can be reviewed directly on our GitHub repository:
 https://github.com/minjeuuu/POLI
 
-We are currently valuing the outright acquisition of POLI (and all associated intellectual property rights) at $850,000 USD, or a site-licensing arrangement starting at $85,000 USD per annum.
+Acquisition Valuation:
+We value the outright acquisition of POLI and all associated intellectual property at $850,000 USD. Alternatively, we are open to institution-wide site licensing arrangements starting at $85,000 USD per annum. The acquisition includes 60 days of direct technical transition support and comprehensive system handover documentation.
 
-If this aligns with your department's technological research or simulation goals, please let me know when you would be available for a brief technical walkthrough.
+If this aligns with your department's academic research, policy simulation, or technological goals, I would welcome the opportunity to schedule a brief technical walkthrough.
 
 Sincerely,
 
@@ -143,28 +146,50 @@ Matthew Cesar Corpuz
 Bachelor of Arts in Political Science (Baguio City)
 Owner & Developer of POLI
 https://github.com/minjeuuu/POLI
+corpuzmatthew0814@gmail.com
 """
 
 def main():
     print("=== POLI Acquisition Proposal Email Auto-Sender ===")
-    print(f"This script will dispatch proposals to {len(RECIPIENTS)} prospective buyer organizations.")
+    print(f"Loaded {len(RECIPIENTS)} prestigious recipient organizations.")
     print("----------------------------------------------------------------")
     
-    # Get SMTP credentials
-    smtp_server = input("SMTP Server (e.g. smtp.gmail.com): ").strip()
-    try:
-        smtp_port = int(input("SMTP Port (e.g. 465 for SSL, 587 for TLS): ").strip())
-    except ValueError:
-        print("Invalid port number.")
-        return
+    # Auto-filled defaults for Matthew's Google/Gmail account
+    default_smtp = "smtp.gmail.com"
+    default_port = 465
+    default_email = "corpuzmatthew0814@gmail.com"
+    
+    print(f"Default Sender Profile:")
+    print(f"  SMTP Server: {default_smtp}")
+    print(f"  SMTP Port:   {default_port} (SSL)")
+    print(f"  Gmail User:  {default_email}")
+    print("----------------------------------------------------------------")
+    
+    use_defaults = input("Use default Gmail SMTP settings? (y/n, default=y): ").strip().lower()
+    if use_defaults == 'n':
+        smtp_server = input("SMTP Server (e.g. smtp.gmail.com): ").strip()
+        try:
+            smtp_port = int(input("SMTP Port (e.g. 465 for SSL, 587 for TLS): ").strip())
+        except ValueError:
+            print("Invalid port number.")
+            return
+        sender_email = input("Sender Email: ").strip()
+    else:
+        smtp_server = default_smtp
+        smtp_port = default_port
+        sender_email = default_email
 
-    sender_email = input("Sender Email: ").strip()
     sender_name = "Matthew Cesar Corpuz"
+    print(f"\nPlease enter the Google App Password for {sender_email}.")
+    print("Note: To send emails using a Google account, you must use a 'Google App Password'")
+    print("generated from your Google Account Security Settings under 2-Step Verification.")
     password = getpass.getpass("Password / App Password: ")
     
-    print("\nStarting email dispatch...")
-    
-    # Setup connection
+    if not password:
+        print("Password cannot be empty.")
+        return
+        
+    print("\nEstablishing secure connection to SMTP server...")
     context = ssl.create_default_context()
     
     try:
@@ -175,12 +200,15 @@ def main():
             server.starttls(context=context)
             
         server.login(sender_email, password)
+        print("✓ Connected and authenticated successfully.\n")
     except Exception as e:
         print(f"\nFailed to connect/authenticate: {e}")
+        print("Please check your email address, port, server, and verify your App Password is correct.")
         return
         
+    print("Starting dispatch sequence...")
     sent_count = 0
-    for recipient in RECIPIENTS:
+    for idx, recipient in enumerate(RECIPIENTS, 1):
         try:
             msg = MIMEMultipart()
             msg["From"] = f"{sender_name} <{sender_email}>"
@@ -191,13 +219,15 @@ def main():
             msg.attach(MIMEText(body, "plain"))
             
             server.sendmail(sender_email, recipient["email"], msg.as_string())
-            print(f"✓ Sent to {recipient['org']} ({recipient['email']})")
+            print(f"[{idx}/{len(RECIPIENTS)}] ✓ Sent to {recipient['org']} ({recipient['email']})")
             sent_count += 1
         except Exception as err:
-            print(f"✗ Failed sending to {recipient['org']}: {err}")
+            print(f"[{idx}/{len(RECIPIENTS)}] ✗ Failed sending to {recipient['org']}: {err}")
             
     server.quit()
-    print(f"\nDispatch completed. Sent {sent_count}/{len(RECIPIENTS)} successfully.")
+    print("----------------------------------------------------------------")
+    print(f"Dispatch completed. Sent {sent_count}/{len(RECIPIENTS)} emails successfully.")
+    print("----------------------------------------------------------------")
 
 if __name__ == "__main__":
     main()
