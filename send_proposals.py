@@ -314,6 +314,7 @@ def main():
     default_smtp = "smtp.gmail.com"
     default_port = 465
     default_email = "corpuzmatthew0814@gmail.com"
+    sender_name = "Matthew Cesar Corpuz"
     
     print(f"Default Sender Profile:")
     print(f"  SMTP Server: {default_smtp}")
@@ -321,83 +322,97 @@ def main():
     print(f"  Gmail User:  {default_email}")
     print("----------------------------------------------------------------")
     
-    use_defaults = input("Use default Gmail SMTP settings? (y/n, default=y): ").strip().lower()
-    if use_defaults == 'n':
-        smtp_server = input("SMTP Server (e.g. smtp.gmail.com): ").strip()
+    # Check if run non-interactively via environment variables
+    env_password = os.environ.get("POLI_SMTP_PASSWORD")
+    
+    if env_password:
+        smtp_server = os.environ.get("POLI_SMTP_SERVER", default_smtp)
         try:
-            smtp_port = int(input("SMTP Port (e.g. 465 for SSL, 587 for TLS): ").strip())
+            smtp_port = int(os.environ.get("POLI_SMTP_PORT", str(default_port)))
         except ValueError:
-            print("Invalid port number.")
-            return
-        sender_email = input("Sender Email: ").strip()
-    else:
-        smtp_server = default_smtp
-        smtp_port = default_port
-        sender_email = default_email
-
-    sender_name = "Matthew Cesar Corpuz"
-    print(f"\nPlease enter the Google App Password for {sender_email}.")
-    print("Note: To send emails using a Google account, you must use a 'Google App Password'")
-    print("generated from your Google Account Security Settings under 2-Step Verification.")
-    password = getpass.getpass("Password / App Password: ")
-    
-    if not password:
-        print("Password cannot be empty.")
-        return
+            smtp_port = default_port
+        sender_email = os.environ.get("POLI_SMTP_EMAIL", default_email)
+        password = env_password
         
-    print("\nEstablishing secure connection to SMTP server...")
-    context = ssl.create_default_context()
-    
-    try:
-        if smtp_port == 465:
-            server = smtplib.SMTP_SSL(smtp_server, smtp_port, context=context)
-        else:
-            server = smtplib.SMTP(smtp_server, smtp_port)
-            server.starttls(context=context)
-            
-        server.login(sender_email, password)
-        print("✓ Connected and authenticated successfully.\n")
-    except Exception as e:
-        print(f"\nFailed to connect/authenticate: {e}")
-        print("Please check your email address, port, server, and verify your App Password is correct.")
-        return
-        
-    print("\n--- Target Recipient Selection ---")
-    print(f"Total contacts loaded: {len(RECIPIENTS)}")
-    print("Sending emails to 200+ recipients at once via a personal Gmail SMTP server")
-    print("will likely trigger Google's anti-spam controls and terminate connection sockets.")
-    print("It is highly recommended to dispatch in smaller batches (e.g., 20-30 at a time)")
-    print("and use a time delay between emails.")
-    
-    start_idx = 1
-    end_idx = len(RECIPIENTS)
-    
-    custom_range = input(f"Send to a specific range of contacts? (y/n, default=n): ").strip().lower()
-    if custom_range == 'y':
         try:
-            start_idx = int(input(f"Start index (1-{len(RECIPIENTS)}): ").strip())
-            end_idx = int(input(f"End index ({start_idx}-{len(RECIPIENTS)}): ").strip())
-            if start_idx < 1 or end_idx > len(RECIPIENTS) or start_idx > end_idx:
-                raise ValueError
+            start_idx = int(os.environ.get("POLI_RANGE_START", "1"))
+            end_idx = int(os.environ.get("POLI_RANGE_END", str(len(RECIPIENTS))))
         except ValueError:
-            print("Invalid range. Sending to all.")
             start_idx = 1
             end_idx = len(RECIPIENTS)
             
-    try:
-        delay_sec = float(input("Enter delay between emails in seconds (default=5): ").strip() or "5")
-        if delay_sec < 0:
+        try:
+            delay_sec = float(os.environ.get("POLI_DELAY", "5.0"))
+        except ValueError:
             delay_sec = 5.0
-    except ValueError:
-        delay_sec = 5.0
+            
+        targets_to_send = RECIPIENTS[start_idx-1:end_idx]
+        total_targets = len(targets_to_send)
+        
+        print("Non-interactive run detected from environment.")
+        print(f"  Sender: {sender_email}")
+        print(f"  Range:  {start_idx} to {end_idx} ({total_targets} recipients)")
+        print(f"  Delay:  {delay_sec}s")
+    else:
+        use_defaults = input("Use default Gmail SMTP settings? (y/n, default=y): ").strip().lower()
+        if use_defaults == 'n':
+            smtp_server = input("SMTP Server (e.g. smtp.gmail.com): ").strip()
+            try:
+                smtp_port = int(input("SMTP Port (e.g. 465 for SSL, 587 for TLS): ").strip())
+            except ValueError:
+                print("Invalid port number.")
+                return
+            sender_email = input("Sender Email: ").strip()
+        else:
+            smtp_server = default_smtp
+            smtp_port = default_port
+            sender_email = default_email
 
-    targets_to_send = RECIPIENTS[start_idx-1:end_idx]
-    total_targets = len(targets_to_send)
-    print(f"\nPrepared to send to {total_targets} targets (indices {start_idx} to {end_idx}) with a {delay_sec}s delay between messages.")
-    confirm = input("Confirm and proceed with dispatch? (y/n, default=y): ").strip().lower()
-    if confirm == 'n':
-        print("Dispatch cancelled.")
-        return
+        print(f"\nPlease enter the Google App Password for {sender_email}.")
+        print("Note: To send emails using a Google account, you must use a 'Google App Password'")
+        print("generated from your Google Account Security Settings under 2-Step Verification.")
+        password = getpass.getpass("Password / App Password: ")
+        
+        if not password:
+            print("Password cannot be empty.")
+            return
+
+        print("\n--- Target Recipient Selection ---")
+        print(f"Total contacts loaded: {len(RECIPIENTS)}")
+        print("Sending emails to 200+ recipients at once via a personal Gmail SMTP server")
+        print("will likely trigger Google's anti-spam controls and terminate connection sockets.")
+        print("It is highly recommended to dispatch in smaller batches (e.g., 20-30 at a time)")
+        print("and use a time delay between emails.")
+        
+        start_idx = 1
+        end_idx = len(RECIPIENTS)
+        
+        custom_range = input(f"Send to a specific range of contacts? (y/n, default=n): ").strip().lower()
+        if custom_range == 'y':
+            try:
+                start_idx = int(input(f"Start index (1-{len(RECIPIENTS)}): ").strip())
+                end_idx = int(input(f"End index ({start_idx}-{len(RECIPIENTS)}): ").strip())
+                if start_idx < 1 or end_idx > len(RECIPIENTS) or start_idx > end_idx:
+                    raise ValueError
+            except ValueError:
+                print("Invalid range. Sending to all.")
+                start_idx = 1
+                end_idx = len(RECIPIENTS)
+                
+        try:
+            delay_sec = float(input("Enter delay between emails in seconds (default=5): ").strip() or "5")
+            if delay_sec < 0:
+                delay_sec = 5.0
+        except ValueError:
+            delay_sec = 5.0
+
+        targets_to_send = RECIPIENTS[start_idx-1:end_idx]
+        total_targets = len(targets_to_send)
+        print(f"\nPrepared to send to {total_targets} targets (indices {start_idx} to {end_idx}) with a {delay_sec}s delay between messages.")
+        confirm = input("Confirm and proceed with dispatch? (y/n, default=y): ").strip().lower()
+        if confirm == 'n':
+            print("Dispatch cancelled.")
+            return
 
     print("\nEstablishing secure connection to SMTP server...")
     context = ssl.create_default_context()
