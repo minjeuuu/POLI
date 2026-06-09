@@ -414,7 +414,7 @@ const ExploreTab: React.FC<ExploreTabProps> = ({ onNavigate, onAddToCompare, onT
 
             {/* Mobile Root Category Selector */}
             {navStack.length === 0 && (
-                <div className="lg:hidden border-t border-stone-100 dark:border-stone-800 px-4 pt-2 overflow-x-auto no-scrollbar flex gap-2">
+                <div className="md:hidden border-t border-stone-100 dark:border-stone-800 px-4 pt-2 overflow-x-auto no-scrollbar flex gap-2">
                      {EXPLORE_CATS.map((cat) => (
                         <button
                             key={cat.id}
@@ -432,9 +432,9 @@ const ExploreTab: React.FC<ExploreTabProps> = ({ onNavigate, onAddToCompare, onT
 
         <div className="flex relative">
             
-            {/* 2. SIDEBAR (Desktop) */}
+            {/* 2. SIDEBAR (Desktop / Tablet) */}
             {navStack.length === 0 && (
-                <div className="w-64 bg-white dark:bg-stone-900 border-r border-academic-line dark:border-stone-800 flex-shrink-0 hidden lg:block border-b">
+                <div className="w-64 bg-white dark:bg-stone-900 border-r border-academic-line dark:border-stone-800 flex-shrink-0 hidden md:block border-b">
                     <div className="p-4 space-y-1">
                         {EXPLORE_CATS.map((cat) => (
                             <button
@@ -503,7 +503,7 @@ const ExploreTab: React.FC<ExploreTabProps> = ({ onNavigate, onAddToCompare, onT
                                             <h3 className="font-bold text-base text-academic-text dark:text-stone-100 font-serif">{section.category}</h3>
                                             <span className="text-[10px] bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-300 px-2 py-0.5 rounded-full ml-auto">{section.items.length}</span>
                                         </div>
-                                        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                                        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                             {section.items.map((item: any, i: number) => (
                                                 <div 
                                                     key={i} 

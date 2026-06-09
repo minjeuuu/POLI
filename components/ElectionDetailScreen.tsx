@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, BookOpen, Clock, Users, FileText, Compass, AlertTriangle, Printer, Download, Bookmark, Globe, Library, Award } from 'lucide-react';
 import { fetchElectionDetail } from '../services/geminiService';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { GDELTWidget } from './external/GDELTWidget';
-import { OpenFECWidget } from './external/OpenFECWidget';
+
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -21,7 +18,6 @@ const TABS = [
     { id: 'issues', label: 'Issues', icon: FileText },
     { id: 'aftermath', label: 'Results & Aftermath', icon: Clock },
     { id: 'critique', label: 'Controversies', icon: AlertTriangle },
-    { id: 'resources', label: 'Library', icon: Library },
 ];
 
 const SectionTitle: React.FC<{ title: string, icon: any, subtitle?: string }> = ({ title, icon: Icon, subtitle }) => (
@@ -271,20 +267,7 @@ const ElectionDetailScreen: React.FC<ElectionDetailScreenProps> = ({ electionNam
                         </div>
                     </div>
 
-                    {/* RESOURCES SECTION */}
-                    <div id="resources" ref={el => { sectionRefs.current['resources'] = el; }} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 shadow-sm">
-                        <SectionTitle title="External Databases & News" icon={Library} subtitle="Linked Academic Repository" />
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                            <div className="space-y-6">
-                                <WikipediaWidget title={data.name} description="election" />
-                                <RedditWidget queryText={data.name} />
-                            </div>
-                            <div className="space-y-6">
-                                <GDELTWidget queryText={data.name} />
-                                <OpenFECWidget queryText={data.name} />
-                            </div>
-                        </div>
-                    </div>
+
 
                 </div>
             </div>

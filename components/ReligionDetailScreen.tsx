@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, BookOpen, Clock, Users, Flame, Building2, AlertCircle, Lightbulb, Zap, Printer, Download, Bookmark, Globe, Library, ShieldAlert } from 'lucide-react';
 import { fetchReligionDetail } from '../services/geminiService';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { WikiquoteWidget } from './external/WikiquoteWidget';
+
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -22,7 +19,6 @@ const TABS = [
     { id: 'practices', label: 'Practices', icon: Flame },
     { id: 'impact', label: 'Political Impact', icon: Building2 },
     { id: 'critique', label: 'Critique', icon: AlertCircle },
-    { id: 'resources', label: 'Library', icon: Library },
 ];
 
 const SectionTitle: React.FC<{ title: string, icon: any, subtitle?: string }> = ({ title, icon: Icon, subtitle }) => (
@@ -331,20 +327,7 @@ const ReligionDetailScreen: React.FC<ReligionDetailScreenProps> = ({ religionNam
                         </div>
                     </div>
 
-                    {/* RESOURCES SECTION */}
-                    <div id="resources" ref={el => { sectionRefs.current['resources'] = el; }} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 shadow-sm">
-                        <SectionTitle title="External Databases & Literature" icon={Library} subtitle="Linked Academic Repository" />
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                            <div className="space-y-6">
-                                <WikipediaWidget title={data.name} description="religion" />
-                                <RedditWidget queryText={data.name} />
-                            </div>
-                            <div className="space-y-6">
-                                <OpenAlexWidget queryText={data.name} />
-                                <WikiquoteWidget queryText={data.name} />
-                            </div>
-                        </div>
-                    </div>
+
 
                 </div>
             </div>

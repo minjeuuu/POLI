@@ -4,14 +4,7 @@ import { ArrowLeft, Clock, Globe, BookOpen, Layers, Download } from 'lucide-reac
 import { fetchPoliticalRecord } from '../services/searchService';
 import LoadingScreen from './LoadingScreen';
 import Timeline from './Timeline';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { GDELTWidget } from './external/GDELTWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { InternetArchiveWidget } from './external/InternetArchiveWidget';
-import { LibraryOfCongressWidget } from './external/LibraryOfCongressWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
-import { DOAJWidget } from './external/DOAJWidget';
+
 
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
@@ -108,27 +101,7 @@ const AlmanacDetailScreen: React.FC<AlmanacDetailScreenProps> = ({ mode, title, 
                         <Timeline events={data.timeline} />
                     )}
 
-                    <div className="mt-16 pt-8 border-t border-stone-200 dark:border-stone-800">
-                        <h3 className="font-serif text-2xl font-bold mb-6 flex items-center gap-2">
-                            <Globe className="w-5 h-5 text-academic-gold" /> External Repositories & Data
-                        </h3>
-                        <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
-                            <div className="space-y-6">
-                                <WikipediaWidget title={title} description="historical record" />
-                                <LibraryOfCongressWidget queryText={title} />
-                            </div>
-                            <div className="space-y-6">
-                                <OpenAlexWidget queryText={title} />
-                                <InternetArchiveWidget queryText={title} />
-                                <CrossrefWidget queryText={title} />
-                            </div>
-                            <div className="space-y-6">
-                                <GDELTWidget queryText={title} />
-                                <RedditWidget queryText={title} />
-                                <DOAJWidget queryText={title} />
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
             ) : (
                 <div className="text-center py-20 text-stone-400">Record not found.</div>

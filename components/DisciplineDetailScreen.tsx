@@ -16,18 +16,7 @@ import FlashcardView from './FlashcardView';
 import RegionalDetailScreen from './RegionalDetailScreen';
 import ConceptDetailModal from './ConceptDetailModal';
 import PersonDetailScreen from './PersonDetailScreen';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { OpenLibraryWidget } from './external/OpenLibraryWidget';
-import { ArXivWidget } from './external/ArXivWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { InternetArchiveWidget } from './external/InternetArchiveWidget';
-import { DictionaryWidget } from './external/DictionaryWidget';
-import { SemanticScholarWidget } from './external/SemanticScholarWidget';
-import { DOAJWidget } from './external/DOAJWidget';
-import { LibraryOfCongressWidget } from './external/LibraryOfCongressWidget';
-import { PubMedWidget } from './external/PubMedWidget';
+
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -431,31 +420,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
                 </div>
             </div>
 
-            <div className="mt-16 pt-8 border-t border-stone-200 dark:border-stone-800">
-                <h3 className="font-serif text-2xl font-bold mb-6 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-academic-gold" /> External Repositories & Data
-                </h3>
-                <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
-                    <div className="space-y-6">
-                        <WikipediaWidget title={disciplineName} description="academic discipline" />
-                        <PubMedWidget queryText={disciplineName} />
-                        <LibraryOfCongressWidget queryText={disciplineName} />
-                    </div>
-                    <div className="space-y-6">
-                        <OpenAlexWidget queryText={disciplineName} />
-                        <InternetArchiveWidget queryText={disciplineName} />
-                        <DictionaryWidget queryText={disciplineName} />
-                        <CrossrefWidget queryText={disciplineName} />
-                    </div>
-                    <div className="space-y-6">
-                        <RedditWidget queryText={`${disciplineName} study`} />
-                        <SemanticScholarWidget queryText={disciplineName} />
-                        <DOAJWidget queryText={disciplineName} />
-                        <ArXivWidget queryText={disciplineName} />
-                        <OpenLibraryWidget queryText={disciplineName} />
-                    </div>
-                </div>
-            </div>
+
 
          </div>
       </div>

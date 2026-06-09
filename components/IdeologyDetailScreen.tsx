@@ -12,21 +12,7 @@ import ReaderView from './ReaderView';
 import QuizView from './QuizView';
 import FlashcardView from './FlashcardView';
 import { IconRenderer } from './IconMap';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { OpenLibraryWidget } from './external/OpenLibraryWidget';
-import { ArXivWidget } from './external/ArXivWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { DOAJWidget } from './external/DOAJWidget';
-import { SemanticScholarWidget } from './external/SemanticScholarWidget';
-import { WikiquoteWidget } from './external/WikiquoteWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { InternetArchiveWidget } from './external/InternetArchiveWidget';
-import { ArtInstituteChicagoWidget } from './external/ArtInstituteChicagoWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
-import { GutendexWidget } from './external/GutendexWidget';
-import { DictionaryWidget } from './external/DictionaryWidget';
-import { GovTrackWidget } from './external/GovTrackWidget';
-import { UKPetitionsWidget } from './external/UKPetitionsWidget';
+
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -341,34 +327,7 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
                 </div>
             </div>
             
-            <div className="mt-16 pt-8 border-t border-stone-200 dark:border-stone-800">
-                <h3 className="font-serif text-2xl font-bold mb-6 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-academic-gold" /> External Repositories & Data
-                </h3>
-                <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
-                    <div className="space-y-6">
-                        <WikipediaWidget title={data.name} description="ideology politics" />
-                        <GovTrackWidget />
-                        <UKPetitionsWidget />
-                        <ArtInstituteChicagoWidget queryText={data.name} />
-                    </div>
-                    <div className="space-y-6">
-                        <WikiquoteWidget queryText={data.name} />
-                        <OpenAlexWidget queryText={data.name} />
-                        <InternetArchiveWidget queryText={data.name} />
-                        <DictionaryWidget queryText={data.name} />
-                        <CrossrefWidget queryText={data.name} />
-                    </div>
-                    <div className="space-y-6">
-                        <GutendexWidget queryText={data.name} />
-                        <RedditWidget queryText={`${data.name} politics`} />
-                        <SemanticScholarWidget queryText={data.name} />
-                        <DOAJWidget queryText={data.name} />
-                        <ArXivWidget queryText={data.name} />
-                        <OpenLibraryWidget queryText={data.name} />
-                    </div>
-                </div>
-            </div>
+
 
           </div>
       </div>

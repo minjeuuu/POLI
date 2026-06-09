@@ -4,20 +4,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ArrowLeft, User, Book, Flag, ExternalLink, Calendar, Lightbulb, Quote, Bookmark, Download, Search, BookOpen, Bell, ArrowRightLeft, Clock, Users, GraduationCap, MapPin, Target, Zap, Share2, Swords, Heart, AlertCircle, Award, Brain, Globe, Printer } from 'lucide-react';
 import { PersonDetail } from '../types';
 import { fetchPersonDetail } from '../services/personService';
-import { OpenLibraryWidget } from './external/OpenLibraryWidget';
-import { RedditWidget } from './external/RedditWidget';
 import LoadingScreen from './LoadingScreen';
 import ReaderView from './ReaderView';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { WikiquoteWidget } from './external/WikiquoteWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { InternetArchiveWidget } from './external/InternetArchiveWidget';
-import { GutendexWidget } from './external/GutendexWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
-import { GDELTWidget } from './external/GDELTWidget';
-import { DOAJWidget } from './external/DOAJWidget';
-import { SemanticScholarWidget } from './external/SemanticScholarWidget';
-import { LibraryOfCongressWidget } from './external/LibraryOfCongressWidget';
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 import { IconRenderer } from './IconMap';
@@ -428,31 +416,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                   </div>
               </div>
               
-              <div className="mt-16 pt-8 border-t border-stone-200 dark:border-stone-800">
-                  <h3 className="font-serif text-2xl font-bold mb-6 flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-academic-gold" /> External Repositories & Data
-                  </h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
-                      <div className="space-y-6">
-                          <WikipediaWidget title={data.name} description={data.ideology || data.country || "politics"} />
-                          <WikiquoteWidget queryText={data.name} />
-                          <LibraryOfCongressWidget queryText={data.name} />
-                      </div>
-                      <div className="space-y-6">
-                          <OpenAlexWidget queryText={data.name} />
-                          <InternetArchiveWidget queryText={data.name} />
-                          <CrossrefWidget queryText={data.name} />
-                          <SemanticScholarWidget queryText={data.name} />
-                      </div>
-                      <div className="space-y-6">
-                          <GutendexWidget queryText={data.name} />
-                          <RedditWidget queryText={data.name} />
-                          <OpenLibraryWidget queryText={`author:"${data.name}"`} />
-                          <GDELTWidget queryText={data.name} />
-                          <DOAJWidget queryText={data.name} />
-                      </div>
-                  </div>
-              </div>
+
 
           </div>
       </div>

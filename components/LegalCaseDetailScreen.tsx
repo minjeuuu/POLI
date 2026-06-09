@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, BookOpen, Clock, Scale, FileText, Compass, Users, Printer, Download, Bookmark, Globe, Library } from 'lucide-react';
 import { fetchLegalCaseDetail } from '../services/geminiService';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
+
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -20,7 +17,6 @@ const TABS = [
     { id: 'questions', label: 'Legal Questions', icon: FileText },
     { id: 'opinions', label: 'Opinions', icon: Scale },
     { id: 'impact', label: 'Impact', icon: Compass },
-    { id: 'resources', label: 'Library', icon: Library },
 ];
 
 const SectionTitle: React.FC<{ title: string, icon: any, subtitle?: string }> = ({ title, icon: Icon, subtitle }) => (
@@ -245,20 +241,7 @@ const LegalCaseDetailScreen: React.FC<LegalCaseDetailScreenProps> = ({ caseName,
                         </div>
                     </div>
 
-                    {/* RESOURCES SECTION */}
-                    <div id="resources" ref={el => { sectionRefs.current['resources'] = el; }} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 shadow-sm">
-                        <SectionTitle title="External Databases & Cases" icon={Library} subtitle="Linked Academic Repository" />
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                            <div className="space-y-6">
-                                <WikipediaWidget title={data.name} description="court case" />
-                                <RedditWidget queryText={data.name} />
-                            </div>
-                            <div className="space-y-6">
-                                <OpenAlexWidget queryText={data.name} />
-                                <CrossrefWidget queryText={data.name} />
-                            </div>
-                        </div>
-                    </div>
+
 
                 </div>
             </div>

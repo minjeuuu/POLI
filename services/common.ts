@@ -66,13 +66,6 @@ export const withCache = async <T>(key: string, fetcher: () => Promise<T>): Prom
  * Handles 503s, 429s, and network blips with exponential backoff + jitter.
  */
 export const generateWithRetry = async (params: any, retries = 3) => {
-    const key = getApiKey();
-    if (!key) {
-        // Intercept immediately and generate high-quality structured mock data!
-        const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
-        const mockResponse = generateMockData(prompt);
-        return { text: mockResponse };
-    }
     for (let i = 0; i <= retries; i++) {
         try {
             return await ai.models.generateContent(params);
@@ -105,14 +98,6 @@ import { generateWithClaude } from "./claudeService";
  * This ensures the user ALWAYS gets data, even if the Pro model is overloaded.
  */
 export const generateWithFallback = async (params: any, fallbackModel: string = 'gemini-3-flash-preview') => {
-    const key = getApiKey();
-    if (!key) {
-        // Intercept immediately and generate high-quality structured mock data!
-        const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
-        const mockResponse = generateMockData(prompt);
-        return { text: mockResponse };
-    }
-
     try {
         // Attempt Primary Request
         return await generateWithRetry(params);
@@ -127,25 +112,21 @@ export const generateWithFallback = async (params: any, fallbackModel: string = 
                 // Fallback often requires less strict config to ensure completion
                 config: { ...params.config, responseMimeType: params.config?.responseMimeType || "application/json" } 
             });
-        } catch (e2) {
+        } catch (e2: any) {
             console.warn(`Gemini Flash fallback failed. Attempting Claude fallback.`, e2);
-            
             try {
                 // Retry with Claude
                 const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
                 const claudeResponse = await generateWithClaude(prompt);
-                
                 if (claudeResponse) {
                     return { text: claudeResponse };
                 }
-            } catch (e3) {
+            } catch (e3: any) {
                 console.warn(`Claude fallback failed:`, e3);
             }
-            
-            // Critical Fallback: Avoid throwing to prevent parallel Promise.all rejections
-            const prompt = typeof params.contents === 'string' ? params.contents : JSON.stringify(params.contents);
-            const mockResponse = generateMockData(prompt);
-            return { text: mockResponse };
+            // Critical Fallback: Throw the exception to force online feedback
+            console.error("All AI fallback attempts failed. Online generation is forced.");
+            throw new Error(`POLI Online Service Error: ${e2.message || e2 || e}`);
         }
     }
 };

@@ -154,29 +154,81 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onNav
       
       <GlobalHeader toggleTheme={toggleTheme} isDark={isDark} onNavigate={onNavigate} />
 
-      <main className="flex-1 overflow-hidden relative pt-[calc(4rem+env(safe-area-inset-top))]">
-        {(themeMode === 'War' || themeMode === 'Steampunk') && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>}
-        {themeMode === 'Christmas' && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/snow.png')]"></div>}
-        {(themeMode === 'Tech' || themeMode === 'Matrix' || themeMode === 'Cyberpunk') && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/circuit-board.png')]"></div>}
-        {themeMode === 'Nature' && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>}
-
-        {/* MAIN APP CONTENT WITH TRANSITIONS */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10, filter: "blur(2px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -10, filter: "blur(2px)" }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="h-full w-full"
-          >
-            {children}
-          </motion.div>
-        </AnimatePresence>
+      {/* CONTAINER FOR SIDEBAR + CONTENT */}
+      <div className="flex flex-1 flex-row overflow-hidden pt-[calc(4rem+env(safe-area-inset-top))]">
         
-      </main>
+        {/* SIDEBAR NAVIGATION (visible on md and above) */}
+        <nav className={`hidden md:flex flex-col flex-none border-r z-40 transition-colors duration-500
+          ${userPrefs?.compactSidebar ? 'w-20' : 'w-64'}
+          ${['War', 'Steampunk', 'Volcanic', 'Coffee'].includes(themeMode) ? 'bg-stone-900 border-red-900 text-stone-300' : 
+            ['Tech', 'Matrix', 'Cyberpunk', 'Neon'].includes(themeMode) ? 'bg-slate-950 border-cyan-900 text-cyan-400' : 
+            'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 text-stone-800 dark:text-stone-200'}
+        `}>
+          {!userPrefs?.compactSidebar && (
+            <div className="p-6 border-b border-stone-200/50 dark:border-stone-800/50">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Navigation Dossier</span>
+            </div>
+          )}
+          <div className="flex-1 py-6 flex flex-col gap-2 px-3">
+            {navItems.map((item) => {
+              const isActive = activeTab === item.id;
+              let activeColorClass = 'text-academic-accent dark:text-indigo-400';
+              let activeBgClass = 'bg-academic-accent/10 dark:bg-indigo-500/20';
+              
+              if (themeMode === 'War') { activeColorClass = 'text-red-500'; activeBgClass = 'bg-red-900/30'; }
+              if (themeMode === 'Tech') { activeColorClass = 'text-cyan-400'; activeBgClass = 'bg-cyan-900/30'; }
+              if (themeMode === 'Christmas') { activeColorClass = 'text-red-600 dark:text-red-400'; activeBgClass = 'bg-green-100 dark:bg-green-900/30'; }
+              if (themeMode === 'Neon') { activeColorClass = 'text-pink-500'; activeBgClass = 'bg-pink-900/30'; }
+              if (themeMode === 'Matrix') { activeColorClass = 'text-green-500'; activeBgClass = 'bg-green-900/30'; }
 
-      <nav className={`flex-none border-t pb-[env(safe-area-inset-bottom)] z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-colors duration-500 
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onTabChange(item.id)}
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 group
+                    ${isActive ? `${activeColorClass} ${activeBgClass} font-bold` : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800/50'}
+                    ${userPrefs?.compactSidebar ? 'justify-center px-0 flex-col gap-1 py-3' : ''}
+                  `}
+                >
+                  <item.icon className={`${userPrefs?.compactSidebar ? 'w-5 h-5' : 'w-5 h-5'} ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px] group-hover:scale-110 transition-transform duration-300'}`} />
+                  <span className={`font-bold uppercase tracking-widest transition-opacity ${userPrefs?.compactSidebar ? 'text-[8px]' : 'text-xs'}`}>
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="p-4 border-t border-stone-200/50 dark:border-stone-800/50 text-center">
+            <span className="text-[9px] font-mono text-stone-400">POLI ARCHIVE V1.4</span>
+          </div>
+        </nav>
+
+        {/* MAIN CONTENT AREA */}
+        <main className="flex-1 overflow-hidden relative">
+          {(themeMode === 'War' || themeMode === 'Steampunk') && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>}
+          {themeMode === 'Christmas' && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/snow.png')]"></div>}
+          {(themeMode === 'Tech' || themeMode === 'Matrix' || themeMode === 'Cyberpunk') && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/circuit-board.png')]"></div>}
+          {themeMode === 'Nature' && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>}
+
+          {/* MAIN APP CONTENT WITH TRANSITIONS */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10, filter: "blur(2px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -10, filter: "blur(2px)" }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="h-full w-full"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+
+      </div>
+
+      {/* BOTTOM NAVIGATION BAR (hidden on md and above) */}
+      <nav className={`flex-none md:hidden border-t pb-[env(safe-area-inset-bottom)] z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-colors duration-500 
           ${['War', 'Steampunk', 'Volcanic', 'Coffee'].includes(themeMode) ? 'bg-stone-900 border-red-900' : 
             ['Tech', 'Matrix', 'Cyberpunk', 'Neon'].includes(themeMode) ? 'bg-slate-950 border-cyan-900' : 
             'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}`}>

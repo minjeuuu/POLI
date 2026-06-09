@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, BookOpen, Clock, Users, GraduationCap, Building2, Target, Compass, Printer, Download, Bookmark, Globe, Library } from 'lucide-react';
+import { ArrowLeft, BookOpen, Clock, Users, GraduationCap, Building2, Target, Compass, Printer, Download, Bookmark, Globe } from 'lucide-react';
 import { fetchUniversityDetail } from '../services/geminiService';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -20,7 +16,6 @@ const TABS = [
     { id: 'focus', label: 'Focus Areas', icon: Target },
     { id: 'alumni', label: 'Notable Alumni', icon: Users },
     { id: 'impact', label: 'Geopolitical Impact', icon: Compass },
-    { id: 'resources', label: 'Library', icon: Library },
 ];
 
 const SectionTitle: React.FC<{ title: string, icon: any, subtitle?: string }> = ({ title, icon: Icon, subtitle }) => (
@@ -229,21 +224,6 @@ const UniversityDetailScreen: React.FC<UniversityDetailScreenProps> = ({ entityN
                         <SectionTitle title="Geopolitical & Historical Impact" icon={Compass} subtitle="Role in Policy & History" />
                         <div className="bg-academic-paper dark:bg-stone-800/30 p-8 rounded-2xl border border-academic-line dark:border-stone-700 font-serif text-lg leading-relaxed text-stone-800 dark:text-stone-200 text-justify">
                             {renderProse(data.historicalImpact)}
-                        </div>
-                    </div>
-
-                    {/* RESOURCES SECTION */}
-                    <div id="resources" ref={el => { sectionRefs.current['resources'] = el; }} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 shadow-sm">
-                        <SectionTitle title="External Databases & Literature" icon={Library} subtitle="Linked Academic Repository" />
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                            <div className="space-y-6">
-                                <WikipediaWidget title={data.name} description="university" />
-                                <RedditWidget queryText={data.name} />
-                            </div>
-                            <div className="space-y-6">
-                                <OpenAlexWidget queryText={data.name} />
-                                <CrossrefWidget queryText={data.name} />
-                            </div>
                         </div>
                     </div>
 

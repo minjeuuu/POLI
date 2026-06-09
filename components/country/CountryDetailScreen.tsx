@@ -39,28 +39,7 @@ import { TourismProfile } from './tourism/TourismProfile';
 import { CultureProfile } from './culture/CultureProfile';
 import { HealthProfile } from './health/HealthProfile';
 import { EducationProfile } from './education/EducationProfile';
-import { WorldBankWidget } from './economy/WorldBankWidget';
-import { RestCountriesWidget } from './external/RestCountriesWidget';
-import { OpenStreetMapWidget } from './external/OpenStreetMapWidget';
-import { OpenMeteoWidget } from '../external/OpenMeteoWidget';
-import { UniversitiesWidget } from '../external/UniversitiesWidget';
-import { PublicHolidaysWidget } from '../external/PublicHolidaysWidget';
-import { WikipediaWidget } from '../external/WikipediaWidget';
-import { FrankfurterWidget } from '../external/FrankfurterWidget';
-import { MetMuseumWidget } from '../external/MetMuseumWidget';
-import { OpenAlexWidget } from '../external/OpenAlexWidget';
-import { ReliefWebWidget } from '../external/ReliefWebWidget';
-import { WikiquoteWidget } from '../external/WikiquoteWidget';
-import { InternetArchiveWidget } from '../external/InternetArchiveWidget';
-import { OpenAQWidget } from '../external/OpenAQWidget';
-import { HackerNewsWidget } from '../external/HackerNewsWidget';
-import { WorldBankIndicatorsWidget } from '../external/WorldBankIndicatorsWidget';
-import { USASpendingWidget } from '../external/USASpendingWidget';
-import { GDELTWidget } from '../external/GDELTWidget';
-import { ArtInstituteChicagoWidget } from '../external/ArtInstituteChicagoWidget';
-import { DOAJWidget } from '../external/DOAJWidget';
-import { SemanticScholarWidget } from '../external/SemanticScholarWidget';
-import { LibraryOfCongressWidget } from '../external/LibraryOfCongressWidget';
+
 
 import { generateAestheticPDF } from '../../utils/pdfGenerator';
 
@@ -469,35 +448,7 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
                    <ImageArchiveGrid images={data.imageArchive || []} />
                </SectionWrapper>
 
-               {/* EXTERNAL NEWS & RESOURCES MULTI-GRID */}
-               <SectionWrapper id="news" title="External Repositories & Data" icon={Globe} isVisible={true}>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
-                        <div className="space-y-6">
-                            <FrankfurterWidget />
-                            <RestCountriesWidget countryName={countryName} />
-                            <WorldBankWidget countryName={countryName} />
-                            <OpenStreetMapWidget countryName={countryName} />
-                            <OpenMeteoWidget locationName={data.capital || countryName} />
-                            <MetMuseumWidget queryText={countryName} />
-                        </div>
-                        <div className="space-y-6">
-                            <WorldBankIndicatorsWidget countryName={countryName} />
-                            <OpenAQWidget countryName={countryName} />
-                            <ReliefWebWidget queryText={countryName} />
-                            <OpenAlexWidget queryText={countryName} />
-                            <WikipediaWidget title={countryName} description="country nation politics" />
-                            <UniversitiesWidget countryName={countryName} />
-                        </div>
-                        <div className="space-y-6">
-                            <GDELTWidget queryText={countryName} />
-                            <LibraryOfCongressWidget queryText={countryName} />
-                            <SemanticScholarWidget queryText={countryName} />
-                            <DOAJWidget queryText={countryName} />
-                            <ArtInstituteChicagoWidget queryText={countryName} />
-                            <PublicHolidaysWidget countryName={countryName} />
-                        </div>
-                    </div>
-               </SectionWrapper>
+
 
           </div>
       </div>

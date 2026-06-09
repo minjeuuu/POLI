@@ -6,17 +6,7 @@ import { EventDetail } from '../types';
 import { fetchEventDetail } from '../services/eventService';
 import LoadingScreen from './LoadingScreen';
 import PersonDetailScreen from './PersonDetailScreen';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { GDELTWidget } from './external/GDELTWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
-import { OpenLibraryWidget } from './external/OpenLibraryWidget';
-import { DOAJWidget } from './external/DOAJWidget';
-import { SemanticScholarWidget } from './external/SemanticScholarWidget';
-import { ReliefWebWidget } from './external/ReliefWebWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { InternetArchiveWidget } from './external/InternetArchiveWidget';
-import { LibraryOfCongressWidget } from './external/LibraryOfCongressWidget';
+
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -34,7 +24,6 @@ const TABS = [
     { id: 'forces', label: 'Forces', icon: Swords },
     { id: 'actors', label: 'Key Figures', icon: Users },
     { id: 'aftermath', label: 'Aftermath', icon: Globe },
-    { id: 'sources', label: 'Archives', icon: FileText },
 ];
 
 const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClose, isSaved, onToggleSave, onNavigate }) => {
@@ -252,30 +241,7 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
                 </div>
             </div>
 
-            <div id="sources" ref={el => { sectionRefs.current['sources'] = el; }} className="mt-16 pt-8 border-t border-stone-200 dark:border-stone-800">
-                <h3 className="font-serif text-2xl font-bold mb-6 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-academic-gold" /> External Repositories & Data
-                </h3>
-                <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
-                    <div className="space-y-6">
-                        <WikipediaWidget title={data.title || eventName} description="historical event politics" />
-                        <ReliefWebWidget queryText={data.title || eventName} />
-                        <LibraryOfCongressWidget queryText={data.title || eventName} />
-                    </div>
-                    <div className="space-y-6">
-                        <OpenAlexWidget queryText={data.title || eventName} />
-                        <InternetArchiveWidget queryText={data.title || eventName} />
-                        <SemanticScholarWidget queryText={data.title || eventName} />
-                        <CrossrefWidget queryText={data.title || eventName} />
-                    </div>
-                    <div className="space-y-6">
-                        <GDELTWidget queryText={data.title || eventName} />
-                        <RedditWidget queryText={data.title || eventName} />
-                        <DOAJWidget queryText={data.title || eventName} />
-                        <OpenLibraryWidget queryText={data.title || eventName} />
-                    </div>
-                </div>
-            </div>
+
 
           </div>
       </div>

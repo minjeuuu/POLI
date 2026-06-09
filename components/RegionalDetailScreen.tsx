@@ -4,15 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Globe, Flag, AlertTriangle, Lightbulb, Download } from 'lucide-react';
 import { RegionalDetail } from '../types';
 import { fetchRegionalDetail } from '../services/geminiService';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { GDELTWidget } from './external/GDELTWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { InternetArchiveWidget } from './external/InternetArchiveWidget';
-import { ReliefWebWidget } from './external/ReliefWebWidget';
-import { LibraryOfCongressWidget } from './external/LibraryOfCongressWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
-import { DOAJWidget } from './external/DOAJWidget';
 import LoadingScreen from './LoadingScreen';
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
@@ -160,30 +151,6 @@ const RegionalDetailScreen: React.FC<RegionalDetailScreenProps> = ({ region, dis
                   ))}
               </ul>
           </section>
-          
-          <div className="mt-16 pt-8 border-t border-stone-200 dark:border-stone-800">
-              <h3 className="font-serif text-2xl font-bold mb-6 flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-academic-gold" /> External Repositories & Data
-              </h3>
-              <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
-                  <div className="space-y-6">
-                      <WikipediaWidget title={region} description={disciplineContext || "politics geography"} />
-                      <ReliefWebWidget queryText={region} />
-                      <LibraryOfCongressWidget queryText={region} />
-                  </div>
-                  <div className="space-y-6">
-                      <OpenAlexWidget queryText={region} />
-                      <InternetArchiveWidget queryText={region} />
-                      <CrossrefWidget queryText={region} />
-                  </div>
-                  <div className="space-y-6">
-                      <GDELTWidget queryText={region} />
-                      <RedditWidget queryText={region} />
-                      <DOAJWidget queryText={region} />
-                  </div>
-              </div>
-          </div>
-
       </div>
     </div>
   );

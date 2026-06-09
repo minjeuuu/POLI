@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, BookOpen, Clock, Users, Building2, Target, Globe, Compass, Printer, Download, Bookmark, Library } from 'lucide-react';
 import { fetchThinkTankDetail } from '../services/geminiService';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
+
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -20,7 +17,6 @@ const TABS = [
     { id: 'focus', label: 'Focus & Projects', icon: Target },
     { id: 'influence', label: 'Influence', icon: Compass },
     { id: 'people', label: 'Key People', icon: Users },
-    { id: 'resources', label: 'Library', icon: Library },
 ];
 
 const SectionTitle: React.FC<{ title: string, icon: any, subtitle?: string }> = ({ title, icon: Icon, subtitle }) => (
@@ -254,20 +250,7 @@ const ThinkTankDetailScreen: React.FC<ThinkTankDetailScreenProps> = ({ entityNam
                         </ul>
                     </div>
 
-                    {/* RESOURCES SECTION */}
-                    <div id="resources" ref={el => { sectionRefs.current['resources'] = el; }} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 shadow-sm">
-                        <SectionTitle title="External Databases & Research" icon={Library} subtitle="Linked Academic Repository" />
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                            <div className="space-y-6">
-                                <WikipediaWidget title={data.name} description="think tank" />
-                                <RedditWidget queryText={data.name} />
-                            </div>
-                            <div className="space-y-6">
-                                <OpenAlexWidget queryText={data.name} />
-                                <CrossrefWidget queryText={data.name} />
-                            </div>
-                        </div>
-                    </div>
+
 
                 </div>
             </div>

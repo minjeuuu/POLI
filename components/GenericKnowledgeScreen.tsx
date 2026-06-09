@@ -6,13 +6,7 @@ import LoadingScreen from './LoadingScreen';
 import { IconRenderer } from './IconMap';
 
 import MiniKnowledgeGraph from './MiniKnowledgeGraph';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { DictionaryWidget } from './external/DictionaryWidget';
-import { UNSDGWidget } from './external/UNSDGWidget';
-import { APIAggregatorWidget } from './external/APIAggregatorWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { CrossrefWidget } from './external/CrossrefWidget';
-import { OpenAlexWidget } from './external/OpenAlexWidget';
+
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -141,22 +135,7 @@ const GenericKnowledgeScreen: React.FC<GenericKnowledgeScreenProps> = ({ query, 
                    </p>
               </section>
 
-              {/* EXTERNAL DATA INTEGRATIONS */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-10">
-                  <div className="space-y-6 flex flex-col">
-                      <WikipediaWidget title={data.title} />
-                      <DictionaryWidget queryText={data.title} />
-                      <RedditWidget queryText={data.title} />
-                  </div>
-                  <div className="space-y-6 flex flex-col">
-                      <CrossrefWidget queryText={data.title} />
-                      <OpenAlexWidget queryText={data.title} />
-                      <UNSDGWidget />
-                  </div>
-              </div>
-              <div className="my-6">
-                  <APIAggregatorWidget query={data.title} />
-              </div>
+
 
               {/* DATA STRIP */}
               {data.statistics && data.statistics.length > 0 && (

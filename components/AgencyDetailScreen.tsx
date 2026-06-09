@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, BookOpen, Clock, Users, Eye, Lock, Target, ShieldAlert, Printer, Download, Bookmark, Globe, Library, Shield } from 'lucide-react';
 import { fetchAgencyDetail } from '../services/geminiService';
-import { WikipediaWidget } from './external/WikipediaWidget';
-import { RedditWidget } from './external/RedditWidget';
-import { GDELTWidget } from './external/GDELTWidget';
+
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -21,7 +19,6 @@ const TABS = [
     { id: 'capabilities', label: 'Capabilities', icon: Shield },
     { id: 'impact', label: 'Geopolitical Impact', icon: Globe },
     { id: 'critique', label: 'Controversies', icon: ShieldAlert },
-    { id: 'resources', label: 'Library', icon: Library },
 ];
 
 const SectionTitle: React.FC<{ title: string, icon: any, subtitle?: string }> = ({ title, icon: Icon, subtitle }) => (
@@ -285,19 +282,7 @@ const AgencyDetailScreen: React.FC<AgencyDetailScreenProps> = ({ agencyName, onC
                         </div>
                     </div>
 
-                    {/* RESOURCES SECTION */}
-                    <div id="resources" ref={el => { sectionRefs.current['resources'] = el; }} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 shadow-sm">
-                        <SectionTitle title="External Databases & News" icon={Library} subtitle="Linked Academic Repository" />
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                            <div className="space-y-6">
-                                <WikipediaWidget title={data.name} description="intelligence agency" />
-                                <RedditWidget queryText={data.name} />
-                            </div>
-                            <div className="space-y-6">
-                                <GDELTWidget queryText={data.name} />
-                            </div>
-                        </div>
-                    </div>
+
 
                 </div>
             </div>
