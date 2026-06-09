@@ -34,25 +34,54 @@ const RegionalDetailScreen: React.FC<RegionalDetailScreenProps> = ({ region, dis
   }, [region, disciplineContext]);
 
   const handleDownload = () => {
-    playSFX('click');
-    if (!data) return;
-    try {
-        const sections = [];
-        if (data.context) sections.push({ title: "Regional Context", content: data.context });
-        if (data.characteristics && data.characteristics.length > 0) sections.push({ title: "Characteristics", content: data.characteristics });
-        if (data.challenges && data.challenges.length > 0) sections.push({ title: "Challenges", content: data.challenges });
-        if (data.futureOutlook) sections.push({ title: "Future Outlook", content: data.futureOutlook });
+      if (typeof playSFX === 'function') playSFX('click');
+      if (!data) return;
+      try {
+          const sections = [];
+          
+          if (data.bio) sections.push({ title: "Biography", content: data.bio });
+          if (data.biography) sections.push({ title: "Biography", content: data.biography });
+          if (data.overview) sections.push({ title: "Overview", content: data.overview });
+          if (data.historicalImpact) sections.push({ title: "Historical Impact", content: data.historicalImpact });
+          if (data.context) sections.push({ title: "Context", content: data.context });
+          if (data.earlyLife) sections.push({ title: "Early Life", content: data.earlyLife });
+          if (data.ideology) sections.push({ title: "Ideology", content: data.ideology });
+          if (data.legacy) sections.push({ title: "Legacy", content: data.legacy });
+          
+          Object.entries(data).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
 
-        generateAestheticPDF(
-            region,
-            `Regional Analysis: ${disciplineContext}`,
-            "",
-            sections,
-            `${region.replace(/\s+/g, '_')}_Analysis.pdf`
-        );
-    } catch (err) {
-        console.error("PDF generation failed:", err);
-    }
+          generateAestheticPDF(
+              data.name || "Dossier",
+              data.type || data.role || data.country || "Intelligence Record",
+              data.shortBio || data.bio?.substring(0, 100) || data.overview?.substring(0, 100) || "Fact Sheet",
+              sections,
+              `${(data.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
+          );
+      } catch (err) {
+          console.error("PDF generation failed:", err);
+      }
   };
 
   if (loading) return (
@@ -109,7 +138,7 @@ const RegionalDetailScreen: React.FC<RegionalDetailScreenProps> = ({ region, dis
                   <h3 className="text-xs font-bold uppercase tracking-widest">Focal Points</h3>
               </div>
               <div className="flex flex-wrap gap-3">
-                  {data.keyCountries.map((c, i) => (
+                  {(Array.isArray(data.keyCountries) ? data.keyCountries : []).map((c, i) => (
                       <button 
                         key={i} 
                         onClick={() => onNavigate('Country', c)}
@@ -128,7 +157,7 @@ const RegionalDetailScreen: React.FC<RegionalDetailScreenProps> = ({ region, dis
                   <h3 className="text-xs font-bold uppercase tracking-widest">Dominant Themes</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.politicalThemes.map((theme, i) => (
+                  {(Array.isArray(data.politicalThemes) ? data.politicalThemes : []).map((theme, i) => (
                       <div key={i} onClick={() => onNavigate('Concept', theme)} className="cursor-pointer hover:bg-stone-100 transition-colors p-4 bg-academic-paper border-l-4 border-academic-accent">
                           <span className="font-serif text-sm font-medium">{theme}</span>
                       </div>
@@ -143,7 +172,7 @@ const RegionalDetailScreen: React.FC<RegionalDetailScreenProps> = ({ region, dis
                   <h3 className="text-xs font-bold uppercase tracking-widest">Core Challenges</h3>
               </div>
               <ul className="space-y-3">
-                  {data.challenges.map((chal, i) => (
+                  {(Array.isArray(data.challenges) ? data.challenges : []).map((chal, i) => (
                       <li key={i} onClick={() => onNavigate('Concept', chal)} className="cursor-pointer hover:text-academic-accent transition-colors flex items-start gap-3">
                           <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span>
                           <span className="font-serif text-stone-600">{chal}</span>
@@ -151,6 +180,7 @@ const RegionalDetailScreen: React.FC<RegionalDetailScreenProps> = ({ region, dis
                   ))}
               </ul>
           </section>
+
       </div>
     </div>
   );

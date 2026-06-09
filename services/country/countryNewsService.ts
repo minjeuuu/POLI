@@ -19,10 +19,10 @@ export const fetchCountryNews = async (countryName: string): Promise<CountryNews
     `;
     
     const response = await generateWithFallback({
-        model: 'gemini-3-pro-preview', // Pro model required for high-quality grounding
+        model: 'gemini-2.5-pro', // Pro model required for high-quality grounding
         contents: prompt,
         config: { 
-            responseMimeType: "application/json",
+            
             tools: [{googleSearch: {}}] // Activate Google Search Grounding
         }
     });

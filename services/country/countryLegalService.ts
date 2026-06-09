@@ -20,10 +20,10 @@ export const fetchLegalProfile = async (countryName: string): Promise<LegalProfi
     `;
 
     const response = await generateWithFallback({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-2.5-pro',
         contents: prompt,
         config: { 
-            responseMimeType: "application/json", 
+             
             maxOutputTokens: 8192,
             thinkingConfig: { thinkingBudget: 4096 } 
         }
@@ -49,7 +49,7 @@ export const fetchSpecificLaw = async (countryName: string, query: string): Prom
     `;
 
     const response = await generateWithFallback({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-2.5-pro',
         contents: prompt,
         config: { 
             maxOutputTokens: 2048,

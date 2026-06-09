@@ -44,7 +44,7 @@ export const NobelPrizeWidget: React.FC<NobelPrizeWidgetProps> = ({ countryName 
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {laureates.slice(0, 6).map((laureate, idx) => {
-                     const name = laureate.knownName?.en || laureate.orgName?.en || 'Unknown';
+                     const name = laureate.knownName?.en || laureate.orgName?.en ;
                      const prize = laureate.nobelPrizes?.[0];
                      const year = prize?.awardYear;
                      const category = prize?.category?.en;

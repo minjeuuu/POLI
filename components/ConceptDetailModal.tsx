@@ -32,20 +32,50 @@ const ConceptDetailModal: React.FC<ConceptDetailModalProps> = ({ term, context, 
   }, [term, context]);
 
   const handleDownload = () => {
-      playSFX('click');
+      if (typeof playSFX === 'function') playSFX('click');
       if (!data) return;
       try {
           const sections = [];
-          if (data.definition) sections.push({ title: "Definition", content: data.definition });
-          if (data.historicalOrigin) sections.push({ title: "Historical Origin", content: data.historicalOrigin });
-          if (data.modernUsage) sections.push({ title: "Modern Usage", content: data.modernUsage });
+          
+          if (data.bio) sections.push({ title: "Biography", content: data.bio });
+          if (data.biography) sections.push({ title: "Biography", content: data.biography });
+          if (data.overview) sections.push({ title: "Overview", content: data.overview });
+          if (data.historicalImpact) sections.push({ title: "Historical Impact", content: data.historicalImpact });
+          if (data.context) sections.push({ title: "Context", content: data.context });
+          if (data.earlyLife) sections.push({ title: "Early Life", content: data.earlyLife });
+          if (data.ideology) sections.push({ title: "Ideology", content: data.ideology });
+          if (data.legacy) sections.push({ title: "Legacy", content: data.legacy });
+          
+          Object.entries(data).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
 
           generateAestheticPDF(
-              term,
-              `Concept Dossier in ${context}`,
-              data.definition ? "" : "No description provided.",
+              data.name || "Dossier",
+              data.type || data.role || data.country || "Intelligence Record",
+              data.shortBio || data.bio?.substring(0, 100) || data.overview?.substring(0, 100) || "Fact Sheet",
               sections,
-              `${term.replace(/\s+/g, '_')}_Concept.pdf`
+              `${(data.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
           );
       } catch (err) {
           console.error("PDF generation failed:", err);
@@ -96,7 +126,7 @@ const ConceptDetailModal: React.FC<ConceptDetailModalProps> = ({ term, context, 
                                 <Globe className="w-4 h-4" /> Examples & Applications
                             </h3>
                             <ul className="space-y-2">
-                                {data.examples.map((ex, i) => (
+                                {(Array.isArray(data.examples) ? data.examples : []).map((ex, i) => (
                                     <li key={i} className="flex items-start gap-3 text-sm font-serif text-stone-700">
                                         <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-academic-gold flex-shrink-0"></span>
                                         {ex}

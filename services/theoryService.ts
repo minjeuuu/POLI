@@ -46,7 +46,7 @@ export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail>
             `;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: prompt,
                 config: { 
                     responseMimeType: "application/json",
@@ -86,7 +86,7 @@ export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDet
             `;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: prompt,
                 config: { 
                     responseMimeType: "application/json",
@@ -111,7 +111,7 @@ export const fetchConceptDetail = async (term: string, context: string): Promise
             `;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: prompt,
                 config: { 
                     responseMimeType: "application/json",
@@ -135,7 +135,7 @@ export const fetchRegionalDetail = async (region: string, discipline: string): P
             `;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: prompt,
                 config: { 
                     responseMimeType: "application/json",

@@ -22,10 +22,10 @@ export const fetchEducationProfile = async (countryName: string) => {
         `;
 
         const response = await generateWithFallback({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-2.5-flash',
             contents: prompt,
             config: { 
-                responseMimeType: "application/json",
+                
                 tools: [{googleSearch: {}}]
             }
         });

@@ -5,7 +5,6 @@ import { fetchPoliticalRecord } from '../services/searchService';
 import LoadingScreen from './LoadingScreen';
 import Timeline from './Timeline';
 
-
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -35,24 +34,50 @@ const AlmanacDetailScreen: React.FC<AlmanacDetailScreenProps> = ({ mode, title, 
   }, [title]);
 
   const handleDownload = () => {
-      playSFX('click');
+      if (typeof playSFX === 'function') playSFX('click');
       if (!data) return;
       try {
           const sections = [];
-          if (data.historicalContext || (data.entity && data.entity.description)) {
-              sections.push({ title: "Historical Context", content: data.historicalContext || data.entity.description });
-          }
-          if (data.timeline && data.timeline.length > 0) {
-              const events = data.timeline.map((e: any) => `${e.date || ''}: ${e.event || ''}`);
-              sections.push({ title: "Timeline", content: events });
-          }
+          
+          if (data.bio) sections.push({ title: "Biography", content: data.bio });
+          if (data.biography) sections.push({ title: "Biography", content: data.biography });
+          if (data.overview) sections.push({ title: "Overview", content: data.overview });
+          if (data.historicalImpact) sections.push({ title: "Historical Impact", content: data.historicalImpact });
+          if (data.context) sections.push({ title: "Context", content: data.context });
+          if (data.earlyLife) sections.push({ title: "Early Life", content: data.earlyLife });
+          if (data.ideology) sections.push({ title: "Ideology", content: data.ideology });
+          if (data.legacy) sections.push({ title: "Legacy", content: data.legacy });
+          
+          Object.entries(data).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
 
           generateAestheticPDF(
-              title,
-              `${mode} Record Almanac`,
-              "",
+              data.name || "Dossier",
+              data.type || data.role || data.country || "Intelligence Record",
+              data.shortBio || data.bio?.substring(0, 100) || data.overview?.substring(0, 100) || "Fact Sheet",
               sections,
-              `${title.replace(/\s+/g, '_')}_Almanac.pdf`
+              `${(data.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
           );
       } catch (err) {
           console.error("PDF generation failed:", err);
@@ -100,7 +125,6 @@ const AlmanacDetailScreen: React.FC<AlmanacDetailScreenProps> = ({ mode, title, 
                     {data.timeline && (
                         <Timeline events={data.timeline} />
                     )}
-
 
                 </div>
             ) : (

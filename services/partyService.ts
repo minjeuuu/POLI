@@ -61,10 +61,10 @@ export const fetchPartyDetail = async (name: string, country: string): Promise<P
             `;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: prompt,
                 config: { 
-                    responseMimeType: "application/json",
+                    
                     maxOutputTokens: 8192,
                     tools: [{googleSearch: {}}]
                 }

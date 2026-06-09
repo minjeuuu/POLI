@@ -7,7 +7,7 @@ export const fetchPoliticalRecord = async (query: string): Promise<PoliticalReco
     return withCache(`record_poli_v1_${query}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: `Generate a structured political record for "${query}".
                 If it is a Country, Person, Ideology, or Event, provide details.
                 PROTOCOL: POLI ARCHIVE V1.
@@ -31,7 +31,7 @@ export const fetchGenericTopic = async (query: string): Promise<any> => {
     return withCache(`generic_dossier_poli_v1_${query}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: `
                 ACT AS: POLI, THE POLITICAL SCIENCE OMNIPEDIA.
                 TOPIC: "${query}"

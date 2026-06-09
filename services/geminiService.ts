@@ -28,7 +28,7 @@ export const fetchPoliticalRecord = async (query: string): Promise<PoliticalReco
     return withCache(`record_v3_${query}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Generate a structured political record for "${query}".
                 If it is a Country, Person, Ideology, or Event, provide details.
                 ${getLanguageInstruction()}`,
@@ -106,7 +106,7 @@ export const fetchDailyContext = async (date: Date): Promise<DailyContext> => {
     return withCache(`daily_v16_schema_${date.toDateString()}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Generate a daily political context briefing for ${date.toDateString()}.
                 Include a quote, a few news items, highlights for person, country, ideology, org, discipline.
                 Fact, Trivia, Historical Events.
@@ -183,7 +183,7 @@ export const fetchDisciplineDetail = async (name: string): Promise<DisciplineDet
      return withCache(`discipline_v4_schema_${name}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Detailed academic overview of the political science discipline: ${name}.
                 ${getLanguageInstruction()}`,
                 config: { 
@@ -285,7 +285,7 @@ export const fetchBookStructure = async (title: string, author: string): Promise
     return withCache(`book_${title}_v2`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Table of contents for "${title}" by ${author}. JSON: { "title": string, "author": string, "chapters": string[] }.`,
                 config: { responseMimeType: "application/json" }
             });
@@ -297,7 +297,7 @@ export const fetchBookStructure = async (title: string, author: string): Promise
 export async function* streamChapterContent(title: string, author: string, chapter: string, summary: boolean) {
     const prompt = `Write the content for chapter "${chapter}" of "${title}" by ${author}. ${summary ? "Summarize key points." : "Provide full text or detailed summary."} ${getLanguageInstruction()}`;
     const response = await ai.models.generateContentStream({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.5-flash',
         contents: prompt
     });
     for await (const chunk of response) {
@@ -308,7 +308,7 @@ export async function* streamChapterContent(title: string, author: string, chapt
 export const askReaderQuestion = async (context: string, query: string, type: string): Promise<string> => {
     try {
         const response = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-2.5-flash',
             contents: `Context: ${context}\n\nTask: ${type}. ${query ? "Question: " + query : ""} \nAnswer:`
         });
         return response.text || "";
@@ -319,7 +319,7 @@ export const fetchQuiz = async (topic: string): Promise<QuizQuestion[]> => {
     return withCache(`quiz_v5_50_${topic}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: `Generate 50 distinct multiple choice questions about ${topic}. 
                 Ensure questions vary in difficulty from introductory to expert.
                 Cover history, key figures, theories, and modern applications.
@@ -338,7 +338,7 @@ export const fetchFlashcards = async (topic: string): Promise<Flashcard[]> => {
     return withCache(`flashcards_v5_50_${topic}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: `Generate 50 comprehensive flashcards for ${topic}. 
                 Cover definitions, key dates, important figures, and core concepts.
                 JSON Array of objects with front, back, category. ${getLanguageInstruction()}`,
@@ -354,21 +354,11 @@ export const fetchFlashcards = async (topic: string): Promise<Flashcard[]> => {
 
 export const fetchRegionalDetail = async (region: string, discipline: string): Promise<RegionalDetail> => {
     return withCache(`region_v4_${region}_${discipline}`, async () => {
-        let wikiImage = "";
-        try {
-            const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(region)}&utf8=&format=json&origin=*`);
-            const searchData = await searchRes.json();
-            if (searchData.query?.search?.length > 0) {
-                const pageTitle = searchData.query.search[0].title;
-                const extractRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
-                const extractData = await extractRes.json();
-                if (extractData.thumbnail?.source) wikiImage = extractData.thumbnail.source;
-            }
-        } catch (e) { console.warn("Wiki fetch failed"); }
+        const wikipediaImage = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(region + " landscape map clear photo")}&w=400&h=400&c=7&pid=Api`;
 
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Political analysis of region: ${region} from perspective of ${discipline}. ${getLanguageInstruction()}`,
                 config: { 
                     responseMimeType: "application/json",
@@ -385,11 +375,11 @@ export const fetchRegionalDetail = async (region: string, discipline: string): P
                 }
             });
             const parsed = safeParse(response.text || '{}', {}) as RegionalDetail;
-            if (wikiImage && (!parsed.imageUrl || !parsed.imageUrl.startsWith("http"))) {
-                parsed.imageUrl = wikiImage;
+            if (wikipediaImage && (!parsed.imageUrl || !parsed.imageUrl.startsWith("http"))) {
+                parsed.imageUrl = wikipediaImage;
             }
             return parsed;
-        } catch (e) { return { region, summary: "Unavailable", keyCountries: [], politicalThemes: [], challenges: [], imageUrl: wikiImage } as RegionalDetail; }
+        } catch (e) { return { region, summary: "Unavailable", keyCountries: [], politicalThemes: [], challenges: [], imageUrl: wikipediaImage } as RegionalDetail; }
     });
 };
 
@@ -397,7 +387,7 @@ export const fetchOrganizationDetail = async (name: string): Promise<Organizatio
     return withCache(`org_v3_${name}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Detailed profile of organization: ${name}. ${getLanguageInstruction()}`,
                 config: { 
                     responseMimeType: "application/json",
@@ -432,7 +422,7 @@ export const fetchPartyDetail = async (name: string, country: string): Promise<P
     return withCache(`party_v2_${name}_${country}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Profile of political party: ${name} in ${country}. ${getLanguageInstruction()}`,
                 config: { responseMimeType: "application/json" }
             });
@@ -445,7 +435,7 @@ export const fetchPersonDetail = async (name: string): Promise<PersonDetail> => 
     return withCache(`person_v2_${name}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Political profile of ${name}. ${getLanguageInstruction()}`,
                 config: { responseMimeType: "application/json" }
             });
@@ -456,30 +446,20 @@ export const fetchPersonDetail = async (name: string): Promise<PersonDetail> => 
 
 export const fetchEventDetail = async (name: string): Promise<EventDetail> => {
     return withCache(`event_v3_${name}`, async () => {
-        let wikiImage = "";
-        try {
-            const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(name)}&utf8=&format=json&origin=*`);
-            const searchData = await searchRes.json();
-            if (searchData.query?.search?.length > 0) {
-                const pageTitle = searchData.query.search[0].title;
-                const extractRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
-                const extractData = await extractRes.json();
-                if (extractData.thumbnail?.source) wikiImage = extractData.thumbnail.source;
-            }
-        } catch (e) { console.warn("Wiki fetch failed"); }
+        const wikipediaImage = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " historical event prominent clear photo")}&w=400&h=400&c=7&pid=Api`;
 
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Detailed political event dossier: ${name}. ${getLanguageInstruction()}`,
                 config: { responseMimeType: "application/json" }
             });
             const parsed = safeParse(response.text || '{}', {}) as EventDetail;
-            if (wikiImage && (!parsed.imageUrl || !parsed.imageUrl.startsWith("http"))) {
-                parsed.imageUrl = wikiImage;
+            if (wikipediaImage && (!parsed.imageUrl || !parsed.imageUrl.startsWith("http"))) {
+                parsed.imageUrl = wikipediaImage;
             }
             return parsed;
-        } catch (e) { return { title: name, date: "Unknown", location: "Unknown", context: "Unavailable", keyActors: [], outcome: "Unknown", significance: "Unavailable", imageUrl: wikiImage, documents: [] } as EventDetail; }
+        } catch (e) { return { title: name, date: "Unknown", location: "Unknown", context: "Unavailable", keyActors: [], outcome: "Unknown", significance: "Unavailable", imageUrl: wikipediaImage, documents: [] } as EventDetail; }
     });
 };
 
@@ -487,7 +467,7 @@ export const fetchIdeologyDetail = async (name: string): Promise<IdeologyDetail>
     return withCache(`ideology_v2_${name}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Detailed analysis of political ideology: ${name}. ${getLanguageInstruction()}`,
                 config: { responseMimeType: "application/json" }
             });
@@ -500,7 +480,7 @@ export const fetchTreatyDetail = async (name: string): Promise<any> => {
     return withCache(`treaty_v2_${name}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Analyze the geopolitical treaty or agreement: "${name}". 
                 RETURN STRICT VALID JSON. DO NOT use markdown.
                 {
@@ -518,7 +498,9 @@ export const fetchTreatyDetail = async (name: string): Promise<any> => {
                 } ${getLanguageInstruction()}`,
                 config: { responseMimeType: "application/json" }
             });
-            return safeParse(response.text || '{}', {});
+            const parsed: any = safeParse(response.text || '{}', {});
+            parsed.imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " treaty document signing ceremony historical clear photo")}&w=400&h=400&c=7&pid=Api`;
+            return parsed;
         } catch (e) { return null; }
     });
 };
@@ -527,7 +509,7 @@ export const fetchMovementDetail = async (name: string): Promise<any> => {
     return withCache(`movement_v2_${name}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Analyze the social or political movement: "${name}". 
                 RETURN STRICT VALID JSON. DO NOT use markdown.
                 {
@@ -546,7 +528,9 @@ export const fetchMovementDetail = async (name: string): Promise<any> => {
                 } ${getLanguageInstruction()}`,
                 config: { responseMimeType: "application/json" }
             });
-            return safeParse(response.text || '{}', {});
+            const parsed: any = safeParse(response.text || '{}', {});
+            parsed.imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " social political movement protest official logo clear photo")}&w=400&h=400&c=7&pid=Api`;
+            return parsed;
         } catch (e) { return null; }
     });
 };
@@ -554,22 +538,10 @@ export const fetchMovementDetail = async (name: string): Promise<any> => {
 export const fetchAgencyDetail = async (name: string): Promise<any> => {
     return withCache(`agency_v2_${name}`, async () => {
         try {
-            let wikipediaImage = "";
-            try {
-                 const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(name)}&utf8=&format=json&origin=*`);
-                 const searchData = await searchRes.json();
-                 if (searchData.query?.search?.length > 0) {
-                     const pageTitle = searchData.query.search[0].title;
-                     const detailRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
-                     const detailData = await detailRes.json();
-                     if (detailData.thumbnail?.source) {
-                         wikipediaImage = detailData.thumbnail.source;
-                     }
-                 }
-            } catch (err) { console.warn('wiki image fetch failed'); }
+            const wikipediaImage = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " intelligence agency seal logo crest vector")}&w=400&h=400&c=7&pid=Api`;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Analyze the intelligence agency or specific operational group: "${name}". 
                 RETURN STRICT VALID JSON. DO NOT use markdown.
                 {
@@ -613,7 +585,7 @@ export const fetchElectionDetail = async (name: string): Promise<any> => {
             } catch (err) { console.warn('wiki image fetch failed'); }
 
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Analyze the political election or campaign: "${name}". 
                 RETURN STRICT VALID JSON. DO NOT use markdown.
                 {
@@ -631,7 +603,7 @@ export const fetchElectionDetail = async (name: string): Promise<any> => {
                 config: { responseMimeType: "application/json" }
             });
             const parsed: any = safeParse(response.text || '{}', {});
-            parsed.imageUrl = wikipediaImage;
+            parsed.imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " election campaign official clear photo")}&w=400&h=400&c=7&pid=Api`;
             return parsed;
         } catch (e) { return null; }
     });
@@ -641,7 +613,7 @@ export const fetchLegalCaseDetail = async (name: string): Promise<any> => {
     return withCache(`legal_case_v1_${name}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Analyze the legal case or Supreme Court ruling: "${name}". 
                 RETURN STRICT VALID JSON. DO NOT use markdown.
                 {
@@ -661,7 +633,9 @@ export const fetchLegalCaseDetail = async (name: string): Promise<any> => {
                 } ${getLanguageInstruction()}`,
                 config: { responseMimeType: "application/json" }
             });
-            return safeParse(response.text || '{}', {});
+            const parsed: any = safeParse(response.text || '{}', {});
+            parsed.imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " landmark legal case courthouse historical clear photo")}&w=400&h=400&c=7&pid=Api`;
+            return parsed;
         } catch (e) { return null; }
     });
 };
@@ -670,7 +644,7 @@ export const fetchScandalDetail = async (name: string): Promise<any> => {
     return withCache(`scandal_v1_${name}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Analyze the political scandal or crisis: "${name}". 
                 RETURN STRICT VALID JSON. DO NOT use markdown.
                 {
@@ -687,7 +661,9 @@ export const fetchScandalDetail = async (name: string): Promise<any> => {
                 } ${getLanguageInstruction()}`,
                 config: { responseMimeType: "application/json" }
             });
-            return safeParse(response.text || '{}', {});
+            const parsed: any = safeParse(response.text || '{}', {});
+            parsed.imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " historical political scandal news clear photo")}&w=400&h=400&c=7&pid=Api`;
+            return parsed;
         } catch (e) { return null; }
     });
 };
@@ -695,22 +671,10 @@ export const fetchScandalDetail = async (name: string): Promise<any> => {
 export const fetchUniversityDetail = async (name: string): Promise<any> => {
     return withCache(`university_v1_${name}`, async () => {
         try {
-            let wikipediaImage = "";
-            try {
-                 const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(name)}&utf8=&format=json&origin=*`);
-                 const searchData = await searchRes.json();
-                 if (searchData.query?.search?.length > 0) {
-                     const pageTitle = searchData.query.search[0].title;
-                     const detailRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
-                     const detailData = await detailRes.json();
-                     if (detailData.thumbnail?.source) {
-                         wikipediaImage = detailData.thumbnail.source;
-                     }
-                 }
-            } catch (err) { console.warn('wiki image fetch failed'); }
+            const wikipediaImage = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " university logo shield crest vector")}&w=400&h=400&c=7&pid=Api`;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Analyze the University: "${name}". 
                 RETURN STRICT VALID JSON. DO NOT use markdown.
                 {
@@ -736,22 +700,10 @@ export const fetchUniversityDetail = async (name: string): Promise<any> => {
 export const fetchThinkTankDetail = async (name: string): Promise<any> => {
     return withCache(`thinktank_v1_${name}`, async () => {
         try {
-            let wikipediaImage = "";
-            try {
-                 const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(name)}&utf8=&format=json&origin=*`);
-                 const searchData = await searchRes.json();
-                 if (searchData.query?.search?.length > 0) {
-                     const pageTitle = searchData.query.search[0].title;
-                     const detailRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
-                     const detailData = await detailRes.json();
-                     if (detailData.thumbnail?.source) {
-                         wikipediaImage = detailData.thumbnail.source;
-                     }
-                 }
-            } catch (err) { console.warn('wiki image fetch failed'); }
+            const wikipediaImage = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " think tank logo official clear vector")}&w=400&h=400&c=7&pid=Api`;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Analyze the Think Tank or Policy Institute: "${name}". 
                 RETURN STRICT VALID JSON. DO NOT use markdown.
                 {
@@ -778,22 +730,10 @@ export const fetchThinkTankDetail = async (name: string): Promise<any> => {
 export const fetchReligionDetail = async (name: string): Promise<any> => {
     return withCache(`religion_v2_${name}`, async () => {
         try {
-            let wikipediaImage = "";
-            try {
-                 const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(name + ' religion')}&utf8=&format=json&origin=*`);
-                 const searchData = await searchRes.json();
-                 if (searchData.query?.search?.length > 0) {
-                     const pageTitle = searchData.query.search[0].title;
-                     const detailRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
-                     const detailData = await detailRes.json();
-                     if (detailData.thumbnail?.source) {
-                         wikipediaImage = detailData.thumbnail.source;
-                     }
-                 }
-            } catch (err) { console.warn('wiki image fetch failed'); }
+            const wikipediaImage = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(name + " religion primary symbol icon flat clear")}&w=400&h=400&c=7&pid=Api`;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Provide an incredibly comprehensive, highly detailed anthropological and historical analysis of the religion, belief system, or cult known as "${name}". 
                 Act as a master theologian and historian. RETURN STRICT VALID JSON. DO NOT use markdown.
                 {
@@ -843,7 +783,7 @@ export const fetchConceptDetail = async (term: string, context: string): Promise
 
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Define political concept: "${term}" in context of "${context}".
                 ${wikiExtract ? `Wikipedia context: ${wikiExtract}` : ""}
                 JSON with definition, context, examples (string[]), history. ${getLanguageInstruction()}`,
@@ -864,7 +804,7 @@ export const fetchHighlightDetail = async (highlight: HighlightedEntity): Promis
     return withCache(`highlight_v7_${highlight.title}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Provide details for the highlighted entity: ${highlight.title} (${highlight.category}).
                 ${getLanguageInstruction()}`,
                 config: { 
@@ -935,7 +875,7 @@ export const fetchExchangeRates = async (): Promise<ExchangeRate[]> => {
     return withCache(`rates_v2_${new Date().getHours()}`, async () => { 
          try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Generate a JSON array of major exchange rates relative to USD.
                 JSON: [{currencyCode: string, currencyName: string, rate: number, symbol: string, category: 'Fiat' | 'Crypto' | 'Historical' | 'Fictional'}].
                 Include major fiat, top 5 crypto.
@@ -951,7 +891,7 @@ export const fetchCurrencyAnalysis = async (currency: string): Promise<{history:
     return withCache(`currency_analysis_v2_${currency}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Analyze currency: ${currency}. Provide brief history and economic profile. JSON: {history: string, economics: string}. ${getLanguageInstruction()}`,
                 config: { responseMimeType: "application/json" }
             });
@@ -964,7 +904,7 @@ export const fetchComparison = async (item1: {name: string, type: string}, item2
     return withCache(`compare_v2_${item1.name}_${item2.name}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: `Compare ${item1.type} "${item1.name}" with ${item2.type} "${item2.name}".
                 Provide synthesis, shared traits, divergences, a comparison matrix (key metrics), historical parallels, future outlook, and hypothetical scenarios.
                 JSON matching ComparisonResult interface. ${getLanguageInstruction()}`,

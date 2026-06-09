@@ -307,7 +307,7 @@ const ReaderView: React.FC<ReaderViewProps> = ({ title, author, onClose, onNavig
       const year = new Date().getFullYear();
       let text = '';
       const t = title || 'Untitled';
-      const a = author || 'Unknown';
+      const a = author ;
       const d = new Date().toLocaleDateString();
       
       // Extensive format logic (Simulated for brevity of regex)
@@ -466,13 +466,13 @@ const ReaderView: React.FC<ReaderViewProps> = ({ title, author, onClose, onNavig
   const fontCategories = [...new Set(FONTS.map(f => f.category))];
 
   if (loadingStructure) return (
-    <div className="fixed inset-0 top-16 z-[60] bg-academic-bg flex items-center justify-center">
+    <div className="h-full w-full relative bg-academic-bg flex items-center justify-center">
       <LoadingScreen message={`Retrieving ${title} from Archives...`} />
     </div>
   );
 
   return (
-    <div className={`fixed inset-0 top-16 z-[60] flex flex-col animate-in slide-in-from-right duration-500 ${currentTheme.bg} ${currentTheme.text} ${currentTheme.selection} transition-colors duration-500`}>
+    <div className={`h-full w-full relative flex flex-col animate-in slide-in-from-right duration-500 ${currentTheme.bg} ${currentTheme.text} ${currentTheme.selection} transition-colors duration-500`}>
        
        {/* READER ACTION BAR */}
        <div className={`flex items-center justify-between px-4 h-14 border-b ${currentTheme.ui} backdrop-blur-md bg-opacity-90 ${currentTheme.bg} transition-colors`}>

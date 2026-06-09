@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Logo from './Logo';
-import { Search, Bell, Sun, Moon, User, X, AlertTriangle, ArrowRight, Zap, Database, Globe, ArrowLeft } from 'lucide-react';
+import { Search, Bell, Sun, Moon, User, X, AlertTriangle, ArrowRight, Zap, Database, Globe, ArrowLeft, Maximize, Minimize } from 'lucide-react';
 import { resolveSearchQuery } from '../utils/searchLogic';
 import { playSFX } from '../services/soundService';
 
@@ -15,13 +15,35 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ toggleTheme, isDark, onNavi
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
 
   useEffect(() => {
     if (isSearchExpanded && searchInputRef.current) {
         searchInputRef.current.focus();
     }
   }, [isSearchExpanded]);
+
+  const toggleFullscreen = () => {
+    playSFX('click');
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,6 +136,15 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ toggleTheme, isDark, onNavi
 
             {/* DIVIDER - Hides on small screens if search expanded */}
             <div className={`h-6 w-px bg-stone-200 dark:bg-stone-800 mx-1 hidden md:block`}></div>
+
+            {/* FULLSCREEN TOGGLE */}
+            <button 
+                onClick={toggleFullscreen}
+                className="p-2 flex items-center justify-center rounded-full text-stone-400 hover:text-academic-gold hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors"
+                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+            >
+                {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+            </button>
 
             {/* THEME TOGGLE */}
             <button 

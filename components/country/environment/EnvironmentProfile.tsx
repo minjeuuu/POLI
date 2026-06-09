@@ -11,9 +11,9 @@ export const EnvironmentProfile: React.FC<{ data: any }> = ({ data }) => {
             <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4 flex items-center gap-2"><Leaf className="w-4 h-4 text-emerald-500" /> Environmental Audit</h4>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <DetailCard label="Carbon Output" value={data.co2Emissions || "N/A"} icon={Wind} subValue="Metric Tons" />
-                <DetailCard label="Forest Cover" value={data.forestCover || "N/A"} icon={Leaf} subValue="% of Land Area" />
-                <DetailCard label="Air Quality" value={data.airQualityIndex || "N/A"} icon={CloudRain} subValue="AQI Score" />
+                <DetailCard label="Carbon Output" value={data.co2Emissions } icon={Wind} subValue="Metric Tons" />
+                <DetailCard label="Forest Cover" value={data.forestCover } icon={Leaf} subValue="% of Land Area" />
+                <DetailCard label="Air Quality" value={data.airQualityIndex } icon={CloudRain} subValue="AQI Score" />
             </div>
 
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 rounded-xl">

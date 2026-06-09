@@ -63,7 +63,7 @@ export const fetchDailyAlmanac = async (date: Date): Promise<AlmanacData> => {
             `;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: prompt,
                 config: { 
                     responseMimeType: "application/json",
@@ -101,7 +101,7 @@ export const fetchUpcomingCalendar = async (): Promise<PoliticalCalendarEvent[]>
 
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: `
                 Generate a list of 20 major upcoming global political events for the next 12 months (relative to now).
                 Include:

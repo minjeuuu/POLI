@@ -39,6 +39,16 @@ const ReaderView = React.lazy(() => import('./components/ReaderView'));
 const ConceptDetailModal = React.lazy(() => import('./components/ConceptDetailModal'));
 const DisciplineDetailScreen = React.lazy(() => import('./components/DisciplineDetailScreen'));
 const GenericKnowledgeScreen = React.lazy(() => import('./components/GenericKnowledgeScreen'));
+// Extra Detail Screens
+const AgencyDetailScreen = React.lazy(() => import('./components/AgencyDetailScreen'));
+const ElectionDetailScreen = React.lazy(() => import('./components/ElectionDetailScreen'));
+const LegalCaseDetailScreen = React.lazy(() => import('./components/LegalCaseDetailScreen'));
+const MovementDetailScreen = React.lazy(() => import('./components/MovementDetailScreen'));
+const ReligionDetailScreen = React.lazy(() => import('./components/ReligionDetailScreen'));
+const ScandalDetailScreen = React.lazy(() => import('./components/ScandalDetailScreen'));
+const ThinkTankDetailScreen = React.lazy(() => import('./components/ThinkTankDetailScreen'));
+const TreatyDetailScreen = React.lazy(() => import('./components/TreatyDetailScreen'));
+const UniversityDetailScreen = React.lazy(() => import('./components/UniversityDetailScreen'));
 
 type OverlayItem = { type: string; payload: any; id: string };
 
@@ -68,14 +78,10 @@ export default function App() {
   // Initialize DB and Load Data
   useEffect(() => {
     const initApp = async () => {
-        try {
-            await db.init();
-            const saved = await db.execute("SELECT * FROM saved_items");
-            if (saved.success) {
-                setSavedItems(saved.rows);
-            }
-        } catch (e) {
-            console.error("Failed to initialize database in App:", e);
+        await db.init();
+        const saved = await db.execute("SELECT * FROM saved_items");
+        if (saved.success) {
+            setSavedItems(saved.rows);
         }
     };
     initApp();
@@ -84,35 +90,28 @@ export default function App() {
   // Auth State Listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-        try {
-            if (firebaseUser) {
-                await db.init();
-                await db.syncFromFirestore();
-                const res = await db.execute(`SELECT * FROM users WHERE email = '${firebaseUser.email}'`);
-                if (res.rows.length > 0) {
-                    handleLogin(res.rows[0]);
-                } else {
-                    handleLogin({
-                        id: firebaseUser.uid,
-                        username: firebaseUser.displayName || 'Scholar',
-                        email: firebaseUser.email,
-                        level: 1,
-                        xp: 0,
-                        coins: 100,
-                    });
-                }
+        if (firebaseUser) {
+            await db.init();
+            const res = await db.execute(`SELECT * FROM users WHERE email = '${firebaseUser.email}'`);
+            if (res.rows.length > 0) {
+                handleLogin(res.rows[0]);
             } else {
-                const isGuest = localStorage.getItem('poli_guest');
-                if (isGuest === 'true') {
-                    setIsAuthenticated(true);
-                } else {
-                    setIsAuthenticated(false);
-                }
+                handleLogin({
+                    id: firebaseUser.uid,
+                    username: firebaseUser.displayName || 'Scholar',
+                    email: firebaseUser.email,
+                    level: 1,
+                    xp: 0,
+                    coins: 100,
+                });
             }
-        } catch (e) {
-            console.error("Auth state db lookup failed:", e);
-            // Default to guest or unauthenticated rather than crashing the app
-            setIsAuthenticated(localStorage.getItem('poli_guest') === 'true');
+        } else {
+            const isGuest = localStorage.getItem('poli_guest');
+            if (isGuest === 'true') {
+                setIsAuthenticated(true);
+            } else {
+                setIsAuthenticated(false);
+            }
         }
     });
     return () => unsubscribe();
@@ -173,9 +172,6 @@ export default function App() {
         if (finalUserData.preferences.themeMode) setThemeMode(finalUserData.preferences.themeMode);
         if (finalUserData.preferences.themeScope) setThemeScope(finalUserData.preferences.themeScope);
         if (finalUserData.preferences.language) setAppLang(finalUserData.preferences.language);
-        if (finalUserData.preferences.geminiApiKey) {
-            localStorage.setItem('poli_gemini_api_key', finalUserData.preferences.geminiApiKey);
-        }
     }
   };
 
@@ -190,7 +186,6 @@ export default function App() {
   const handleLogout = async () => {
     await signOut(auth);
     localStorage.removeItem('poli_guest');
-    localStorage.removeItem('poli_gemini_api_key');
     setUser(null);
     setIsAuthenticated(false);
     setHasLaunched(false);
@@ -343,6 +338,51 @@ export default function App() {
                     onBack={closeHandler}
                     onNavigate={(d) => handleNavigate('Discipline', d)}
                   />
+              </div>
+          );
+          case 'Agency': return (
+              <div className={overlayClass}>
+                  <AgencyDetailScreen agencyName={top.payload} onClose={closeHandler} />
+              </div>
+          );
+          case 'Election': return (
+              <div className={overlayClass}>
+                  <ElectionDetailScreen electionName={top.payload} onClose={closeHandler} />
+              </div>
+          );
+          case 'LegalCase': return (
+              <div className={overlayClass}>
+                  <LegalCaseDetailScreen caseName={top.payload} onClose={closeHandler} />
+              </div>
+          );
+          case 'Movement': return (
+              <div className={overlayClass}>
+                  <MovementDetailScreen movementName={top.payload} onClose={closeHandler} />
+              </div>
+          );
+          case 'Religion': return (
+              <div className={overlayClass}>
+                  <ReligionDetailScreen religionName={top.payload} onClose={closeHandler} />
+              </div>
+          );
+          case 'Scandal': return (
+              <div className={overlayClass}>
+                  <ScandalDetailScreen scandalName={top.payload} onClose={closeHandler} />
+              </div>
+          );
+          case 'ThinkTank': return (
+              <div className={overlayClass}>
+                  <ThinkTankDetailScreen entityName={top.payload} onClose={closeHandler} />
+              </div>
+          );
+          case 'Treaty': return (
+              <div className={overlayClass}>
+                  <TreatyDetailScreen treatyName={top.payload} onClose={closeHandler} />
+              </div>
+          );
+          case 'University': return (
+              <div className={overlayClass}>
+                  <UniversityDetailScreen entityName={top.payload} onClose={closeHandler} />
               </div>
           );
           case 'Generic': return (

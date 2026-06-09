@@ -155,22 +155,106 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
       </div>
   );
 
-  return (
-    <>
-    <div className="h-full overflow-y-auto scroll-smooth bg-academic-bg dark:bg-stone-950 relative pb-32 transition-colors duration-500" onClick={() => setActiveMenu(null)} ref={containerRef}>
-         
-         {/* 1. HERO HEADER */}
-         {navStack.length === 0 && (
+  if (selectedPerson) {
+      return (
+        <PersonDetailScreen 
+            personName={selectedPerson} 
+            onClose={() => setSelectedPerson(null)}
+            onNavigate={onNavigate}
+            isSaved={isSaved(selectedPerson, 'Person')}
+            onToggleSave={() => onToggleSave({ 
+                id: `saved_Person_${Date.now()}`, 
+                type: 'Person', 
+                title: selectedPerson, 
+                subtitle: 'Profile', 
+                dateAdded: new Date().toLocaleDateString() 
+            })}
+        />
+      );
+  }
+
+  if (navStack.length === 0) {
+      return (
+        <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 relative pb-24 overflow-y-auto transition-colors">
+            {/* HERO HEADER */}
             <div className="p-10 bg-gradient-to-b from-white to-academic-bg dark:from-stone-900 dark:to-stone-950 border-b border-academic-line dark:border-stone-800 transition-colors">
                 <div className="max-w-5xl mx-auto">
-                <h2 className="text-5xl md:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">Profiles & Leaders</h2>
+                    <h2 className="text-5xl md:text-6xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">Profiles & Leaders</h2>
                     <p className="text-xl font-serif text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed text-justify">
                         Explore the key figures shaping history, theory, and fiction. From presidents to philosophers.
                     </p>
                 </div>
             </div>
-         )}
 
+            {/* VIEW CONTENT */}
+            <div className="p-8 max-w-6xl mx-auto w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    {PERSONS_HIERARCHY.map((cat, idx) => (
+                        <div 
+                            key={idx} 
+                            onClick={() => handleItemClick(cat)}
+                            className="group bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-8 cursor-pointer hover:shadow-2xl hover:border-academic-accent/30 dark:hover:border-indigo-500/30 transition-all relative overflow-hidden rounded-2xl active:scale-[0.99]"
+                        >
+                            {/* Decorative Background */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-stone-50 to-transparent dark:from-stone-800/50 dark:to-transparent rounded-bl-full -mr-20 -mt-20 z-0 group-hover:scale-110 transition-transform duration-700"></div>
+                            
+                            <div className="relative z-10 flex flex-col h-full">
+                                <div className="flex items-center justify-between mb-6">
+                                    <span className="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-[10px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 group-hover:bg-academic-accent dark:group-hover:bg-indigo-600 group-hover:text-white transition-colors rounded-full border border-stone-200 dark:border-stone-700">
+                                        {(cat.items?.length || 0)} Folders
+                                    </span>
+                                    <div className="p-2 bg-stone-100 dark:bg-stone-800 rounded-full text-stone-400 dark:text-stone-500 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors">
+                                        <ChevronRight className="w-5 h-5" />
+                                    </div>
+                                </div>
+                                
+                                <h3 className="text-3xl md:text-4xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors leading-tight">
+                                    {cat.name}
+                                </h3>
+                                <p className="text-lg md:text-xl text-stone-500 dark:text-stone-400 font-serif leading-relaxed text-justify mb-8 flex-1">
+                                    {cat.role || "Browse influential figures and categories within this fundamental division."}
+                                </p>
+
+                                <div className="flex flex-col gap-2 mt-auto">
+                                    <div className="flex flex-wrap gap-2">
+                                        {(cat.items || []).slice(0, 4).map((item, i) => (
+                                            <span key={i} onClick={(e) => { e.stopPropagation(); handleItemClick(item); }} className="cursor-pointer hover:bg-stone-200 dark:hover:bg-stone-700 text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-700 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-stone-800/50">
+                                                {item.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                    {(cat.items || []).length > 4 && (
+                                        <details className="group/details" onClick={(e) => e.stopPropagation()}>
+                                            <summary className="text-[10px] font-bold text-academic-gold cursor-pointer inline-flex items-center gap-1 hover:text-orange-500 transition-colors list-none">
+                                                <span className="group-open/details:hidden">+{(cat.items || []).length - 4} more</span>
+                                                <span className="hidden group-open/details:inline">Hide</span>
+                                            </summary>
+                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                {(cat.items || []).slice(4).map((item, i) => (
+                                                    <span key={i + 4} onClick={(e) => { e.stopPropagation(); handleItemClick(item); }} className="cursor-pointer hover:bg-stone-200 dark:hover:bg-stone-700 text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-700 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-stone-800/50">
+                                                        {item.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </details>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="text-center py-16 opacity-40">
+                <User className="w-10 h-10 mx-auto mb-4 text-stone-300 dark:text-stone-600" />
+                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-400 dark:text-stone-600">End of Records</p>
+            </div>
+        </div>
+      );
+  }
+
+  return (
+    <div className="h-full flex flex-col bg-academic-bg dark:bg-stone-950 relative animate-in slide-in-from-right duration-500" onClick={() => setActiveMenu(null)}>
          {/* 2. NAVIGATION BAR */}
          <div className="relative z-20 bg-academic-paper dark:bg-stone-900 border-b border-academic-line dark:border-stone-800 p-3 sm:p-4 shadow-sm transition-colors">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
@@ -213,8 +297,8 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
          </div>
 
          {/* 3. LIST CONTENT */}
-         <div className="flex bg-stone-50/50 dark:bg-black/20">
-            <div className="flex-1 p-6 md:p-8">
+         <div className="flex-1 overflow-hidden flex bg-stone-50/50 dark:bg-black/20">
+            <div className="flex-1 overflow-y-auto scroll-smooth p-6 md:p-8 pb-32" ref={containerRef}>
                 
                 {filteredItems.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 opacity-50 h-full">
@@ -294,24 +378,6 @@ const PersonsTab: React.FC<PersonsTabProps> = ({ onNavigate, onAddToCompare, onT
             )}
          </div>
     </div>
-
-    {/* OVERLAY */}
-    {selectedPerson && (
-        <PersonDetailScreen 
-            personName={selectedPerson} 
-            onClose={() => setSelectedPerson(null)}
-            onNavigate={onNavigate}
-            isSaved={isSaved(selectedPerson, 'Person')}
-            onToggleSave={() => onToggleSave({ 
-                id: `saved_Person_${Date.now()}`, 
-                type: 'Person', 
-                title: selectedPerson, 
-                subtitle: 'Profile', 
-                dateAdded: new Date().toLocaleDateString() 
-            })}
-        />
-    )}
-    </>
   );
 };
 
@@ -379,7 +445,7 @@ const PersonCard = ({ item, viewMode, onClick, icon: Icon, colorClass, activeMen
             </div>
             
             <div className="flex-1 min-w-0">
-                <h3 className="font-serif font-bold text-base text-academic-text dark:text-stone-100 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors leading-tight mb-1 truncate">{item.name}</h3>
+                <h3 className="font-serif font-bold text-base text-academic-text dark:text-stone-100 group-hover:text-academic-accent dark:group-hover:text-indigo-400 transition-colors leading-tight mb-1 line-clamp-2">{item.name}</h3>
                 <p className="text-xs text-stone-500 dark:text-stone-400 font-medium truncate">{item.role || 'Political Figure'}</p>
                 {viewMode !== 'list' && <p className="text-[10px] text-stone-400 dark:text-stone-600 uppercase tracking-widest mt-2">{item.country}</p>}
             </div>

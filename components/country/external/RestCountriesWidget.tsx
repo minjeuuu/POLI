@@ -76,7 +76,7 @@ export const RestCountriesWidget: React.FC<RestCountriesWidgetProps> = ({ countr
                 <span className="flex items-center gap-1.5 bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded-sm"><Globe className="w-3 h-3" /> Region: {data.region}</span>
                 <span className="flex items-center gap-1.5 bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded-sm"><Globe className="w-3 h-3" /> Subregion: {data.subregion}</span>
                 <span className="flex items-center gap-1.5 bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded-sm"><Clock className="w-3 h-3" /> Timezones: {data.timezones?.[0]}</span>
-                <span className="flex items-center gap-1.5 bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded-sm"><Flag className="w-3 h-3" /> Capital: {data.capital?.[0] || 'N/A'}</span>
+                <span className="flex items-center gap-1.5 bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded-sm"><Flag className="w-3 h-3" /> Capital: {data.capital?.[0] }</span>
             </div>
         </div>
     );

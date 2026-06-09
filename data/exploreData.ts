@@ -3107,3 +3107,1412 @@ EXPLORE_HIERARCHY["Religions"] = [
         ]
     }
 ];
+
+EXPLORE_HIERARCHY["Historical Leaders"] = [
+    {
+        category: "Ancient Antiquity",
+        icon: "Crown",
+        items: [
+            { name: "Alexander the Great", type: "Person" },
+            { name: "Julius Caesar", type: "Person" },
+            { name: "Augustus", type: "Person" },
+            { name: "Cyrus the Great", type: "Person" },
+            { name: "Hammurabi", type: "Person" },
+            { name: "Ramses II", type: "Person" },
+            { name: "Qin Shi Huang", type: "Person" },
+            { name: "Ashoka the Great", type: "Person" },
+            { name: "Pericles", type: "Person" },
+            { name: "Chandragupta Maurya", type: "Person" },
+            { name: "Leonidas I", type: "Person" },
+            { name: "Cleopatra", type: "Person" },
+            { name: "Hannibal Barca", type: "Person" },
+            { name: "Trajan", type: "Person" },
+            { name: "Marcus Aurelius", type: "Person" },
+            { name: "Constantine the Great", type: "Person" },
+            { name: "Justinian I", type: "Person" },
+            { name: "Boudica", type: "Person" },
+            { name: "Vercingetorix", type: "Person" },
+            { name: "Xerxes I", type: "Person" },
+            { name: "Darius the Great", type: "Person" },
+            { name: "Sargon of Akkad", type: "Person" },
+            { name: "Nebuchadnezzar II", type: "Person" },
+            { name: "Sun Tzu", type: "Person" },
+            { name: "Wu Zetian", type: "Person" }
+        ]
+    },
+    {
+        category: "Medieval Kings & Queens",
+        icon: "Shield",
+        items: [
+            { name: "Charlemagne", type: "Person" },
+            { name: "William the Conqueror", type: "Person" },
+            { name: "Richard the Lionheart", type: "Person" },
+            { name: "Saladin", type: "Person" },
+            { name: "Genghis Khan", type: "Person" },
+            { name: "Kublai Khan", type: "Person" },
+            { name: "Eleanor of Aquitaine", type: "Person" },
+            { name: "Joan of Arc", type: "Person" },
+            { name: "Isabella I of Castile", type: "Person" },
+            { name: "Ferdinand II of Aragon", type: "Person" },
+            { name: "Alfred the Great", type: "Person" },
+            { name: "Harun al-Rashid", type: "Person" },
+            { name: "Suleiman the Magnificent", type: "Person" },
+            { name: "Mehmed the Conqueror", type: "Person" },
+            { name: "Ivan the Terrible", type: "Person" },
+            { name: "Mansa Musa", type: "Person" },
+            { name: "Pachacuti", type: "Person" },
+            { name: "Moctezuma II", type: "Person" },
+            { name: "Atahualpa", type: "Person" },
+            { name: "Edward I of England", type: "Person" },
+            { name: "Henry V of England", type: "Person" },
+            { name: "Philip II of France", type: "Person" },
+            { name: "Frederick Barbarossa", type: "Person" },
+            { name: "Tamerlane", type: "Person" },
+            { name: "Babur", type: "Person" }
+        ]
+    },
+    {
+        category: "Early Modern Monarchs",
+        icon: "Gem",
+        items: [
+            { name: "Elizabeth I of England", type: "Person" },
+            { name: "Henry VIII of England", type: "Person" },
+            { name: "Louis XIV of France", type: "Person" },
+            { name: "Peter the Great", type: "Person" },
+            { name: "Catherine the Great", type: "Person" },
+            { name: "Frederick the Great", type: "Person" },
+            { name: "Maria Theresa", type: "Person" },
+            { name: "Philip II of Spain", type: "Person" },
+            { name: "Charles V, Holy Roman Emperor", type: "Person" },
+            { name: "Gustavus Adolphus", type: "Person" },
+            { name: "Akbar the Great", type: "Person" },
+            { name: "Aurangzeb", type: "Person" },
+            { name: "Kangxi Emperor", type: "Person" },
+            { name: "Qianlong Emperor", type: "Person" },
+            { name: "Tokugawa Ieyasu", type: "Person" },
+            { name: "Toyotomi Hideyoshi", type: "Person" },
+            { name: "Oda Nobunaga", type: "Person" },
+            { name: "Abbas the Great", type: "Person" },
+            { name: "Oliver Cromwell", type: "Person" },
+            { name: "Mary, Queen of Scots", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Modern Statesmen"] = [
+    {
+        category: "Founding Fathers & Revolutionaries",
+        icon: "Flag",
+        items: [
+            { name: "George Washington", type: "Person" },
+            { name: "Thomas Jefferson", type: "Person" },
+            { name: "Benjamin Franklin", type: "Person" },
+            { name: "Alexander Hamilton", type: "Person" },
+            { name: "John Adams", type: "Person" },
+            { name: "James Madison", type: "Person" },
+            { name: "Maximilien Robespierre", type: "Person" },
+            { name: "Georges Danton", type: "Person" },
+            { name: "Jean-Paul Marat", type: "Person" },
+            { name: "Simón Bolívar", type: "Person" },
+            { name: "José de San Martín", type: "Person" },
+            { name: "Toussaint Louverture", type: "Person" },
+            { name: "Miguel Hidalgo", type: "Person" },
+            { name: "Bernardo O'Higgins", type: "Person" },
+            { name: "Giuseppe Garibaldi", type: "Person" },
+            { name: "Sun Yat-sen", type: "Person" },
+            { name: "Emiliano Zapata", type: "Person" },
+            { name: "Pancho Villa", type: "Person" },
+            { name: "Mustafa Kemal Atatürk", type: "Person" },
+            { name: "Vladímir Lenin", type: "Person" },
+            { name: "Leon Trotsky", type: "Person" }
+        ]
+    },
+    {
+        category: "20th Century Leaders",
+        icon: "Globe",
+        items: [
+            { name: "Winston Churchill", type: "Person" },
+            { name: "Franklin D. Roosevelt", type: "Person" },
+            { name: "Harry S. Truman", type: "Person" },
+            { name: "Dwight D. Eisenhower", type: "Person" },
+            { name: "John F. Kennedy", type: "Person" },
+            { name: "Lyndon B. Johnson", type: "Person" },
+            { name: "Richard Nixon", type: "Person" },
+            { name: "Ronald Reagan", type: "Person" },
+            { name: "Charles de Gaulle", type: "Person" },
+            { name: "Konrad Adenauer", type: "Person" },
+            { name: "Willy Brandt", type: "Person" },
+            { name: "Helmut Kohl", type: "Person" },
+            { name: "Margaret Thatcher", type: "Person" },
+            { name: "Clement Attlee", type: "Person" },
+            { name: "David Lloyd George", type: "Person" },
+            { name: "Mikhail Gorbachev", type: "Person" },
+            { name: "Nikita Khrushchev", type: "Person" },
+            { name: "Joseph Stalin", type: "Person" },
+            { name: "Mao Zedong", type: "Person" },
+            { name: "Deng Xiaoping", type: "Person" },
+            { name: "Chiang Kai-shek", type: "Person" },
+            { name: "Fidel Castro", type: "Person" },
+            { name: "Che Guevara", type: "Person" },
+            { name: "Jawaharlal Nehru", type: "Person" },
+            { name: "Indira Gandhi", type: "Person" },
+            { name: "Gamal Abdel Nasser", type: "Person" },
+            { name: "Anwar Sadat", type: "Person" },
+            { name: "Golda Meir", type: "Person" },
+            { name: "David Ben-Gurion", type: "Person" },
+            { name: "Yasser Arafat", type: "Person" },
+            { name: "Nelson Mandela", type: "Person" },
+            { name: "F. W. de Klerk", type: "Person" },
+            { name: "Patrice Lumumba", type: "Person" },
+            { name: "Kwame Nkrumah", type: "Person" },
+            { name: "Jomo Kenyatta", type: "Person" },
+            { name: "Julius Nyerere", type: "Person" },
+            { name: "Haile Selassie", type: "Person" },
+            { name: "Josip Broz Tito", type: "Person" },
+            { name: "Sukarno", type: "Person" },
+            { name: "Lee Kuan Yew", type: "Person" }
+        ]
+    },
+    {
+        category: "21st Century Politicians",
+        icon: "Briefcase",
+        items: [
+            { name: "Barack Obama", type: "Person" },
+            { name: "George W. Bush", type: "Person" },
+            { name: "Bill Clinton", type: "Person" },
+            { name: "Joe Biden", type: "Person" },
+            { name: "Donald Trump", type: "Person" },
+            { name: "Kamala Harris", type: "Person" },
+            { name: "Angela Merkel", type: "Person" },
+            { name: "Emmanuel Macron", type: "Person" },
+            { name: "Justin Trudeau", type: "Person" },
+            { name: "Boris Johnson", type: "Person" },
+            { name: "Theresa May", type: "Person" },
+            { name: "David Cameron", type: "Person" },
+            { name: "Tony Blair", type: "Person" },
+            { name: "Vladimir Putin", type: "Person" },
+            { name: "Xi Jinping", type: "Person" },
+            { name: "Narendra Modi", type: "Person" },
+            { name: "Shinzo Abe", type: "Person" },
+            { name: "Jair Bolsonaro", type: "Person" },
+            { name: "Luiz Inácio Lula da Silva", type: "Person" },
+            { name: "Andrés Manuel López Obrador", type: "Person" },
+            { name: "Cyril Ramaphosa", type: "Person" },
+            { name: "Paul Kagame", type: "Person" },
+            { name: "Recep Tayyip Erdoğan", type: "Person" },
+            { name: "Benjamin Netanyahu", type: "Person" },
+            { name: "Volodymyr Zelenskyy", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Political Thinkers"] = [
+    {
+        category: "Classical Philosophers",
+        icon: "BookOpen",
+        items: [
+            { name: "Socrates", type: "Person" },
+            { name: "Plato", type: "Person" },
+            { name: "Aristotle", type: "Person" },
+            { name: "Confucius", type: "Person" },
+            { name: "Laozi", type: "Person" },
+            { name: "Han Feizi", type: "Person" },
+            { name: "Chanakya", type: "Person" },
+            { name: "Cicero", type: "Person" },
+            { name: "Seneca", type: "Person" },
+            { name: "Epictetus", type: "Person" },
+            { name: "Saint Augustine", type: "Person" },
+            { name: "Thomas Aquinas", type: "Person" },
+            { name: "Al-Farabi", type: "Person" },
+            { name: "Avicenna", type: "Person" },
+            { name: "Averroes", type: "Person" }
+        ]
+    },
+    {
+        category: "Enlightenment & Modern",
+        icon: "Lightbulb",
+        items: [
+            { name: "Niccolò Machiavelli", type: "Person" },
+            { name: "Thomas Hobbes", type: "Person" },
+            { name: "John Locke", type: "Person" },
+            { name: "Jean-Jacques Rousseau", type: "Person" },
+            { name: "Montesquieu", type: "Person" },
+            { name: "Voltaire", type: "Person" },
+            { name: "Immanuel Kant", type: "Person" },
+            { name: "Georg Wilhelm Friedrich Hegel", type: "Person" },
+            { name: "Karl Marx", type: "Person" },
+            { name: "Friedrich Engels", type: "Person" },
+            { name: "Adam Smith", type: "Person" },
+            { name: "David Hume", type: "Person" },
+            { name: "John Stuart Mill", type: "Person" },
+            { name: "Jeremy Bentham", type: "Person" },
+            { name: "Edmund Burke", type: "Person" },
+            { name: "Alexis de Tocqueville", type: "Person" },
+            { name: "Max Weber", type: "Person" },
+            { name: "Émile Durkheim", type: "Person" },
+            { name: "Friedrich Nietzsche", type: "Person" }
+        ]
+    },
+    {
+        category: "Contemporary Theorists",
+        icon: "Brain",
+        items: [
+            { name: "John Rawls", type: "Person" },
+            { name: "Robert Nozick", type: "Person" },
+            { name: "Michel Foucault", type: "Person" },
+            { name: "Jacques Derrida", type: "Person" },
+            { name: "Hannah Arendt", type: "Person" },
+            { name: "Jürgen Habermas", type: "Person" },
+            { name: "Isaiah Berlin", type: "Person" },
+            { name: "Karl Popper", type: "Person" },
+            { name: "Antonio Gramsci", type: "Person" },
+            { name: "Slavoj Žižek", type: "Person" },
+            { name: "Noam Chomsky", type: "Person" },
+            { name: "Milton Friedman", type: "Person" },
+            { name: "Friedrich Hayek", type: "Person" },
+            { name: "John Maynard Keynes", type: "Person" },
+            { name: "Amartya Sen", type: "Person" },
+            { name: "Martha Nussbaum", type: "Person" },
+            { name: "Peter Singer", type: "Person" },
+            { name: "Judith Butler", type: "Person" },
+            { name: "bell hooks", type: "Person" },
+            { name: "Cornel West", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Rights Activists"] = [
+    {
+        category: "Civil Rights Leaders",
+        icon: "HeartHandshake",
+        items: [
+            { name: "Martin Luther King Jr.", type: "Person" },
+            { name: "Malcolm X", type: "Person" },
+            { name: "Rosa Parks", type: "Person" },
+            { name: "John Lewis", type: "Person" },
+            { name: "Harriet Tubman", type: "Person" },
+            { name: "Frederick Douglass", type: "Person" },
+            { name: "W. E. B. Du Bois", type: "Person" },
+            { name: "Ida B. Wells", type: "Person" },
+            { name: "Thurgood Marshall", type: "Person" },
+            { name: "Medgar Evers", type: "Person" },
+            { name: "Susan B. Anthony", type: "Person" },
+            { name: "Elizabeth Cady Stanton", type: "Person" },
+            { name: "Sojourner Truth", type: "Person" },
+            { name: "Emmeline Pankhurst", type: "Person" },
+            { name: "Gloria Steinem", type: "Person" },
+            { name: "Cesar Chavez", type: "Person" },
+            { name: "Dolores Huerta", type: "Person" },
+            { name: "Harvey Milk", type: "Person" },
+            { name: "Marsha P. Johnson", type: "Person" }
+        ]
+    },
+    {
+        category: "Global Dissidents",
+        icon: "Megaphone",
+        items: [
+            { name: "Mahatma Gandhi", type: "Person" },
+            { name: "Desmond Tutu", type: "Person" },
+            { name: "Steve Biko", type: "Person" },
+            { name: "Aung San Suu Kyi", type: "Person" },
+            { name: "Dalai Lama", type: "Person" },
+            { name: "Andrei Sakharov", type: "Person" },
+            { name: "Aleksandr Solzhenitsyn", type: "Person" },
+            { name: "Vaclav Havel", type: "Person" },
+            { name: "Lech Wałęsa", type: "Person" },
+            { name: "Navalny", type: "Person" },
+            { name: "Liu Xiaobo", type: "Person" },
+            { name: "Malala Yousafzai", type: "Person" },
+            { name: "Greta Thunberg", type: "Person" },
+            { name: "Rigoberta Menchú", type: "Person" },
+            { name: "Shiradi Ebadi", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["More Treaties & Laws"] = [
+    {
+        category: "Global Treaties",
+        icon: "Scroll",
+        items: [
+            { name: "Treaty of Versailles", type: "Treaty" },
+            { name: "Treaty of Westphalia", type: "Treaty" },
+            { name: "Treaty of Tordesillas", type: "Treaty" },
+            { name: "Magna Carta", type: "Treaty" },
+            { name: "Geneva Conventions", type: "Treaty" },
+            { name: "Paris Agreement", type: "Treaty" },
+            { name: "Kyoto Protocol", type: "Treaty" },
+            { name: "Treaty on the Non-Proliferation of Nuclear Weapons", type: "Treaty" },
+            { name: "Charter of the United Nations", type: "Treaty" },
+            { name: "Universal Declaration of Human Rights", type: "Treaty" },
+            { name: "Maastricht Treaty", type: "Treaty" },
+            { name: "Treaty of Rome", type: "Treaty" },
+            { name: "NAFTA", type: "Treaty" },
+            { name: "USMCA", type: "Treaty" },
+            { name: "Treaty of Paris (1783)", type: "Treaty" },
+            { name: "Treaty of Ghent", type: "Treaty" },
+            { name: "Camp David Accords", type: "Treaty" },
+            { name: "Oslo Accords", type: "Treaty" },
+            { name: "Good Friday Agreement", type: "Treaty" },
+            { name: "Treaty of Brest-Litovsk", type: "Treaty" },
+            { name: "Antarctic Treaty", type: "Treaty" },
+            { name: "Outer Space Treaty", type: "Treaty" },
+            { name: "Marrakesh Agreement", type: "Treaty" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Economic Theories"] = [
+    {
+        category: "Macroeconomics",
+        icon: "TrendingUp",
+        items: [
+            { name: "Keynesian Economics", type: "Ideology" },
+            { name: "Classical Economics", type: "Ideology" },
+            { name: "Neoclassical Economics", type: "Ideology" },
+            { name: "Austrian School", type: "Ideology" },
+            { name: "Chicago School", type: "Ideology" },
+            { name: "Monetarism", type: "Ideology" },
+            { name: "Supply-side Economics", type: "Ideology" },
+            { name: "Institutional Economics", type: "Ideology" },
+            { name: "Marxian Economics", type: "Ideology" },
+            { name: "Behavioral Economics", type: "Ideology" },
+            { name: "Ecological Economics", type: "Ideology" },
+            { name: "Feminist Economics", type: "Ideology" },
+            { name: "Modern Monetary Theory", type: "Ideology" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Legal & Judicial Figures"] = [
+    {
+        category: "Justices & Jurists",
+        icon: "Scale",
+        items: [
+            { name: "John Marshall", type: "Person" },
+            { name: "Oliver Wendell Holmes Jr.", type: "Person" },
+            { name: "Ruth Bader Ginsburg", type: "Person" },
+            { name: "Antonin Scalia", type: "Person" },
+            { name: "Earl Warren", type: "Person" },
+            { name: "Clarence Thomas", type: "Person" },
+            { name: "Sonia Sotomayor", type: "Person" },
+            { name: "William Howard Taft", type: "Person" },
+            { name: "Hugo Black", type: "Person" },
+            { name: "William O. Douglas", type: "Person" },
+            { name: "Felix Frankfurter", type: "Person" },
+            { name: "Sandra Day O'Connor", type: "Person" },
+            { name: "Lord Denning", type: "Person" },
+            { name: "Edward Coke", type: "Person" },
+            { name: "William Blackstone", type: "Person" },
+            { name: "Aharon Barak", type: "Person" },
+            { name: "B. R. Ambedkar", type: "Person" },
+            { name: "John Roberts", type: "Person" },
+            { name: "Samuel Alito", type: "Person" },
+            { name: "Ketanji Brown Jackson", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Dictators & Autocrats"] = [
+    {
+        category: "Totalitarian Leaders",
+        icon: "Lock",
+        items: [
+            { name: "Adolf Hitler", type: "Person" },
+            { name: "Benito Mussolini", type: "Person" },
+            { name: "Saddam Hussein", type: "Person" },
+            { name: "Muammar Gaddafi", type: "Person" },
+            { name: "Augusto Pinochet", type: "Person" },
+            { name: "Pol Pot", type: "Person" },
+            { name: "Kim Il-sung", type: "Person" },
+            { name: "Kim Jong-il", type: "Person" },
+            { name: "Kim Jong-un", type: "Person" },
+            { name: "Idi Amin", type: "Person" },
+            { name: "Francisco Franco", type: "Person" },
+            { name: "Mobutu Sese Seko", type: "Person" },
+            { name: "Ferdinand Marcos", type: "Person" },
+            { name: "Nicolae Ceaușescu", type: "Person" },
+            { name: "Slobodan Milošević", type: "Person" },
+            { name: "Jean-Bédel Bokassa", type: "Person" },
+            { name: "François Duvalier", type: "Person" },
+            { name: "Jean-Claude Duvalier", type: "Person" },
+            { name: "Rafael Trujillo", type: "Person" },
+            { name: "Omar al-Bashir", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Scientists in Politics"] = [
+    {
+        category: "Scientists & Innovators",
+        icon: "Atom",
+        items: [
+            { name: "Albert Einstein", type: "Person" },
+            { name: "J. Robert Oppenheimer", type: "Person" },
+            { name: "Andrei Sakharov", type: "Person" },
+            { name: "A. P. J. Abdul Kalam", type: "Person" },
+            { name: "Linus Pauling", type: "Person" },
+            { name: "Leonardo da Vinci", type: "Person" },
+            { name: "Galileo Galilei", type: "Person" },
+            { name: "Isaac Newton", type: "Person" },
+            { name: "Charles Darwin", type: "Person" },
+            { name: "Nikola Tesla", type: "Person" },
+            { name: "Marie Curie", type: "Person" },
+            { name: "Louis Pasteur", type: "Person" },
+            { name: "Alan Turing", type: "Person" },
+            { name: "Tim Berners-Lee", type: "Person" },
+            { name: "John von Neumann", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Aviation & Space Leaders"] = [
+    {
+        category: "Pioneers",
+        icon: "Rocket",
+        items: [
+            { name: "Yuri Gagarin", type: "Person" },
+            { name: "Neil Armstrong", type: "Person" },
+            { name: "Buzz Aldrin", type: "Person" },
+            { name: "Valentina Tereshkova", type: "Person" },
+            { name: "Sergei Korolev", type: "Person" },
+            { name: "Wernher von Braun", type: "Person" },
+            { name: "Sally Ride", type: "Person" },
+            { name: "Chris Hadfield", type: "Person" },
+            { name: "John Glenn", type: "Person" },
+            { name: "Chuck Yeager", type: "Person" },
+            { name: "Amelia Earhart", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Military Strategists"] = [
+    {
+        category: "Generals & Commanders",
+        icon: "Swords",
+        items: [
+            { name: "Napoleon Bonaparte", type: "Person" },
+            { name: "Arthur Wellesley, Duke of Wellington", type: "Person" },
+            { name: "Horatio Nelson", type: "Person" },
+            { name: "George S. Patton", type: "Person" },
+            { name: "Douglas MacArthur", type: "Person" },
+            { name: "Gheorghe Zhukov", type: "Person" },
+            { name: "Erwin Rommel", type: "Person" },
+            { name: "Bernard Montgomery", type: "Person" },
+            { name: "Chester W. Nimitz", type: "Person" },
+            { name: "Isoroku Yamamoto", type: "Person" },
+            { name: "Heinz Guderian", type: "Person" },
+            { name: "Ulysses S. Grant", type: "Person" },
+            { name: "Robert E. Lee", type: "Person" },
+            { name: "William Tecumseh Sherman", type: "Person" },
+            { name: "Stonewall Jackson", type: "Person" },
+            { name: "Carl von Clausewitz", type: "Person" },
+            { name: "Antoine-Henri Jomini", type: "Person" },
+            { name: "Mikhail Kutuzov", type: "Person" },
+            { name: "Vo Nguyen Giap", type: "Person" },
+            { name: "Saladin", type: "Person" },
+            { name: "Scipio Africanus", type: "Person" },
+            { name: "Khalid ibn al-Walid", type: "Person" },
+            { name: "Subutai", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["More Historical Figures"] = [
+    {
+        category: "Ancient Rome",
+        icon: "Monument",
+        items: [
+            { name: "Tiberius", type: "Person" },
+            { name: "Caligula", type: "Person" },
+            { name: "Claudius", type: "Person" },
+            { name: "Nero", type: "Person" },
+            { name: "Vespasian", type: "Person" },
+            { name: "Titus", type: "Person" },
+            { name: "Domitian", type: "Person" },
+            { name: "Nerva", type: "Person" },
+            { name: "Hadrian", type: "Person" },
+            { name: "Antoninus Pius", type: "Person" },
+            { name: "Commodus", type: "Person" },
+            { name: "Septimius Severus", type: "Person" },
+            { name: "Caracalla", type: "Person" },
+            { name: "Diocletian", type: "Person" },
+            { name: "Julian the Apostate", type: "Person" },
+            { name: "Romulus", type: "Person" },
+            { name: "Tarquin the Proud", type: "Person" },
+            { name: "Lucius Junius Brutus", type: "Person" },
+            { name: "Cincinnatus", type: "Person" },
+            { name: "Scipio Africanus", type: "Person" },
+            { name: "Cato the Elder", type: "Person" },
+            { name: "Tiberius Gracchus", type: "Person" },
+            { name: "Gaius Gracchus", type: "Person" },
+            { name: "Gaius Marius", type: "Person" },
+            { name: "Sulla", type: "Person" },
+            { name: "Pompey the Great", type: "Person" },
+            { name: "Crassus", type: "Person" },
+            { name: "Marc Antony", type: "Person" },
+            { name: "Lepidus", type: "Person" },
+            { name: "Agrippa", type: "Person" },
+            { name: "Livia Drusilla", type: "Person" },
+            { name: "Agrippina the Younger", type: "Person" },
+            { name: "Valerian", type: "Person" },
+            { name: "Aurelian", type: "Person" },
+            { name: "Zenobia", type: "Person" },
+            { name: "Theodosius I", type: "Person" },
+            { name: "Honorius", type: "Person" },
+            { name: "Romulus Augustulus", type: "Person" }
+        ]
+    },
+    {
+        category: "Ancient Greece",
+        icon: "Temple",
+        items: [
+            { name: "Solon", type: "Person" },
+            { name: "Cleisthenes", type: "Person" },
+            { name: "Lycurgus of Sparta", type: "Person" },
+            { name: "Themistocles", type: "Person" },
+            { name: "Alcibiades", type: "Person" },
+            { name: "Philip II of Macedon", type: "Person" },
+            { name: "Demosthenes", type: "Person" },
+            { name: "Epicurus", type: "Person" },
+            { name: "Zeno of Citium", type: "Person" },
+            { name: "Parmenides", type: "Person" },
+            { name: "Heraclitus", type: "Person" },
+            { name: "Thales of Miletus", type: "Person" },
+            { name: "Anaximander", type: "Person" },
+            { name: "Anaximenes", type: "Person" },
+            { name: "Pythagoras", type: "Person" },
+            { name: "Empedocles", type: "Person" },
+            { name: "Diogenes of Sinope", type: "Person" },
+            { name: "Pyrrho", type: "Person" },
+            { name: "Cimon", type: "Person" },
+            { name: "Ephialtes", type: "Person" },
+            { name: "Lysander", type: "Person" },
+            { name: "Agesilaus II", type: "Person" },
+            { name: "Epaminondas", type: "Person" },
+            { name: "Pelopidas", type: "Person" },
+            { name: "Ptolemy I Soter", type: "Person" },
+            { name: "Seleucus I Nicator", type: "Person" },
+            { name: "Antigonus I Monophthalmus", type: "Person" },
+            { name: "Lysimachus", type: "Person" },
+            { name: "Cassander", type: "Person" }
+        ]
+    },
+    {
+        category: "Imperial China",
+        icon: "Landmark",
+        items: [
+            { name: "Emperor Gaozu of Han", type: "Person" },
+            { name: "Emperor Wu of Han", type: "Person" },
+            { name: "Emperor Guangwu of Han", type: "Person" },
+            { name: "Cao Cao", type: "Person" },
+            { name: "Liu Bei", type: "Person" },
+            { name: "Sun Quan", type: "Person" },
+            { name: "Zhuge Liang", type: "Person" },
+            { name: "Sima Yi", type: "Person" },
+            { name: "Emperor Wen of Sui", type: "Person" },
+            { name: "Emperor Yang of Sui", type: "Person" },
+            { name: "Emperor Taizong of Tang", type: "Person" },
+            { name: "Emperor Xuanzong of Tang", type: "Person" },
+            { name: "An Lushan", type: "Person" },
+            { name: "Taizu of Song", type: "Person" },
+            { name: "Wang Anshi", type: "Person" },
+            { name: "Zhu Yuanzhang", type: "Person" },
+            { name: "Yongle Emperor", type: "Person" },
+            { name: "Wanli Emperor", type: "Person" },
+            { name: "Chongzhen Emperor", type: "Person" },
+            { name: "Hong Taiji", type: "Person" },
+            { name: "Empress Dowager Cixi", type: "Person" },
+            { name: "Zheng He", type: "Person" },
+            { name: "Sima Qian", type: "Person" },
+            { name: "Dong Zhongshu", type: "Person" },
+            { name: "Zhu Xi", type: "Person" },
+            { name: "Wang Yangming", type: "Person" },
+            { name: "Mencius", type: "Person" },
+            { name: "Zhuangzi", type: "Person" },
+            { name: "Mozi", type: "Person" },
+            { name: "Xunzi", type: "Person" }
+        ]
+    },
+    {
+        category: "Ancient Near East & Egypt",
+        icon: "Sun",
+        items: [
+            { name: "Sennacherib", type: "Person" },
+            { name: "Ashurbanipal", type: "Person" },
+            { name: "Tiglath-Pileser III", type: "Person" },
+            { name: "Hatshepsut", type: "Person" },
+            { name: "Thutmose III", type: "Person" },
+            { name: "Akhenaten", type: "Person" },
+            { name: "Tutankhamun", type: "Person" },
+            { name: "Ramses III", type: "Person" },
+            { name: "Narmer", type: "Person" },
+            { name: "Djoser", type: "Person" },
+            { name: "Khufu", type: "Person" },
+            { name: "Khafre", type: "Person" },
+            { name: "Mentuhotep II", type: "Person" },
+            { name: "Amenemhat I", type: "Person" },
+            { name: "Senusret III", type: "Person" },
+            { name: "Cambyses II", type: "Person" },
+            { name: "Darius III", type: "Person" },
+            { name: "Artaxerxes I", type: "Person" },
+            { name: "Suppiluliuma I", type: "Person" },
+            { name: "Hattusili III", type: "Person" },
+            { name: "Cyaxares", type: "Person" },
+            { name: "Astyages", type: "Person" },
+            { name: "Sargon II", type: "Person" },
+            { name: "Esarhaddon", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Medieval and Renaissance Leaders"] = [
+    {
+        category: "Medieval Kings & Popes",
+        icon: "Crown",
+        items: [
+            { name: "Charles Martel", type: "Person" },
+            { name: "Clovis I", type: "Person" },
+            { name: "Pepin the Short", type: "Person" },
+            { name: "Otto I", type: "Person" },
+            { name: "Frederick II", type: "Person" },
+            { name: "Louis IX of France", type: "Person" },
+            { name: "Philip IV of France", type: "Person" },
+            { name: "Edward III of England", type: "Person" },
+            { name: "Richard III of England", type: "Person" },
+            { name: "Henry VII of England", type: "Person" },
+            { name: "Pope Gregory VII", type: "Person" },
+            { name: "Pope Innocent III", type: "Person" },
+            { name: "Pope Urban II", type: "Person" },
+            { name: "Pope Boniface VIII", type: "Person" },
+            { name: "Hugh Capet", type: "Person" },
+            { name: "Robert the Bruce", type: "Person" },
+            { name: "William Wallace", type: "Person" },
+            { name: "Llywelyn the Great", type: "Person" },
+            { name: "Brian Boru", type: "Person" },
+            { name: "Stephen I of Hungary", type: "Person" },
+            { name: "Casimir III the Great", type: "Person" },
+            { name: "Charles IV, Holy Roman Emperor", type: "Person" },
+            { name: "Louis XI of France", type: "Person" },
+            { name: "Isabella of France", type: "Person" },
+            { name: "Margaret of Anjou", type: "Person" }
+        ]
+    },
+    {
+        category: "Islamic Golden Age & Turco-Mongol",
+        icon: "Moon",
+        items: [
+            { name: "Al-Khwarizmi", type: "Person" },
+            { name: "Al-Kindi", type: "Person" },
+            { name: "Al-Ghazali", type: "Person" },
+            { name: "Ibn Khaldun", type: "Person" },
+            { name: "Ibn Battuta", type: "Person" },
+            { name: "Tariq ibn Ziyad", type: "Person" },
+            { name: "Abd al-Rahman I", type: "Person" },
+            { name: "Abd al-Rahman III", type: "Person" },
+            { name: "Al-Mansur", type: "Person" },
+            { name: "Baibars", type: "Person" },
+            { name: "Alp Arslan", type: "Person" },
+            { name: "Nur ad-Din", type: "Person" },
+            { name: "Tughril", type: "Person" },
+            { name: "Ogedei Khan", type: "Person" },
+            { name: "Batu Khan", type: "Person" },
+            { name: "Hulagu Khan", type: "Person" },
+            { name: "Timur Lenk", type: "Person" },
+            { name: "Shah Rukh", type: "Person" },
+            { name: "Ulugh Beg", type: "Person" },
+            { name: "Babur", type: "Person" },
+            { name: "Humayun", type: "Person" },
+            { name: "Jahangir", type: "Person" },
+            { name: "Shah Jahan", type: "Person" },
+            { name: "Nadir Shah", type: "Person" },
+            { name: "Selim I", type: "Person" },
+            { name: "Bayezid I", type: "Person" }
+        ]
+    },
+    {
+        category: "Renaissance Thinkers & Princes",
+        icon: "Castle",
+        items: [
+            { name: "Lorenzo de' Medici", type: "Person" },
+            { name: "Cosimo de' Medici", type: "Person" },
+            { name: "Cesare Borgia", type: "Person" },
+            { name: "Lucrezia Borgia", type: "Person" },
+            { name: "Pope Alexander VI", type: "Person" },
+            { name: "Pope Julius II", type: "Person" },
+            { name: "Pope Leo X", type: "Person" },
+            { name: "Thomas More", type: "Person" },
+            { name: "Erasmus", type: "Person" },
+            { name: "Martin Luther", type: "Person" },
+            { name: "John Calvin", type: "Person" },
+            { name: "Huldrych Zwingli", type: "Person" },
+            { name: "John Knox", type: "Person" },
+            { name: "Thomas Cranmer", type: "Person" },
+            { name: "Ignatius of Loyola", type: "Person" },
+            { name: "Charles the Bold", type: "Person" },
+            { name: "Maximilian I", type: "Person" },
+            { name: "Francis I of France", type: "Person" },
+            { name: "Henry IV of France", type: "Person" },
+            { name: "Catherine de' Medici", type: "Person" },
+            { name: "William the Silent", type: "Person" },
+            { name: "Maurice of Nassau", type: "Person" },
+            { name: "John of Austria", type: "Person" },
+            { name: "Albrecht von Wallenstein", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Modern State Builders"] = [
+    {
+        category: "19th Century Statesmen",
+        icon: "TopHat",
+        items: [
+            { name: "Napoleon III", type: "Person" },
+            { name: "Otto von Bismarck", type: "Person" },
+            { name: "Klemens von Metternich", type: "Person" },
+            { name: "Camillo Cavour", type: "Person" },
+            { name: "Giuseppe Mazzini", type: "Person" },
+            { name: "Queen Victoria", type: "Person" },
+            { name: "Benjamin Disraeli", type: "Person" },
+            { name: "William Gladstone", type: "Person" },
+            { name: "Lord Palmerston", type: "Person" },
+            { name: "Robert Peel", type: "Person" },
+            { name: "Abraham Lincoln", type: "Person" },
+            { name: "Ulysses S. Grant", type: "Person" },
+            { name: "Jefferson Davis", type: "Person" },
+            { name: "Alexander II of Russia", type: "Person" },
+            { name: "Nicholas I of Russia", type: "Person" },
+            { name: "Emperor Meiji", type: "Person" },
+            { name: "Ito Hirobumi", type: "Person" },
+            { name: "Saigo Takamori", type: "Person" },
+            { name: "Pedro II of Brazil", type: "Person" },
+            { name: "Benito Juárez", type: "Person" },
+            { name: "Porfirio Díaz", type: "Person" },
+            { name: "John A. Macdonald", type: "Person" },
+            { name: "Wilfrid Laurier", type: "Person" },
+            { name: "Lajos Kossuth", type: "Person" },
+            { name: "Charles X of France", type: "Person" },
+            { name: "Louis Philippe I", type: "Person" }
+        ]
+    },
+    {
+        category: "20th Century Leaders",
+        icon: "Phone",
+        items: [
+            { name: "Woodrow Wilson", type: "Person" },
+            { name: "Theodore Roosevelt", type: "Person" },
+            { name: "William Howard Taft", type: "Person" },
+            { name: "Herbert Hoover", type: "Person" },
+            { name: "Calvin Coolidge", type: "Person" },
+            { name: "Warren G. Harding", type: "Person" },
+            { name: "Franklin D. Roosevelt", type: "Person" },
+            { name: "Harry S. Truman", type: "Person" },
+            { name: "Dwight D. Eisenhower", type: "Person" },
+            { name: "John F. Kennedy", type: "Person" },
+            { name: "Lyndon B. Johnson", type: "Person" },
+            { name: "Richard Nixon", type: "Person" },
+            { name: "Gerald Ford", type: "Person" },
+            { name: "Jimmy Carter", type: "Person" },
+            { name: "Ronald Reagan", type: "Person" },
+            { name: "George H. W. Bush", type: "Person" },
+            { name: "Léon Blum", type: "Person" },
+            { name: "Édouard Daladier", type: "Person" },
+            { name: "Paul Reynaud", type: "Person" },
+            { name: "Georges Clemenceau", type: "Person" },
+            { name: "Aristide Briand", type: "Person" },
+            { name: "Eduard Beneš", type: "Person" },
+            { name: "Tomáš Masaryk", type: "Person" },
+            { name: "Ignacy Paderewski", type: "Person" },
+            { name: "Józef Piłsudski", type: "Person" },
+            { name: "Sun Yat-sen", type: "Person" },
+            { name: "Yuan Shikai", type: "Person" },
+            { name: "Bao Dai", type: "Person" },
+            { name: "Ngo Dinh Diem", type: "Person" },
+            { name: "Syngman Rhee", type: "Person" },
+            { name: "Kim Koo", type: "Person" },
+            { name: "Chou En-lai", type: "Person" },
+            { name: "Liu Shaoqi", type: "Person" },
+            { name: "Hua Guofeng", type: "Person" },
+            { name: "Harold Macmillan", type: "Person" },
+            { name: "Alec Douglas-Home", type: "Person" },
+            { name: "Edward Heath", type: "Person" },
+            { name: "Harold Wilson", type: "Person" },
+            { name: "James Callaghan", type: "Person" },
+            { name: "John Major", type: "Person" },
+            { name: "Pierre Trudeau", type: "Person" },
+            { name: "Lester B. Pearson", type: "Person" },
+            { name: "John Diefenbaker", type: "Person" },
+            { name: "Brian Mulroney", type: "Person" },
+            { name: "Gough Whitlam", type: "Person" },
+            { name: "Malcolm Fraser", type: "Person" },
+            { name: "Bob Hawke", type: "Person" },
+            { name: "Paul Keating", type: "Person" },
+            { name: "John Howard", type: "Person" },
+            { name: "Olof Palme", type: "Person" },
+            { name: "Bruno Kreisky", type: "Person" },
+            { name: "François Mitterrand", type: "Person" },
+            { name: "Valéry Giscard d'Estaing", type: "Person" },
+            { name: "Georges Pompidou", type: "Person" },
+            { name: "Helmut Schmidt", type: "Person" },
+            { name: "Ludwig Erhard", type: "Person" },
+            { name: "Kurt Georg Kiesinger", type: "Person" },
+            { name: "Willy Brandt", type: "Person" }
+        ]
+    },
+    {
+        category: "Recent Modern Politicians",
+        icon: "Camera",
+        items: [
+            { name: "Jacques Chirac", type: "Person" },
+            { name: "Nicolas Sarkozy", type: "Person" },
+            { name: "François Hollande", type: "Person" },
+            { name: "Gerhard Schröder", type: "Person" },
+            { name: "Olaf Scholz", type: "Person" },
+            { name: "Gordon Brown", type: "Person" },
+            { name: "Rishi Sunak", type: "Person" },
+            { name: "Liz Truss", type: "Person" },
+            { name: "Keir Starmer", type: "Person" },
+            { name: "Julia Gillard", type: "Person" },
+            { name: "Kevin Rudd", type: "Person" },
+            { name: "Tony Abbott", type: "Person" },
+            { name: "Malcolm Turnbull", type: "Person" },
+            { name: "Scott Morrison", type: "Person" },
+            { name: "Anthony Albanese", type: "Person" },
+            { name: "Justin Trudeau", type: "Person" },
+            { name: "Stephen Harper", type: "Person" },
+            { name: "Paul Martin", type: "Person" },
+            { name: "Jean Chrétien", type: "Person" },
+            { name: "Jacinda Ardern", type: "Person" },
+            { name: "Helen Clark", type: "Person" },
+            { name: "John Key", type: "Person" },
+            { name: "Bill English", type: "Person" },
+            { name: "Chris Hipkins", type: "Person" },
+            { name: "Christopher Luxon", type: "Person" },
+            { name: "Shinzo Abe", type: "Person" },
+            { name: "Fumio Kishida", type: "Person" },
+            { name: "Yoshihide Suga", type: "Person" },
+            { name: "Junichiro Koizumi", type: "Person" },
+            { name: "Taro Aso", type: "Person" },
+            { name: "Moon Jae-in", type: "Person" },
+            { name: "Yoon Suk-yeol", type: "Person" },
+            { name: "Park Geun-hye", type: "Person" },
+            { name: "Lee Myung-bak", type: "Person" },
+            { name: "Roh Moo-hyun", type: "Person" },
+            { name: "Tsai Ing-wen", type: "Person" },
+            { name: "Ma Ying-jeou", type: "Person" },
+            { name: "Chen Shui-bian", type: "Person" },
+            { name: "Lee Teng-hui", type: "Person" },
+            { name: "Joko Widodo", type: "Person" },
+            { name: "Susilo Bambang Yudhoyono", type: "Person" },
+            { name: "Megawati Sukarnoputri", type: "Person" },
+            { name: "Abdurrahman Wahid", type: "Person" },
+            { name: "B. J. Habibie", type: "Person" },
+            { name: "Prabowo Subianto", type: "Person" },
+            { name: "Rodrigo Duterte", type: "Person" },
+            { name: "Bongbong Marcos", type: "Person" },
+            { name: "Benigno Aquino III", type: "Person" },
+            { name: "Gloria Macapagal Arroyo", type: "Person" },
+            { name: "Joseph Estrada", type: "Person" },
+            { name: "Fidel V. Ramos", type: "Person" },
+            { name: "Corazon Aquino", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Diplomats & Advisers"] = [
+    {
+        category: "Historical Diplomats",
+        icon: "Briefcase",
+        items: [
+            { name: "Charles Maurice de Talleyrand", type: "Person" },
+            { name: "Cardinal Richelieu", type: "Person" },
+            { name: "Cardinal Mazarin", type: "Person" },
+            { name: "Viscount Castlereagh", type: "Person" },
+            { name: "Henry Kissinger", type: "Person" },
+            { name: "Zbigniew Brzezinski", type: "Person" },
+            { name: "George F. Kennan", type: "Person" },
+            { name: "John Foster Dulles", type: "Person" },
+            { name: "Dean Acheson", type: "Person" },
+            { name: "George Marshall", type: "Person" },
+            { name: "Colin Powell", type: "Person" },
+            { name: "Condoleezza Rice", type: "Person" },
+            { name: "Hillary Clinton", type: "Person" },
+            { name: "John Kerry", type: "Person" },
+            { name: "Mike Pompeo", type: "Person" },
+            { name: "Antony Blinken", type: "Person" },
+            { name: "Andrei Gromyko", type: "Person" },
+            { name: "Sergey Lavrov", type: "Person" },
+            { name: "Wang Yi", type: "Person" },
+            { name: "Zhou Enlai", type: "Person" },
+            { name: "Eduard Shevardnadze", type: "Person" },
+            { name: "Kofi Annan", type: "Person" },
+            { name: "Ban Ki-moon", type: "Person" },
+            { name: "Boutros Boutros-Ghali", type: "Person" },
+            { name: "Javier Pérez de Cuéllar", type: "Person" },
+            { name: "Kurt Waldheim", type: "Person" },
+            { name: "U Thant", type: "Person" },
+            { name: "Dag Hammarskjöld", type: "Person" },
+            { name: "Trygve Lie", type: "Person" },
+            { name: "António Guterres", type: "Person" },
+            { name: "Ralph Bunche", type: "Person" },
+            { name: "Cyrus Vance", type: "Person" },
+            { name: "Madeleine Albright", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Political Philosophers & Economists"] = [
+    {
+        category: "Classical Economists",
+        icon: "Coins",
+        items: [
+            { name: "David Ricardo", type: "Person" },
+            { name: "Thomas Malthus", type: "Person" },
+            { name: "Jean-Baptiste Say", type: "Person" },
+            { name: "John Stuart Mill", type: "Person" },
+            { name: "Alfred Marshall", type: "Person" },
+            { name: "Vilfredo Pareto", type: "Person" },
+            { name: "Léon Walras", type: "Person" },
+            { name: "Carl Menger", type: "Person" },
+            { name: "Eugen von Böhm-Bawerk", type: "Person" },
+            { name: "Ludwig von Mises", type: "Person" },
+            { name: "Joseph Schumpeter", type: "Person" },
+            { name: "Thorstein Veblen", type: "Person" },
+            { name: "John R. Commons", type: "Person" },
+            { name: "Irving Fisher", type: "Person" },
+            { name: "Arthur Cecil Pigou", type: "Person" }
+        ]
+    },
+    {
+        category: "Modern Economists",
+        icon: "LineChart",
+        items: [
+            { name: "Paul Samuelson", type: "Person" },
+            { name: "Kenneth Arrow", type: "Person" },
+            { name: "Robert Solow", type: "Person" },
+            { name: "Arthur Laffer", type: "Person" },
+            { name: "James Buchanan", type: "Person" },
+            { name: "Gary Becker", type: "Person" },
+            { name: "George Stigler", type: "Person" },
+            { name: "Ronald Coase", type: "Person" },
+            { name: "Douglass North", type: "Person" },
+            { name: "Oliver Williamson", type: "Person" },
+            { name: "Elinor Ostrom", type: "Person" },
+            { name: "Amartya Sen", type: "Person" },
+            { name: "Joseph Stiglitz", type: "Person" },
+            { name: "Paul Krugman", type: "Person" },
+            { name: "Thomas Piketty", type: "Person" },
+            { name: "Esther Duflo", type: "Person" },
+            { name: "Abhijit Banerjee", type: "Person" },
+            { name: "Michael Kremer", type: "Person" },
+            { name: "Richard Thaler", type: "Person" },
+            { name: "Daniel Kahneman", type: "Person" },
+            { name: "Milton Friedman", type: "Person" },
+            { name: "Anna Schwartz", type: "Person" },
+            { name: "Ben Bernanke", type: "Person" },
+            { name: "Janet Yellen", type: "Person" },
+            { name: "Mario Draghi", type: "Person" },
+            { name: "Christine Lagarde", type: "Person" }
+        ]
+    },
+    {
+        category: "Additional Theorists",
+        icon: "Brain",
+        items: [
+            { name: "Murray Rothbard", type: "Person" },
+            { name: "Hans-Hermann Hoppe", type: "Person" },
+            { name: "Ayn Rand", type: "Person" },
+            { name: "Leo Strauss", type: "Person" },
+            { name: "Carl Schmitt", type: "Person" },
+            { name: "Giorgio Agamben", type: "Person" },
+            { name: "Chantal Mouffe", type: "Person" },
+            { name: "Ernesto Laclau", type: "Person" },
+            { name: "Michael Walzer", type: "Person" },
+            { name: "Charles Taylor", type: "Person" },
+            { name: "Alasdair MacIntyre", type: "Person" },
+            { name: "Michael Sandel", type: "Person" },
+            { name: "Philip Pettit", type: "Person" },
+            { name: "Quentin Skinner", type: "Person" },
+            { name: "J.G.A. Pocock", type: "Person" },
+            { name: "G.A. Cohen", type: "Person" },
+            { name: "Ronald Dworkin", type: "Person" },
+            { name: "Joseph Raz", type: "Person" },
+            { name: "H.L.A. Hart", type: "Person" },
+            { name: "Lon Fuller", type: "Person" },
+            { name: "John Austin", type: "Person" },
+            { name: "Hugo Grotius", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Global Governance & Organizations"] = [
+    {
+        category: "Intergovernmental Organizations",
+        icon: "Globe",
+        items: [
+            { name: "United Nations", type: "Generic" },
+            { name: "European Union", type: "Generic" },
+            { name: "African Union", type: "Generic" },
+            { name: "Arab League", type: "Generic" },
+            { name: "Association of Southeast Asian Nations (ASEAN)", type: "Generic" },
+            { name: "Organization of American States (OAS)", type: "Generic" },
+            { name: "Mercosur", type: "Generic" },
+            { name: "Caribbean Community (CARICOM)", type: "Generic" },
+            { name: "Shanghai Cooperation Organisation (SCO)", type: "Generic" },
+            { name: "Council of Europe", type: "Generic" },
+            { name: "NATO", type: "Generic" },
+            { name: "Commonwealth of Nations", type: "Generic" },
+            { name: "Francophonie", type: "Generic" },
+            { name: "Organization of Islamic Cooperation (OIC)", type: "Generic" },
+            { name: "OPEC", type: "Generic" },
+            { name: "World Trade Organization (WTO)", type: "Generic" },
+            { name: "International Monetary Fund (IMF)", type: "Generic" },
+            { name: "World Bank Group", type: "Generic" },
+            { name: "World Health Organization (WHO)", type: "Generic" },
+            { name: "International Labour Organization (ILO)", type: "Generic" }
+        ]
+    },
+    {
+        category: "International Courts & Tribunals",
+        icon: "Scale",
+        items: [
+            { name: "International Court of Justice (ICJ)", type: "Generic" },
+            { name: "International Criminal Court (ICC)", type: "Generic" },
+            { name: "European Court of Human Rights (ECHR)", type: "Generic" },
+            { name: "Inter-American Court of Human Rights", type: "Generic" },
+            { name: "African Court on Human and Peoples' Rights", type: "Generic" },
+            { name: "International Tribunal for the Law of the Sea (ITLOS)", type: "Generic" },
+            { name: "Permanent Court of Arbitration", type: "Generic" },
+            { name: "International Criminal Tribunal for the former Yugoslavia (ICTY)", type: "Generic" },
+            { name: "International Criminal Tribunal for Rwanda (ICTR)", type: "Generic" },
+            { name: "Special Court for Sierra Leone", type: "Generic" },
+            { name: "Extraordinary Chambers in the Courts of Cambodia", type: "Generic" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["More Treaties & International Law"] = [
+    {
+        category: "Arms Control Treaties",
+        icon: "Shield",
+        items: [
+            { name: "Strategic Arms Limitation Talks (SALT I)", type: "Treaty" },
+            { name: "Strategic Arms Limitation Talks (SALT II)", type: "Treaty" },
+            { name: "Strategic Arms Reduction Treaty (START I)", type: "Treaty" },
+            { name: "New START", type: "Treaty" },
+            { name: "Intermediate-Range Nuclear Forces Treaty (INF)", type: "Treaty" },
+            { name: "Anti-Ballistic Missile Treaty (ABM)", type: "Treaty" },
+            { name: "Comprehensive Nuclear-Test-Ban Treaty (CTBT)", type: "Treaty" },
+            { name: "Treaty on the Prohibition of Nuclear Weapons (TPNW)", type: "Treaty" },
+            { name: "Chemical Weapons Convention", type: "Treaty" },
+            { name: "Biological Weapons Convention", type: "Treaty" },
+            { name: "Mine Ban Treaty (Ottawa Treaty)", type: "Treaty" },
+            { name: "Convention on Cluster Munitions", type: "Treaty" },
+            { name: "Arms Trade Treaty", type: "Treaty" }
+        ]
+    },
+    {
+        category: "Environmental Treaties",
+        icon: "Leaf",
+        items: [
+            { name: "Montreal Protocol", type: "Treaty" },
+            { name: "Convention on Biological Diversity", type: "Treaty" },
+            { name: "UN Framework Convention on Climate Change (UNFCCC)", type: "Treaty" },
+            { name: "Kyoto Protocol", type: "Treaty" },
+            { name: "Paris Agreement", type: "Treaty" },
+            { name: "Minamata Convention on Mercury", type: "Treaty" },
+            { name: "Basel Convention", type: "Treaty" },
+            { name: "Stockholm Convention on Persistent Organic Pollutants", type: "Treaty" },
+            { name: "Rotterdam Convention", type: "Treaty" },
+            { name: "CITES", type: "Treaty" },
+            { name: "Ramsar Convention", type: "Treaty" },
+            { name: "UN Convention to Combat Desertification", type: "Treaty" },
+            { name: "Alpine Convention", type: "Treaty" }
+        ]
+    },
+    {
+        category: "Human Rights Treaties",
+        icon: "Heart",
+        items: [
+            { name: "International Covenant on Civil and Political Rights (ICCPR)", type: "Treaty" },
+            { name: "International Covenant on Economic, Social and Cultural Rights (ICESCR)", type: "Treaty" },
+            { name: "Convention on the Elimination of All Forms of Racial Discrimination (CERD)", type: "Treaty" },
+            { name: "Convention on the Elimination of All Forms of Discrimination Against Women (CEDAW)", type: "Treaty" },
+            { name: "Convention Against Torture (CAT)", type: "Treaty" },
+            { name: "Convention on the Rights of the Child (CRC)", type: "Treaty" },
+            { name: "International Convention on the Protection of the Rights of All Migrant Workers", type: "Treaty" },
+            { name: "Convention on the Rights of Persons with Disabilities (CRPD)", type: "Treaty" },
+            { name: "International Convention for the Protection of All Persons from Enforced Disappearance", type: "Treaty" },
+            { name: "Convention Relating to the Status of Refugees", type: "Treaty" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["More Political Movements & Scandals"] = [
+    {
+        category: "20th Century Movements",
+        icon: "Megaphone",
+        items: [
+            { name: "Civil Rights Movement", type: "Movement" },
+            { name: "Anti-Apartheid Movement", type: "Movement" },
+            { name: "Women's Suffrage Movement", type: "Movement" },
+            { name: "Labor Movement", type: "Movement" },
+            { name: "Environmental Movement", type: "Movement" },
+            { name: "Anti-War Movement", type: "Movement" },
+            { name: "Gay Rights Movement", type: "Movement" },
+            { name: "Decolonization Movements", type: "Movement" },
+            { name: "Non-Aligned Movement", type: "Movement" },
+            { name: "Solidarity Movement (Poland)", type: "Movement" },
+            { name: "Chicano Movement", type: "Movement" },
+            { name: "American Indian Movement", type: "Movement" },
+            { name: "Black Power Movement", type: "Movement" },
+            { name: "Zionism", type: "Movement" },
+            { name: "Pan-Arabism", type: "Movement" },
+            { name: "Pan-Africanism", type: "Movement" },
+            { name: "Negritude", type: "Movement" }
+        ]
+    },
+    {
+        category: "21st Century Movements",
+        icon: "Radio",
+        items: [
+            { name: "Arab Spring", type: "Movement" },
+            { name: "Occupy Wall Street", type: "Movement" },
+            { name: "Black Lives Matter", type: "Movement" },
+            { name: "Me Too Movement", type: "Movement" },
+            { name: "Tea Party Movement", type: "Movement" },
+            { name: "Fridays for Future", type: "Movement" },
+            { name: "Extinction Rebellion", type: "Movement" },
+            { name: "Umbrella Movement", type: "Movement" },
+            { name: "Yellow Vests Movement", type: "Movement" },
+            { name: "Ni una menos", type: "Movement" },
+            { name: "Alt-Right", type: "Movement" },
+            { name: "Antifa", type: "Movement" },
+            { name: "Indignados Movement", type: "Movement" }
+        ]
+    },
+    {
+        category: "Major Political Scandals",
+        icon: "AlertCircle",
+        items: [
+            { name: "Watergate Scandal", type: "Scandal" },
+            { name: "Teapot Dome Scandal", type: "Scandal" },
+            { name: "Iran-Contra Affair", type: "Scandal" },
+            { name: "Monica Lewinsky Scandal", type: "Scandal" },
+            { name: "Dreyfus Affair", type: "Scandal" },
+            { name: "Profumo Affair", type: "Scandal" },
+            { name: "Panama Papers", type: "Scandal" },
+            { name: "Pandora Papers", type: "Scandal" },
+            { name: "Operation Car Wash (Lava Jato)", type: "Scandal" },
+            { name: "1MDB Scandal", type: "Scandal" },
+            { name: "Gullengate", type: "Scandal" },
+            { name: "Plame Affair", type: "Scandal" },
+            { name: "Enron Scandal", type: "Scandal" },
+            { name: "Cambridge Analytica Scandal", type: "Scandal" },
+            { name: "Expenses Scandal (UK)", type: "Scandal" },
+            { name: "Tangentopoli", type: "Scandal" },
+            { name: "Mani Pulite", type: "Scandal" },
+            { name: "Lockheed Bribery Scandals", type: "Scandal" },
+            { name: "Recruit Scandal", type: "Scandal" },
+            { name: "Bofors Scandal", type: "Scandal" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["More Agencies & Think Tanks"] = [
+    {
+        category: "Intelligence Agencies",
+        icon: "Eye",
+        items: [
+            { name: "CIA", type: "Agency" },
+            { name: "MI6", type: "Agency" },
+            { name: "Mossad", type: "Agency" },
+            { name: "KGB", type: "Agency" },
+            { name: "FSB", type: "Agency" },
+            { name: "GRU", type: "Agency" },
+            { name: "SVR", type: "Agency" },
+            { name: "DGSE", type: "Agency" },
+            { name: "BND", type: "Agency" },
+            { name: "ISI", type: "Agency" },
+            { name: "RAW", type: "Agency" },
+            { name: "MSS", type: "Agency" },
+            { name: "ASIS", type: "Agency" },
+            { name: "CSIS", type: "Agency" },
+            { name: "GCHQ", type: "Agency" },
+            { name: "NSA", type: "Agency" },
+            { name: "DIA", type: "Agency" },
+            { name: "FBI", type: "Agency" },
+            { name: "MI5", type: "Agency" },
+            { name: "Shin Bet", type: "Agency" }
+        ]
+    },
+    {
+        category: "Prominent Think Tanks",
+        icon: "Building",
+        items: [
+            { name: "Brookings Institution", type: "ThinkTank" },
+            { name: "Chatham House", type: "ThinkTank" },
+            { name: "Council on Foreign Relations", type: "ThinkTank" },
+            { name: "RAND Corporation", type: "ThinkTank" },
+            { name: "Carnegie Endowment for International Peace", type: "ThinkTank" },
+            { name: "Heritage Foundation", type: "ThinkTank" },
+            { name: "Center for Strategic and International Studies (CSIS)", type: "ThinkTank" },
+            { name: "Cato Institute", type: "ThinkTank" },
+            { name: "American Enterprise Institute (AEI)", type: "ThinkTank" },
+            { name: "Amnesty International", type: "ThinkTank" },
+            { name: "Human Rights Watch", type: "ThinkTank" },
+            { name: "Transparency International", type: "ThinkTank" },
+            { name: "International Crisis Group", type: "ThinkTank" },
+            { name: "Stockholm International Peace Research Institute (SIPRI)", type: "ThinkTank" },
+            { name: "Woodrow Wilson International Center for Scholars", type: "ThinkTank" },
+            { name: "Hoover Institution", type: "ThinkTank" },
+            { name: "Open Society Foundations", type: "ThinkTank" },
+            { name: "Peterson Institute for International Economics", type: "ThinkTank" },
+            { name: "Urban Institute", type: "ThinkTank" },
+            { name: "Center for American Progress", type: "ThinkTank" },
+            { name: "Bruegel", type: "ThinkTank" },
+            { name: "International Institute for Strategic Studies (IISS)", type: "ThinkTank" },
+            { name: "Council of the Americas", type: "ThinkTank" },
+            { name: "Atlantic Council", type: "ThinkTank" },
+            { name: "Hudson Institute", type: "ThinkTank" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Elections & Universities"] = [
+    {
+        category: "Historic Elections",
+        icon: "Vote",
+        items: [
+            { name: "1800 US Presidential Election", type: "Election" },
+            { name: "1860 US Presidential Election", type: "Election" },
+            { name: "1876 US Presidential Election", type: "Election" },
+            { name: "1912 US Presidential Election", type: "Election" },
+            { name: "1932 US Presidential Election", type: "Election" },
+            { name: "1960 US Presidential Election", type: "Election" },
+            { name: "1968 US Presidential Election", type: "Election" },
+            { name: "2000 US Presidential Election", type: "Election" },
+            { name: "2016 US Presidential Election", type: "Election" },
+            { name: "2020 US Presidential Election", type: "Election" },
+            { name: "1945 UK General Election", type: "Election" },
+            { name: "1979 UK General Election", type: "Election" },
+            { name: "1997 UK General Election", type: "Election" },
+            { name: "2016 Brexit Referendum", type: "Election" },
+            { name: "1933 German Federal Election", type: "Election" },
+            { name: "1994 South African General Election", type: "Election" },
+            { name: "1977 Indian General Election", type: "Election" },
+            { name: "2014 Indian General Election", type: "Election" },
+            { name: "1989 Polish Legislative Election", type: "Election" },
+            { name: "1988 Chilean National Plebiscite", type: "Election" },
+            { name: "1992 Russian Referendum", type: "Election" },
+            { name: "1995 Quebec Referendum", type: "Election" }
+        ]
+    },
+    {
+        category: "Renowned Universities",
+        icon: "GraduationCap",
+        items: [
+            { name: "Harvard University", type: "University" },
+            { name: "University of Oxford", type: "University" },
+            { name: "University of Cambridge", type: "University" },
+            { name: "Stanford University", type: "University" },
+            { name: "Massachusetts Institute of Technology (MIT)", type: "University" },
+            { name: "Yale University", type: "University" },
+            { name: "Princeton University", type: "University" },
+            { name: "University of Chicago", type: "University" },
+            { name: "Columbia University", type: "University" },
+            { name: "University of Pennsylvania", type: "University" },
+            { name: "University of California, Berkeley", type: "University" },
+            { name: "Sorbonne University", type: "University" },
+            { name: "Sciences Po", type: "University" },
+            { name: "London School of Economics (LSE)", type: "University" },
+            { name: "University College London (UCL)", type: "University" },
+            { name: "King's College London", type: "University" },
+            { name: "Heidelberg University", type: "University" },
+            { name: "University of Tokyo", type: "University" },
+            { name: "Peking University", type: "University" },
+            { name: "Tsinghua University", type: "University" },
+            { name: "National University of Singapore (NUS)", type: "University" },
+            { name: "University of Sydney", type: "University" },
+            { name: "University of Melbourne", type: "University" },
+            { name: "University of Toronto", type: "University" },
+            { name: "McGill University", type: "University" },
+            { name: "ETH Zurich", type: "University" },
+            { name: "University of Bologna", type: "University" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Media & Propagandists"] = [
+    {
+        category: "Communicators",
+        icon: "Radio",
+        items: [
+            { name: "Joseph Goebbels", type: "Person" },
+            { name: "Edward Bernays", type: "Person" },
+            { name: "Rupert Murdoch", type: "Person" },
+            { name: "William Randolph Hearst", type: "Person" },
+            { name: "Walter Cronkite", type: "Person" },
+            { name: "Edward R. Murrow", type: "Person" },
+            { name: "Bob Woodward", type: "Person" },
+            { name: "Carl Bernstein", type: "Person" },
+            { name: "Julian Assange", type: "Person" },
+            { name: "Edward Snowden", type: "Person" },
+            { name: "Glenn Greenwald", type: "Person" },
+            { name: "Chelsea Manning", type: "Person" }
+        ]
+    }
+];
+
+EXPLORE_HIERARCHY["Civilization & Faith"] = [
+    {
+        category: "World Religions",
+        icon: "Globe",
+        items: [
+            { name: "Christianity", type: "Religion" },
+            { name: "Islam", type: "Religion" },
+            { name: "Hinduism", type: "Religion" },
+            { name: "Buddhism", type: "Religion" },
+            { name: "Sikhism", type: "Religion" },
+            { name: "Judaism", type: "Religion" },
+            { name: "Bahá'í Faith", type: "Religion" },
+            { name: "Jainism", type: "Religion" },
+            { name: "Shinto", type: "Religion" },
+            { name: "Taoism", type: "Religion" },
+            { name: "Zoroastrianism", type: "Religion" },
+            { name: "Confucianism", type: "Religion" },
+            { name: "Druze", type: "Religion" },
+            { name: "Rastafari", type: "Religion" },
+            { name: "Tenrikyo", type: "Religion" },
+            { name: "Wicca", type: "Religion" },
+            { name: "Scientology", type: "Religion" },
+            { name: "Neo-Paganism", type: "Religion" },
+            { name: "Deism", type: "Religion" },
+            { name: "Agnosticism", type: "Religion" },
+            { name: "Atheism", type: "Religion" }
+        ]
+    },
+    {
+        category: "Mythological Pantheons",
+        icon: "Globe",
+        items: [
+            { name: "Greek Mythology", type: "Concept" },
+            { name: "Roman Mythology", type: "Concept" },
+            { name: "Norse Mythology", type: "Concept" },
+            { name: "Egyptian Mythology", type: "Concept" },
+            { name: "Celtic Mythology", type: "Concept" },
+            { name: "Hindu Mythology", type: "Concept" },
+            { name: "Mesopotamian Mythology", type: "Concept" },
+            { name: "Aztec Mythology", type: "Concept" },
+            { name: "Maya Mythology", type: "Concept" },
+            { name: "Inca Mythology", type: "Concept" },
+            { name: "Japanese Mythology", type: "Concept" },
+            { name: "Chinese Mythology", type: "Concept" },
+            { name: "Polynesian Mythology", type: "Concept" },
+            { name: "Yoruba Religion", type: "Religion" },
+            { name: "African Indigenous Religions", type: "Religion" }
+        ]
+    }
+];
+
+

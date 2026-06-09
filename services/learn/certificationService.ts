@@ -30,7 +30,7 @@ export const generateCertificate = async (username: string, course: string): Pro
     `;
 
     const res = await generateWithRetry({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.5-flash',
         contents: prompt,
         config: { responseMimeType: "application/json" }
     });

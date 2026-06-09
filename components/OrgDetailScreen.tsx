@@ -9,7 +9,6 @@ import LoadingScreen from './LoadingScreen';
 import CountryDetailScreen from './country/CountryDetailScreen';
 import ReaderView from './ReaderView';
 import ConceptDetailModal from './ConceptDetailModal';
-
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -126,15 +125,67 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
       });
   };
 
-  if (loading) return <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><LoadingScreen message={`Accessing ${orgName} Archives...`} /></div>;
-  if (!data) return <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><p className="text-stone-500">Archives Unavailable</p></div>;
+  
+  const handleDownload = () => {
+      if (typeof playSFX === 'function') playSFX('click');
+      if (!data) return;
+      try {
+          const sections = [];
+          
+          if (data.bio) sections.push({ title: "Biography", content: data.bio });
+          if (data.biography) sections.push({ title: "Biography", content: data.biography });
+          if (data.overview) sections.push({ title: "Overview", content: data.overview });
+          if (data.historicalImpact) sections.push({ title: "Historical Impact", content: data.historicalImpact });
+          if (data.context) sections.push({ title: "Context", content: data.context });
+          if (data.earlyLife) sections.push({ title: "Early Life", content: data.earlyLife });
+          if (data.ideology) sections.push({ title: "Ideology", content: data.ideology });
+          if (data.legacy) sections.push({ title: "Legacy", content: data.legacy });
+          
+          Object.entries(data).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
+
+          generateAestheticPDF(
+              data.name || "Dossier",
+              data.type || data.role || data.country || "Intelligence Record",
+              data.shortBio || data.bio?.substring(0, 100) || data.overview?.substring(0, 100) || "Fact Sheet",
+              sections,
+              `${(data.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
+          );
+      } catch (err) {
+          console.error("PDF generation failed:", err);
+      }
+  };
+
+    if (loading) return <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><LoadingScreen message={`Accessing ${orgName} Archives...`} /></div>;
+  if (!data) return <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><p className="text-stone-500">Archives Unavailable</p></div>;
 
   const memberList = getMembers();
   const filteredMembers = memberList.filter(m => m.name.toLowerCase().includes(memberSearch.toLowerCase()));
 
   return (
     <>
-    <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
+    <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
       
       {/* ACTION BAR */}
       <div className="flex-none h-16 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 flex items-center justify-between px-6 z-50 shadow-sm print:hidden">
@@ -147,7 +198,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
           </div>
           <div className="flex items-center gap-2">
              <button onClick={() => { playSFX('click'); onAddToCompare(orgName, 'Org'); }} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Compare"><ArrowRightLeft className="w-4 h-4" /></button>
-             <button onClick={() => window.print()} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
+             <button onClick={handleDownload} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
              <button onClick={handleDownloadDossier} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Download Dossier"><Download className="w-4 h-4" /></button>
              <button onClick={onToggleSave} className={`p-2 rounded-full transition-colors ${isSaved ? 'text-academic-gold bg-stone-50 dark:bg-stone-800' : 'text-stone-400 hover:text-academic-accent hover:bg-stone-100 dark:hover:bg-stone-800'}`}><Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} /></button>
           </div>
@@ -181,7 +232,12 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
                            )}
                       </div>
                       <div className="flex-1">
-                          <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-3 leading-tight">{data.name}</h1>
+                          {data.imageUrl && (
+                        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-stone-200 dark:border-stone-800 shadow-md mb-6">
+                            <ImageWithFallback src={data.imageUrl} alt={data.name} className="w-full h-full object-cover" />
+                        </div>
+                    )}
+                    <h1 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100 mb-3 leading-tight">{data.name}</h1>
                           {data.nativeName && <h2 className="text-lg font-serif text-stone-500 dark:text-stone-400 italic mb-6">{data.nativeName}</h2>}
                           
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm mt-6 bg-stone-50 dark:bg-stone-800/50 p-4 rounded-lg border border-stone-100 dark:border-stone-800">
@@ -217,7 +273,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
                   <div className="mt-8">
                       <span className="text-[10px] font-bold uppercase text-stone-400 dark:text-stone-500 block mb-3 flex items-center gap-2"><Globe className="w-3 h-3" /> Regional Presence</span>
                       <div className="flex flex-wrap gap-2">
-                          {data.satelliteOffices?.map((off, i) => (
+                          {(Array.isArray(data.satelliteOffices) ? data.satelliteOffices : []).map((off, i) => (
                               <span key={i} onClick={() => onNavigate && onNavigate('Regional', off)} className="cursor-pointer hover:border-academic-accent hover:text-academic-accent transition-colors px-3 py-1.5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-xs font-mono text-stone-600 dark:text-stone-300 rounded-md shadow-sm">{off}</span>
                           ))}
                       </div>
@@ -230,7 +286,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
               <div id="leadership" ref={el => { sectionRefs.current['leadership'] = el; }}>
                   <SectionTitle title="Executive Leadership" icon={Crown} subtitle="Key Figures" />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {data.leadership?.map((leader, i) => (
+                      {(Array.isArray(data.leadership) ? data.leadership : []).map((leader, i) => (
                           <div key={i} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 rounded-xl shadow-sm">
                               <div className="flex items-center gap-4 mb-3">
                                   <div className="w-12 h-12 bg-academic-gold/10 rounded-full flex items-center justify-center text-academic-gold font-bold text-xl">
@@ -283,7 +339,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
                               </tr>
                           </thead>
                           <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
-                              {data.finances?.map((item, i) => (
+                              {(Array.isArray(data.finances) ? data.finances : []).map((item, i) => (
                                   <tr key={i} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                                       <td className="px-6 py-4 font-serif text-stone-800 dark:text-stone-200">{item.source}</td>
                                       <td className="px-6 py-4 font-mono text-stone-600 dark:text-stone-400 text-right">{item.amount}</td>
@@ -300,7 +356,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
               <div id="projects" ref={el => { sectionRefs.current['projects'] = el; }}>
                   <SectionTitle title="Strategic Initiatives" icon={Target} subtitle="Current Projects" />
                   <div className="space-y-4">
-                      {data.projects?.map((project, i) => (
+                      {(Array.isArray(data.projects) ? data.projects : []).map((project, i) => (
                           <div key={i} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 rounded-xl shadow-sm hover:border-academic-accent dark:hover:border-indigo-500 transition-colors">
                               <div className="flex justify-between items-start mb-2">
                                   <h4 className="font-serif font-bold text-lg text-academic-text dark:text-stone-100">{project.name}</h4>
@@ -388,7 +444,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
                   <SectionTitle title="Controversies" icon={AlertCircle} subtitle="Criticisms & Issues" />
                   <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-2xl p-8">
                       <ul className="space-y-4">
-                          {data.controversies?.map((item, i) => (
+                          {(Array.isArray(data.controversies) ? data.controversies : []).map((item, i) => (
                               <li key={i} className="flex gap-3">
                                   <span className="text-red-400 font-bold">•</span>
                                   <span className="font-serif text-stone-800 dark:text-stone-200 leading-relaxed text-justify">{item}</span>
@@ -399,7 +455,7 @@ const OrgDetailScreen: React.FC<OrgDetailScreenProps> = ({ orgName, onClose, isS
               </div>
           )}
 
-
+            
 
           </div>
       </div>

@@ -88,14 +88,66 @@ const PartyDetailScreen: React.FC<PartyDetailScreenProps> = ({ partyName, countr
     }
   };
 
-  if (loading) return (
-      <div className="fixed inset-0 top-16 z-[70] bg-academic-bg dark:bg-stone-950">
+  
+  const handleDownload = () => {
+      if (typeof playSFX === 'function') playSFX('click');
+      if (!data) return;
+      try {
+          const sections = [];
+          
+          if (data.bio) sections.push({ title: "Biography", content: data.bio });
+          if (data.biography) sections.push({ title: "Biography", content: data.biography });
+          if (data.overview) sections.push({ title: "Overview", content: data.overview });
+          if (data.historicalImpact) sections.push({ title: "Historical Impact", content: data.historicalImpact });
+          if (data.context) sections.push({ title: "Context", content: data.context });
+          if (data.earlyLife) sections.push({ title: "Early Life", content: data.earlyLife });
+          if (data.ideology) sections.push({ title: "Ideology", content: data.ideology });
+          if (data.legacy) sections.push({ title: "Legacy", content: data.legacy });
+          
+          Object.entries(data).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
+
+          generateAestheticPDF(
+              data.name || "Dossier",
+              data.type || data.role || data.country || "Intelligence Record",
+              data.shortBio || data.bio?.substring(0, 100) || data.overview?.substring(0, 100) || "Fact Sheet",
+              sections,
+              `${(data.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
+          );
+      } catch (err) {
+          console.error("PDF generation failed:", err);
+      }
+  };
+
+    if (loading) return (
+      <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950">
           <LoadingScreen message={`Analyzing ${partyName}...`} />
       </div>
   );
 
   if (!data || Object.keys(data).length === 0) return (
-      <div className="fixed inset-0 top-16 z-[70] bg-academic-bg dark:bg-stone-950 flex items-center justify-center">
+      <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex items-center justify-center">
           <div className="text-center">
               <Flag className="w-12 h-12 text-stone-300 dark:text-stone-600 mx-auto mb-4" />
               <p className="text-stone-500 font-serif">Party archives unavailable.</p>
@@ -105,7 +157,7 @@ const PartyDetailScreen: React.FC<PartyDetailScreenProps> = ({ partyName, countr
   );
 
   return (
-    <div className="fixed inset-0 top-16 z-[70] bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
+    <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
       
       {/* HEADER */}
       <div className="flex-none h-16 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 flex items-center justify-between px-6 z-50 shadow-sm print:hidden">
@@ -119,7 +171,7 @@ const PartyDetailScreen: React.FC<PartyDetailScreenProps> = ({ partyName, countr
             </div>
           </div>
           <div className="flex items-center gap-2">
-             <button onClick={() => window.print()} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
+             <button onClick={handleDownload} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
              <button onClick={handleDownloadDossier} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Download Dossier"><Download className="w-4 h-4" /></button>
           </div>
       </div>
@@ -151,7 +203,12 @@ const PartyDetailScreen: React.FC<PartyDetailScreenProps> = ({ partyName, countr
                    )}
               </div>
               <div className="flex-1">
-                  <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 leading-tight">{data.name}</h1>
+                  {data.imageUrl && (
+                        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-stone-200 dark:border-stone-800 shadow-md mb-6">
+                            <ImageWithFallback src={data.imageUrl} alt={data.name} className="w-full h-full object-cover" />
+                        </div>
+                    )}
+                    <h1 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 leading-tight">{data.name}</h1>
                   <div className="flex flex-wrap gap-2 mb-6">
                       <span className="px-3 py-1 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] font-bold uppercase tracking-widest text-stone-600 dark:text-stone-400 rounded-full">{data.politicalPosition}</span>
                       <span onClick={() => onNavigate && onNavigate('Ideology', data.ideology)} className="cursor-pointer hover:bg-indigo-700 transition-colors px-3 py-1 bg-academic-accent dark:bg-indigo-600 text-[10px] font-bold uppercase tracking-widest text-white rounded-full shadow-sm">{data.ideology}</span>
@@ -168,7 +225,7 @@ const PartyDetailScreen: React.FC<PartyDetailScreenProps> = ({ partyName, countr
                       <div className="mt-6 flex items-center gap-3">
                           <span className="text-[10px] font-bold uppercase text-stone-400 dark:text-stone-500 tracking-widest">Party Colors</span>
                           <div className="flex gap-2">
-                              {data.colors.map((color, i) => (
+                              {(Array.isArray(data.colors) ? data.colors : []).map((color, i) => (
                                   <div key={i} className="w-6 h-6 rounded-full border border-stone-200 dark:border-stone-700 shadow-sm" style={{ backgroundColor: color.toLowerCase() }} title={color}></div>
                               ))}
                           </div>
@@ -203,7 +260,7 @@ const PartyDetailScreen: React.FC<PartyDetailScreenProps> = ({ partyName, countr
                   <>
                     <SectionTitle title="Key Figures" icon={Users} subtitle="Prominent Members" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        {data.keyMembers.map((member, i) => (
+                        {(Array.isArray(data.keyMembers) ? data.keyMembers : []).map((member, i) => (
                             <div key={i} onClick={() => onNavigate && onNavigate('Person', member)} className="p-5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-academic-accent dark:hover:border-indigo-500 shadow-sm transition-all text-center group cursor-pointer hover:-translate-y-1">
                                 <div className="w-12 h-12 mx-auto bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center text-stone-400 font-serif font-bold text-lg mb-3 group-hover:bg-academic-accent group-hover:text-white dark:group-hover:bg-indigo-600 transition-colors">
                                     {member.charAt(0)}
@@ -215,7 +272,10 @@ const PartyDetailScreen: React.FC<PartyDetailScreenProps> = ({ partyName, countr
                   </>
               )}
           </div>
-        </div>
+          
+             
+
+          </div>
       </div>
     </div>
   );

@@ -6,7 +6,6 @@ import LoadingScreen from './LoadingScreen';
 import { IconRenderer } from './IconMap';
 
 import MiniKnowledgeGraph from './MiniKnowledgeGraph';
-
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -134,8 +133,6 @@ const GenericKnowledgeScreen: React.FC<GenericKnowledgeScreenProps> = ({ query, 
                        {data.overview}
                    </p>
               </section>
-
-
 
               {/* DATA STRIP */}
               {data.statistics && data.statistics.length > 0 && (

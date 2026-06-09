@@ -6,7 +6,6 @@ import { EventDetail } from '../types';
 import { fetchEventDetail } from '../services/eventService';
 import LoadingScreen from './LoadingScreen';
 import PersonDetailScreen from './PersonDetailScreen';
-
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -24,6 +23,7 @@ const TABS = [
     { id: 'forces', label: 'Forces', icon: Swords },
     { id: 'actors', label: 'Key Figures', icon: Users },
     { id: 'aftermath', label: 'Aftermath', icon: Globe },
+    { id: 'sources', label: 'Archives', icon: FileText },
 ];
 
 const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClose, isSaved, onToggleSave, onNavigate }) => {
@@ -47,27 +47,50 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
   }, [eventName]);
 
   const handleDownload = () => {
-      playSFX('click');
+      if (typeof playSFX === 'function') playSFX('click');
       if (!data) return;
       try {
           const sections = [];
-          if (data.context) {
-              sections.push({ title: "Historical Context", content: data.context });
-          }
-          if (data.timeline && data.timeline.length > 0) {
-              const events = data.timeline.map((e: any) => `${e.date || ''}: ${e.event || ''}`);
-              sections.push({ title: "Chronology", content: events });
-          }
-          if (data.aftermath) {
-              sections.push({ title: "Aftermath", content: data.aftermath });
-          }
+          
+          if (data.bio) sections.push({ title: "Biography", content: data.bio });
+          if (data.biography) sections.push({ title: "Biography", content: data.biography });
+          if (data.overview) sections.push({ title: "Overview", content: data.overview });
+          if (data.historicalImpact) sections.push({ title: "Historical Impact", content: data.historicalImpact });
+          if (data.context) sections.push({ title: "Context", content: data.context });
+          if (data.earlyLife) sections.push({ title: "Early Life", content: data.earlyLife });
+          if (data.ideology) sections.push({ title: "Ideology", content: data.ideology });
+          if (data.legacy) sections.push({ title: "Legacy", content: data.legacy });
+          
+          Object.entries(data).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
 
           generateAestheticPDF(
-              data.title || eventName,
-              "Historical Event Dossier",
-              data.summary || "No description provided.",
+              data.name || "Dossier",
+              data.type || data.role || data.country || "Intelligence Record",
+              data.shortBio || data.bio?.substring(0, 100) || data.overview?.substring(0, 100) || "Fact Sheet",
               sections,
-              `${(data.title || eventName).replace(/\s+/g, '_')}_Event.pdf`
+              `${(data.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
           );
       } catch (err) {
           console.error("PDF generation failed:", err);
@@ -115,7 +138,7 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
                 </div>
             </div>
             <div className="flex items-center gap-2">
-                <button onClick={() => window.print()} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Print Event"><Printer className="w-5 h-5" /></button>
+                <button onClick={handleDownload} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Print Event"><Printer className="w-5 h-5" /></button>
                 <button onClick={handleDownload} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Download Report"><Download className="w-5 h-5" /></button>
                 <button onClick={handleWebSearch} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Visual Evidence"><ImageIcon className="w-5 h-5" /></button>
                 <button onClick={onToggleSave} className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors ${isSaved ? 'text-academic-gold' : 'text-stone-400 dark:text-stone-500'}`}><Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} /></button>
@@ -144,10 +167,10 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
                  )}
                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-8">
                      <div>
-                         <h1 className="text-5xl font-serif font-bold text-white leading-tight mb-2 text-shadow-lg">{data.title || eventName}</h1>
+                         <h1 className="text-3xl font-serif font-bold text-white leading-tight mb-2 text-shadow-lg">{data.title || eventName}</h1>
                          <div className="flex flex-wrap items-center gap-6 text-white/90 text-sm font-mono font-bold">
                              <span className="flex items-center gap-2"><Calendar className="w-4 h-4" /> {data.date}</span>
-                             <span className="flex items-center gap-2"><MapPin className="w-4 h-4" /> {data.location}</span>
+                             {data.location && <span className="flex items-center gap-2"><MapPin className="w-4 h-4" /> {data.location}</span>}
                          </div>
                      </div>
                  </div>
@@ -196,14 +219,18 @@ const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ eventName, onClos
                 </div>
 
                 <div className="space-y-6">
-                    <div className="p-6 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30">
-                        <h4 className="text-[10px] font-bold uppercase text-red-600 dark:text-red-400 mb-2 flex items-center gap-2"><UserMinus className="w-4 h-4" /> Casualties</h4>
-                        <p className="font-serif font-bold text-xl text-stone-800 dark:text-stone-200">{(data as any).casualties || "Unknown"}</p>
-                    </div>
-                    <div className="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                        <h4 className="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-2"><Cloud className="w-4 h-4" /> Conditions</h4>
-                        <p className="font-serif font-bold text-xl text-stone-800 dark:text-stone-200">{(data as any).weather || "N/A"}</p>
-                    </div>
+                    {((data as any).casualties && (data as any).casualties.toLowerCase() !== "unknown" && (data as any).casualties !== "N/A") && (
+                        <div className="p-6 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30">
+                            <h4 className="text-[10px] font-bold uppercase text-red-600 dark:text-red-400 mb-2 flex items-center gap-2"><UserMinus className="w-4 h-4" /> Casualties</h4>
+                            <p className="font-serif font-bold text-xl text-stone-800 dark:text-stone-200">{(data as any).casualties}</p>
+                        </div>
+                    )}
+                    {((data as any).weather && (data as any).weather.toLowerCase() !== "unknown" && (data as any).weather !== "N/A") && (
+                        <div className="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                            <h4 className="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-2"><Cloud className="w-4 h-4" /> Conditions</h4>
+                            <p className="font-serif font-bold text-xl text-stone-800 dark:text-stone-200">{(data as any).weather}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 

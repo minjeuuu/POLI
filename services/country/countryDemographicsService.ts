@@ -35,7 +35,7 @@ export const fetchDemographics = async (countryName: string): Promise<Demographi
     `;
 
     const response = await generateWithFallback({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-2.5-pro',
         contents: prompt,
         config: { 
             responseMimeType: "application/json", 

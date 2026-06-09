@@ -17,7 +17,7 @@ export const fetchInfrastructureProfile = async (countryName: string): Promise<I
     `;
 
     const response = await generateWithFallback({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-2.5-pro',
         contents: prompt,
         config: { responseMimeType: "application/json", maxOutputTokens: 8192 }
     });

@@ -119,6 +119,18 @@ export const APIAggregatorWidget: React.FC<{ query?: string }> = ({ query = "gen
                         </div>
                     </div>
 
+                    {/* Spaceflight News */}
+                    <div className="bg-stone-800/50 border border-stone-700/50 rounded-xl p-4 backdrop-blur-md">
+                        <h3 className="text-xs uppercase tracking-widest text-orange-400 mb-3 flex items-center gap-2">
+                            <Database className="w-3 h-3" /> Spaceflight News
+                        </h3>
+                        <div className="space-y-2">
+                             {data.spaceflight?.slice(0, 3).map((item: any, i: number) => (
+                                <p key={i} className="text-sm font-serif line-clamp-1">{item.title}</p>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Library of Congress */}
                     <div className="bg-stone-800/50 border border-stone-700/50 rounded-xl p-4 backdrop-blur-md">
                         <h3 className="text-xs uppercase tracking-widest text-cyan-400 mb-3 flex items-center gap-2">
@@ -127,6 +139,54 @@ export const APIAggregatorWidget: React.FC<{ query?: string }> = ({ query = "gen
                         <div className="space-y-2">
                              {data.loc?.slice(0, 3).map((item: any, i: number) => (
                                 <p key={i} className="text-sm font-serif line-clamp-1">{item.title}</p>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Art Institute */}
+                    <div className="bg-stone-800/50 border border-stone-700/50 rounded-xl p-4 backdrop-blur-md">
+                        <h3 className="text-xs uppercase tracking-widest text-pink-400 mb-3 flex items-center gap-2">
+                            <Database className="w-3 h-3" /> Art Institute Chicago
+                        </h3>
+                        <div className="space-y-2">
+                             {data.artInstitute?.slice(0, 3).map((item: any, i: number) => (
+                                <p key={i} className="text-sm font-serif line-clamp-1">{item.title}</p>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Open Meteo */}
+                    <div className="bg-stone-800/50 border border-stone-700/50 rounded-xl p-4 backdrop-blur-md">
+                        <h3 className="text-xs uppercase tracking-widest text-sky-400 mb-3 flex items-center gap-2">
+                            <Database className="w-3 h-3" /> Weather (Berlin)
+                        </h3>
+                        <div className="space-y-2">
+                             {data.openMeteo?.map((item: any, i: number) => (
+                                <p key={i} className="text-sm font-serif line-clamp-1">Temp: {item.temperature}°C, Wind: {item.windspeed}km/h</p>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* FBI Wanted */}
+                    <div className="bg-stone-800/50 border border-stone-700/50 rounded-xl p-4 backdrop-blur-md">
+                        <h3 className="text-xs uppercase tracking-widest text-red-500 mb-3 flex items-center gap-2">
+                            <Database className="w-3 h-3" /> FBI Wanted List
+                        </h3>
+                        <div className="space-y-2">
+                             {data.fbiWanted?.slice(0, 3).map((item: any, i: number) => (
+                                <p key={i} className="text-sm font-serif line-clamp-1">{item.title}</p>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* TVMaze */}
+                    <div className="bg-stone-800/50 border border-stone-700/50 rounded-xl p-4 backdrop-blur-md">
+                        <h3 className="text-xs uppercase tracking-widest text-yellow-400 mb-3 flex items-center gap-2">
+                            <Database className="w-3 h-3" /> TV Maze
+                        </h3>
+                        <div className="space-y-2">
+                             {data.tvMaze?.slice(0, 3).map((item: any, i: number) => (
+                                <p key={i} className="text-sm font-serif line-clamp-1">{item.show?.name}</p>
                             ))}
                         </div>
                     </div>

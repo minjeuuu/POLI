@@ -43,29 +43,54 @@ const HighlightDetailScreen: React.FC<HighlightDetailScreenProps> = ({ highlight
   };
 
   const handleDownload = () => {
-    playSFX('click');
-    if (!detail) return;
-    try {
-        const sections = [];
-        if (detail.content) {
-            sections.push({ title: "Content", content: detail.content });
-        }
-        if (detail.analysis) {
-            sections.push({ title: "Analysis", content: detail.analysis });
-        }
-        if (detail.keyTakeaways && detail.keyTakeaways.length > 0) {
-            sections.push({ title: "Key Takeaways", content: detail.keyTakeaways });
-        }
-        generateAestheticPDF(
-            highlight.title,
-            highlight.subtitle,
-            "",
-            sections,
-            `${highlight.title.replace(/\s+/g, '_')}_Highlight.pdf`
-        );
-    } catch (err) {
-        console.error("PDF generation failed:", err);
-    }
+      if (typeof playSFX === 'function') playSFX('click');
+      if (!detail) return;
+      try {
+          const sections = [];
+          
+          if (detail.bio) sections.push({ title: "Biography", content: detail.bio });
+          if (detail.biography) sections.push({ title: "Biography", content: detail.biography });
+          if (detail.overview) sections.push({ title: "Overview", content: detail.overview });
+          if (detail.historicalImpact) sections.push({ title: "Historical Impact", content: detail.historicalImpact });
+          if (detail.context) sections.push({ title: "Context", content: detail.context });
+          if (detail.earlyLife) sections.push({ title: "Early Life", content: detail.earlyLife });
+          if (detail.ideology) sections.push({ title: "Ideology", content: detail.ideology });
+          if (detail.legacy) sections.push({ title: "Legacy", content: detail.legacy });
+          
+          Object.entries(detail).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
+
+          generateAestheticPDF(
+              detail.name || "Dossier",
+              detail.type || detail.role || detail.country || "Intelligence Record",
+              detail.shortBio || detail.bio?.substring(0, 100) || detail.overview?.substring(0, 100) || "Fact Sheet",
+              sections,
+              `${(detail.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
+          );
+      } catch (err) {
+          console.error("PDF generation failed:", err);
+      }
   };
 
   const handleShare = async () => {
@@ -184,7 +209,7 @@ const HighlightDetailScreen: React.FC<HighlightDetailScreenProps> = ({ highlight
                      Key Concepts
                    </h3>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {detail.keyConcepts?.map((concept, i) => {
+                      {(Array.isArray(detail.keyConcepts) ? detail.keyConcepts : []).map((concept, i) => {
                           if (!concept) return null;
                           return (
                               <div key={i} className="p-4 bg-academic-paper border border-academic-line">
@@ -213,7 +238,7 @@ const HighlightDetailScreen: React.FC<HighlightDetailScreenProps> = ({ highlight
                       Modern Connections
                     </h3>
                     <ul className="space-y-2">
-                        {detail.modernConnections.map((conn, i) => (
+                        {(Array.isArray(detail.modernConnections) ? detail.modernConnections : []).map((conn, i) => (
                             <li key={i} className="flex items-start gap-3">
                                 <div className="mt-1.5 w-1.5 h-1.5 bg-academic-accent rounded-full"></div>
                                 <span className="text-sm font-serif text-stone-600">{conn}</span>
@@ -230,7 +255,7 @@ const HighlightDetailScreen: React.FC<HighlightDetailScreenProps> = ({ highlight
                         Primary & Secondary Sources
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                          {detail.sources.map((source, i) => (
+                          {(Array.isArray(detail.sources) ? detail.sources : []).map((source, i) => (
                               <a 
                                 key={i}
                                 href={(source.url && source.url.startsWith('http')) ? source.url : `https://www.google.com/search?q=${encodeURIComponent(source.title)}`}

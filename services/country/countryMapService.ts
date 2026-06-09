@@ -16,10 +16,10 @@ export const fetchCountryMaps = async (countryName: string): Promise<CountryMapD
     `;
 
     const response = await generateWithFallback({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-2.5-pro',
         contents: prompt,
         config: { 
-            responseMimeType: "application/json",
+            
             tools: [{googleSearch: {}}]
         }
     });

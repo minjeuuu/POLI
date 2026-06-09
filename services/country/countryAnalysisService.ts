@@ -20,7 +20,7 @@ export const fetchCountryAnalysis = async (countryName: string): Promise<Analysi
     `;
 
     const response = await generateWithFallback({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-2.5-pro',
         contents: prompt,
         config: { 
             responseMimeType: "application/json", 

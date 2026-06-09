@@ -25,7 +25,7 @@ export const generateDebateOpening = async (topic: string): Promise<string> => {
 
     try {
         const res = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-2.5-flash',
             contents: prompt,
             config: { responseMimeType: "text/plain" }
         });
@@ -50,7 +50,7 @@ export const generateRebuttal = async (topic: string, history: DebateTurn[]): Pr
 
     try {
         const res = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-2.5-flash',
             contents: prompt,
             config: { responseMimeType: "text/plain" }
         });
@@ -79,7 +79,7 @@ export const evaluateDebate = async (topic: string, history: DebateTurn[]): Prom
 
     try {
         const res = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-2.5-flash',
             contents: prompt,
             config: { responseMimeType: "application/json" }
         });

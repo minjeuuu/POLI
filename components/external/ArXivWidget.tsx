@@ -28,7 +28,7 @@ export const ArXivWidget: React.FC<ArXivWidgetProps> = ({ queryText }) => {
                             summary: entry.querySelector("summary")?.textContent || "",
                             link: entry.querySelector("id")?.textContent || "",
                             published: entry.querySelector("published")?.textContent || "",
-                            author: entry.querySelector("author > name")?.textContent || "Unknown"
+                            author: entry.querySelector("author > name")?.textContent 
                         };
                     });
                     setPapers(parsedPapers);

@@ -17,7 +17,7 @@ export const generateAdaptiveQuiz = async (topic: string, difficulty: 'Easy' | '
     
     try {
         const res = await generateWithRetry({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-2.5-flash',
             contents: prompt,
             config: { responseMimeType: "application/json" }
         });

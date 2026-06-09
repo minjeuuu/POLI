@@ -12,10 +12,10 @@ export const InfrastructureGrid: React.FC<{ data: InfrastructureProfile }> = ({ 
             <div>
                 <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4 flex items-center gap-2"><Truck className="w-4 h-4" /> Transport Network</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <DetailCard label="Road Network" value={data.transport?.roadNetwork?.total || "N/A"} icon={Truck} subValue={data.transport?.roadNetwork?.paved + " Paved"} />
-                    <DetailCard label="Rail Network" value={data.transport?.railNetwork?.total || "N/A"} icon={Truck} subValue={data.transport?.railNetwork?.highSpeed ? "High Speed" : "Standard"} />
-                    <DetailCard label="Airports" value={data.transport?.airports?.total || "N/A"} icon={Truck} subValue={data.transport?.airports?.international?.length + " Int'l"} />
-                    <DetailCard label="Major Ports" value={data.transport?.ports?.total || "N/A"} icon={Truck} subValue={data.transport?.ports?.majorTerminals?.join(', ')} />
+                    <DetailCard label="Road Network" value={data.transport?.roadNetwork?.total } icon={Truck} subValue={data.transport?.roadNetwork?.paved + " Paved"} />
+                    <DetailCard label="Rail Network" value={data.transport?.railNetwork?.total } icon={Truck} subValue={data.transport?.railNetwork?.highSpeed ? "High Speed" : "Standard"} />
+                    <DetailCard label="Airports" value={data.transport?.airports?.total } icon={Truck} subValue={data.transport?.airports?.international?.length + " Int'l"} />
+                    <DetailCard label="Major Ports" value={data.transport?.ports?.total } icon={Truck} subValue={data.transport?.ports?.majorTerminals?.join(', ')} />
                 </div>
             </div>
 

@@ -6,7 +6,7 @@ export const fetchBookStructure = async (title: string, author: string): Promise
     return withCache(`book_${title}_structure_v6_pro`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: `
                 Generate a comprehensive Table of Contents for the document/book/song: "${title}" by ${author || "Unknown"}.
                 
@@ -48,7 +48,7 @@ export async function* streamChapterContent(title: string, author: string, chapt
     `;
     
     const response = await ai.models.generateContentStream({
-        model: 'gemini-3-pro-preview', // Pro model for longer, higher quality context
+        model: 'gemini-2.5-pro', // Pro model for longer, higher quality context
         contents: prompt,
         config: {
             maxOutputTokens: 8192 // Ensure maximum length for chapters
@@ -62,7 +62,7 @@ export async function* streamChapterContent(title: string, author: string, chapt
 export const askReaderQuestion = async (context: string, query: string, type: string): Promise<string> => {
     try {
         const response = await generateWithRetry({
-            model: 'gemini-3-pro-preview',
+            model: 'gemini-2.5-pro',
             contents: `Context: ${context.substring(0, 20000)}\n\nTask: ${type}. ${query ? "Question: " + query : ""} \nAnswer:`
         });
         return response.text || "";

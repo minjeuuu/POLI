@@ -58,21 +58,50 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
   };
 
   const handleDownload = () => {
-      playSFX('click');
+      if (typeof playSFX === 'function') playSFX('click');
       if (!data) return;
       try {
           const sections = [];
+          
+          if (data.bio) sections.push({ title: "Biography", content: data.bio });
           if (data.biography) sections.push({ title: "Biography", content: data.biography });
-          if (data.careerArc) sections.push({ title: "Career Arc", content: data.careerArc });
-          if (data.psychologicalProfile?.publicPerception) sections.push({ title: "Public Perception", content: data.psychologicalProfile.publicPerception });
+          if (data.overview) sections.push({ title: "Overview", content: data.overview });
+          if (data.historicalImpact) sections.push({ title: "Historical Impact", content: data.historicalImpact });
+          if (data.context) sections.push({ title: "Context", content: data.context });
+          if (data.earlyLife) sections.push({ title: "Early Life", content: data.earlyLife });
+          if (data.ideology) sections.push({ title: "Ideology", content: data.ideology });
           if (data.legacy) sections.push({ title: "Legacy", content: data.legacy });
+          
+          Object.entries(data).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
 
           generateAestheticPDF(
-              data.name || personName,
-              data.role || "Political Figure Dossier",
-              data.shortBio || "No description provided.",
+              data.name || "Dossier",
+              data.type || data.role || data.country || "Intelligence Record",
+              data.shortBio || data.bio?.substring(0, 100) || data.overview?.substring(0, 100) || "Fact Sheet",
               sections,
-              `${(data.name || personName).replace(/\s+/g, '_')}_Dossier.pdf`
+              `${(data.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
           );
       } catch (err) {
           console.error("PDF generation failed:", err);
@@ -91,16 +120,16 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
   };
 
   if (loading) return (
-      <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex items-center justify-center">
+      <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex items-center justify-center">
           <LoadingScreen message={`Profiling ${personName}...`} />
       </div>
   );
 
-  if (!data) return <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><p className="text-stone-500">Data unavailable.</p></div>;
+  if (!data) return <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><p className="text-stone-500">Data unavailable.</p></div>;
 
   return (
     <>
-    <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden relative">
+    <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden relative">
       
       {/* HEADER */}
       <div className="bg-academic-paper/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-academic-line dark:border-stone-800 shadow-sm">
@@ -118,7 +147,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                 </div>
             </div>
             <div className="flex items-center gap-2">
-                 <button onClick={() => window.print()} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Print Record"><Printer className="w-5 h-5" /></button>
+                 <button onClick={handleDownload} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Print Record"><Printer className="w-5 h-5" /></button>
                  <button onClick={handleDownload} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Download Record"><Download className="w-5 h-5" /></button>
                  <button onClick={handleWebSearch} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 transition-colors" title="Search Images"><Search className="w-5 h-5" /></button>
                  <button onClick={onToggleSave} className={`p-2 rounded-full transition-colors ${isSaved ? 'text-academic-gold' : 'text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400'}`}>
@@ -139,8 +168,8 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
           <div className="max-w-5xl mx-auto p-4 sm:p-6 md:p-10 space-y-12">
               
               {/* HERO SECTION */}
-              <div id="biography" ref={el => { sectionRefs.current['biography'] = el; }} className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div className="md:col-span-1">
+              <div id="biography" ref={el => { sectionRefs.current['biography'] = el; }} className="flex flex-col gap-8">
+                  <div className="">
                       <div className="aspect-[3/4] bg-stone-200 dark:bg-stone-800 rounded-2xl overflow-hidden shadow-lg border border-stone-200 dark:border-stone-700 relative group">
                           {data.imageUrl ? (
                               <ImageWithFallback src={data.imageUrl} alt={data.name} className="w-full h-full object-cover" />
@@ -173,8 +202,8 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                       </div>
                   </div>
 
-                  <div className="md:col-span-2">
-                      <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">{data.name}</h1>
+                  <div className="">
+                      <h1 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100 mb-6 tracking-tight">{data.name}</h1>
                       <div className="prose prose-stone dark:prose-invert font-serif text-lg leading-relaxed text-justify max-w-none">
                            {data.bio.split('\n\n').map((para, i) => (
                                <p key={i} className="mb-4">{para}</p>
@@ -208,26 +237,28 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
               </div>
 
               {/* CAREER */}
-              <div id="career" ref={el => { sectionRefs.current['career'] = el; }} className="bg-white dark:bg-stone-900 p-8 rounded-2xl border border-stone-200 dark:border-stone-800">
-                  <div className="flex items-center gap-3 mb-8 border-b border-stone-100 dark:border-stone-800 pb-4">
-                      <div className="p-2 bg-stone-100 dark:bg-stone-800 rounded-lg text-academic-accent"><Flag className="w-5 h-5" /></div>
-                      <h3 className="text-xl font-bold font-serif">Offices & Roles</h3>
-                  </div>
-                  <div className="space-y-6">
-                       {data.officesHeld.map((office, i) => (
-                           <div key={i} className="flex gap-4 relative group">
-                               <div className="flex-col items-center hidden sm:flex">
-                                   <div className="w-3 h-3 rounded-full bg-academic-gold border-2 border-white dark:border-stone-900 z-10 group-hover:scale-125 transition-transform"></div>
-                                   <div className="w-0.5 flex-1 bg-stone-200 dark:bg-stone-800 -mt-1"></div>
+              {Array.isArray(data.officesHeld) && data.officesHeld.length > 0 && (
+                  <div id="career" ref={el => { sectionRefs.current['career'] = el; }} className="bg-white dark:bg-stone-900 p-8 rounded-2xl border border-stone-200 dark:border-stone-800">
+                      <div className="flex items-center gap-3 mb-8 border-b border-stone-100 dark:border-stone-800 pb-4">
+                          <div className="p-2 bg-stone-100 dark:bg-stone-800 rounded-lg text-academic-accent"><Flag className="w-5 h-5" /></div>
+                          <h3 className="text-xl font-bold font-serif">Offices & Roles</h3>
+                      </div>
+                      <div className="space-y-6">
+                           {data.officesHeld.map((office: any, i: number) => (
+                               <div key={i} className="flex gap-4 relative group">
+                                   <div className="flex-col items-center hidden sm:flex">
+                                       <div className="w-3 h-3 rounded-full bg-academic-gold border-2 border-white dark:border-stone-900 z-10 group-hover:scale-125 transition-transform"></div>
+                                       <div className="w-0.5 flex-1 bg-stone-200 dark:bg-stone-800 -mt-1"></div>
+                                   </div>
+                                   <div className="flex-1 pb-6">
+                                       <span className="text-xs font-bold text-stone-400 font-mono block mb-1">{office.years}</span>
+                                       <h4 className="text-lg font-serif font-bold text-stone-800 dark:text-stone-200 cursor-pointer hover:text-academic-accent transition-colors" onClick={() => handleNavigateSafe('Concept', office.role)}>{office.role}</h4>
+                                   </div>
                                </div>
-                               <div className="flex-1 pb-6">
-                                   <span className="text-xs font-bold text-stone-400 font-mono block mb-1">{office.years}</span>
-                                   <h4 className="text-lg font-serif font-bold text-stone-800 dark:text-stone-200 cursor-pointer hover:text-academic-accent transition-colors" onClick={() => handleNavigateSafe('Concept', office.role)}>{office.role}</h4>
-                               </div>
-                           </div>
-                       ))}
+                           ))}
+                      </div>
                   </div>
-              </div>
+              )}
 
               {/* PERSONAL LIFE */}
               {data.personalLife && (
@@ -241,32 +272,38 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
               )}
 
               {/* NETWORK */}
-              <div id="network" ref={el => { sectionRefs.current['network'] = el; }}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="bg-emerald-50 dark:bg-emerald-900/10 p-8 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
-                          <h4 className="text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-6 flex items-center gap-2"><Users className="w-4 h-4" /> Allies & Mentors</h4>
-                          <div className="space-y-3">
-                              {(data as any).allies?.map((ally: string, i: number) => (
-                                  <div key={i} className="flex items-center gap-3 p-3 bg-white dark:bg-stone-900 rounded-lg shadow-sm cursor-pointer hover:scale-[1.02] transition-transform" onClick={() => handleNavigateSafe('Person', ally)}>
-                                      <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-300 font-bold text-xs">{ally.charAt(0)}</div>
-                                      <span className="font-serif font-bold text-sm text-stone-700 dark:text-stone-200">{ally}</span>
+              {((Array.isArray((data as any).allies) && (data as any).allies.length > 0) || (Array.isArray((data as any).rivals) && (data as any).rivals.length > 0)) && (
+                  <div id="network" ref={el => { sectionRefs.current['network'] = el; }}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {Array.isArray((data as any).allies) && (data as any).allies.length > 0 && (
+                              <div className="bg-emerald-50 dark:bg-emerald-900/10 p-8 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
+                                  <h4 className="text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-6 flex items-center gap-2"><Users className="w-4 h-4" /> Allies & Mentors</h4>
+                                  <div className="space-y-3">
+                                      {(data as any).allies.map((ally: string, i: number) => (
+                                          <div key={i} className="flex items-center gap-3 p-3 bg-white dark:bg-stone-900 rounded-lg shadow-sm cursor-pointer hover:scale-[1.02] transition-transform" onClick={() => handleNavigateSafe('Person', ally)}>
+                                              <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-300 font-bold text-xs">{ally.charAt(0)}</div>
+                                              <span className="font-serif font-bold text-sm text-stone-700 dark:text-stone-200">{ally}</span>
+                                          </div>
+                                      ))}
                                   </div>
-                              ))}
-                          </div>
-                      </div>
-                      <div className="bg-rose-50 dark:bg-rose-900/10 p-8 rounded-2xl border border-rose-100 dark:border-rose-900/30">
-                          <h4 className="text-xs font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400 mb-6 flex items-center gap-2"><Swords className="w-4 h-4" /> Rivals & Opponents</h4>
-                          <div className="space-y-3">
-                              {(data as any).rivals?.map((rival: string, i: number) => (
-                                  <div key={i} className="flex items-center gap-3 p-3 bg-white dark:bg-stone-900 rounded-lg shadow-sm cursor-pointer hover:scale-[1.02] transition-transform" onClick={() => handleNavigateSafe('Person', rival)}>
-                                      <div className="w-8 h-8 bg-rose-100 dark:bg-rose-800 rounded-full flex items-center justify-center text-rose-600 dark:text-rose-300 font-bold text-xs">{rival.charAt(0)}</div>
-                                      <span className="font-serif font-bold text-sm text-stone-700 dark:text-stone-200">{rival}</span>
+                              </div>
+                          )}
+                          {Array.isArray((data as any).rivals) && (data as any).rivals.length > 0 && (
+                              <div className="bg-rose-50 dark:bg-rose-900/10 p-8 rounded-2xl border border-rose-100 dark:border-rose-900/30">
+                                  <h4 className="text-xs font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400 mb-6 flex items-center gap-2"><Swords className="w-4 h-4" /> Rivals & Opponents</h4>
+                                  <div className="space-y-3">
+                                      {(data as any).rivals.map((rival: string, i: number) => (
+                                          <div key={i} className="flex items-center gap-3 p-3 bg-white dark:bg-stone-900 rounded-lg shadow-sm cursor-pointer hover:scale-[1.02] transition-transform" onClick={() => handleNavigateSafe('Person', rival)}>
+                                              <div className="w-8 h-8 bg-rose-100 dark:bg-rose-800 rounded-full flex items-center justify-center text-rose-600 dark:text-rose-300 font-bold text-xs">{rival.charAt(0)}</div>
+                                              <span className="font-serif font-bold text-sm text-stone-700 dark:text-stone-200">{rival}</span>
+                                          </div>
+                                      ))}
                                   </div>
-                              ))}
-                          </div>
+                              </div>
+                          )}
                       </div>
                   </div>
-              </div>
+              )}
 
               {/* PSYCHOLOGY (NEW) */}
               {data.psychologicalProfile && (
@@ -284,10 +321,10 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                               <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4">Public Perception</h4>
                               <p className="font-serif text-stone-700 dark:text-stone-300 leading-relaxed text-justify">{data.psychologicalProfile.publicPerception}</p>
                           </div>
-                          <div className="md:col-span-2">
+                          <div className="">
                               <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4">Personality Traits</h4>
                               <div className="flex flex-wrap gap-2">
-                                  {data.psychologicalProfile.traits?.map((trait, i) => (
+                                  {(Array.isArray(data.psychologicalProfile.traits) ? data.psychologicalProfile.traits : []).map((trait, i) => (
                                       <span key={i} className="px-3 py-1 bg-purple-50 dark:bg-purple-900/10 text-purple-600 dark:text-purple-400 rounded-full text-xs font-bold border border-purple-100 dark:border-purple-900/20">{trait}</span>
                                   ))}
                               </div>
@@ -312,7 +349,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                               <div>
                                   <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Key Interviews</h4>
                                   <ul className="space-y-2">
-                                      {data.mediaPresence.interviews?.map((item, i) => (
+                                      {(Array.isArray(data.mediaPresence?.interviews) ? data.mediaPresence.interviews : []).map((item, i) => (
                                           <li key={i} className="flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300">
                                               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
                                               {item}
@@ -323,7 +360,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                               <div>
                                   <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Major Speeches</h4>
                                   <ul className="space-y-2">
-                                      {data.mediaPresence.speeches?.map((item, i) => (
+                                      {(Array.isArray(data.mediaPresence?.speeches) ? data.mediaPresence.speeches : []).map((item, i) => (
                                           <li key={i} className="flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300">
                                               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
                                               {item}
@@ -337,21 +374,23 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
               )}
 
               {/* TIMELINE */}
-              <div id="timeline" ref={el => { sectionRefs.current['timeline'] = el; }} className="bg-white dark:bg-stone-900 p-8 rounded-2xl border border-stone-200 dark:border-stone-800">
-                   <div className="flex items-center gap-3 mb-8 border-b border-stone-100 dark:border-stone-800 pb-4">
-                      <div className="p-2 bg-stone-100 dark:bg-stone-800 rounded-lg text-academic-gold"><Clock className="w-5 h-5" /></div>
-                      <h3 className="text-xl font-bold font-serif">Life Timeline</h3>
+              {Array.isArray(data.timeline) && data.timeline.length > 0 && (
+                  <div id="timeline" ref={el => { sectionRefs.current['timeline'] = el; }} className="bg-white dark:bg-stone-900 p-8 rounded-2xl border border-stone-200 dark:border-stone-800">
+                       <div className="flex items-center gap-3 mb-8 border-b border-stone-100 dark:border-stone-800 pb-4">
+                          <div className="p-2 bg-stone-100 dark:bg-stone-800 rounded-lg text-academic-gold"><Clock className="w-5 h-5" /></div>
+                          <h3 className="text-xl font-bold font-serif">Life Timeline</h3>
+                      </div>
+                      <div className="space-y-6 relative border-l-2 border-stone-200 dark:border-stone-800 ml-3 pl-8">
+                           {data.timeline.map((evt: any, i: number) => (
+                               <div key={i} className="relative group cursor-pointer" onClick={() => handleNavigateSafe('Event', evt.event)}>
+                                    <div className="absolute -left-[39px] top-1 w-3 h-3 bg-stone-400 rounded-full border-2 border-white dark:border-stone-900 group-hover:bg-academic-accent transition-colors"></div>
+                                    <span className="text-xs font-mono font-bold text-stone-500 mb-1 block">{evt.year}</span>
+                                    <h4 className="text-base font-serif font-bold text-academic-text dark:text-stone-200 group-hover:text-academic-accent transition-colors">{evt.event}</h4>
+                               </div>
+                           ))}
+                      </div>
                   </div>
-                  <div className="space-y-6 relative border-l-2 border-stone-200 dark:border-stone-800 ml-3 pl-8">
-                       {data.timeline.map((evt, i) => (
-                           <div key={i} className="relative group cursor-pointer" onClick={() => handleNavigateSafe('Event', evt.event)}>
-                                <div className="absolute -left-[39px] top-1 w-3 h-3 bg-stone-400 rounded-full border-2 border-white dark:border-stone-900 group-hover:bg-academic-accent transition-colors"></div>
-                                <span className="text-xs font-mono font-bold text-stone-500 mb-1 block">{evt.year}</span>
-                                <h4 className="text-base font-serif font-bold text-academic-text dark:text-stone-200 group-hover:text-academic-accent transition-colors">{evt.event}</h4>
-                           </div>
-                       ))}
-                  </div>
-              </div>
+              )}
 
               {/* CONTROVERSIES */}
               {data.controversies && data.controversies.length > 0 && (
@@ -361,7 +400,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                           <h3 className="text-xl font-bold font-serif text-red-900 dark:text-red-100">Controversies & Criticisms</h3>
                       </div>
                       <ul className="space-y-4">
-                          {data.controversies.map((item, i) => (
+                          {(Array.isArray(data.controversies) ? data.controversies : []).map((item, i) => (
                               <li key={i} className="flex gap-3">
                                   <span className="text-red-400 font-bold">•</span>
                                   <span className="font-serif text-stone-800 dark:text-stone-200">{item}</span>
@@ -379,7 +418,7 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
                           <h3 className="text-xl font-bold font-serif text-amber-900 dark:text-amber-100">Honors & Awards</h3>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {data.awards.map((item, i) => (
+                          {(Array.isArray(data.awards) ? data.awards : []).map((item, i) => (
                               <div key={i} className="flex items-center gap-3 p-3 bg-white dark:bg-stone-900 rounded-lg shadow-sm border border-amber-100 dark:border-amber-900/20">
                                   <Award className="w-4 h-4 text-amber-500" />
                                   <span className="font-serif font-bold text-sm text-stone-800 dark:text-stone-200">{item}</span>
@@ -390,34 +429,38 @@ const PersonDetailScreen: React.FC<PersonDetailScreenProps> = ({ personName, onC
               )}
 
               {/* QUOTES & LEGACY */}
-              <div id="legacy" ref={el => { sectionRefs.current['legacy'] = el; }} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="bg-academic-text dark:bg-stone-100 text-white dark:text-stone-900 p-8 rounded-2xl relative overflow-hidden">
-                       <Quote className="absolute top-6 right-6 w-16 h-16 text-white/10 dark:text-black/10" />
-                       <h4 className="text-xs font-bold uppercase tracking-widest mb-6 opacity-70">Notable Quotes</h4>
-                       <div className="space-y-6 relative z-10">
-                           {((data as any).quotes || []).map((quote: string, i: number) => (
-                               <blockquote key={i} className="font-serif text-lg leading-relaxed text-justify italic">
-                                   "{quote}"
-                               </blockquote>
-                           ))}
-                       </div>
-                  </div>
-                  
-                  <div className="bg-white dark:bg-stone-900 p-8 rounded-2xl border border-stone-200 dark:border-stone-800">
-                      <h4 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-6 flex items-center gap-2"><Target className="w-4 h-4" /> Political Works</h4>
-                      <div className="space-y-3">
-                          {data.politicalWorks.map((work, i) => (
-                              <div key={i} className="flex items-center justify-between p-3 bg-stone-50 dark:bg-stone-800 rounded-lg cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-700 group" onClick={() => setReadingDoc({title: work, author: data.name})}>
-                                  <span className="font-serif font-bold text-sm text-stone-800 dark:text-stone-200">{work}</span>
-                                  <BookOpen className="w-4 h-4 text-stone-400 group-hover:text-academic-gold" />
+              {(((data as any).quotes && (data as any).quotes.length > 0) || (Array.isArray(data.politicalWorks) && data.politicalWorks.length > 0)) && (
+                  <div id="legacy" ref={el => { sectionRefs.current['legacy'] = el; }} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {((data as any).quotes && (data as any).quotes.length > 0) && (
+                          <div className="bg-academic-text dark:bg-stone-100 text-white dark:text-stone-900 p-8 rounded-2xl relative overflow-hidden">
+                               <Quote className="absolute top-6 right-6 w-16 h-16 text-white/10 dark:text-black/10" />
+                               <h4 className="text-xs font-bold uppercase tracking-widest mb-6 opacity-70">Notable Quotes</h4>
+                               <div className="space-y-6 relative z-10">
+                                   {((data as any).quotes || []).map((quote: string, i: number) => (
+                                       <blockquote key={i} className="font-serif text-lg leading-relaxed text-justify italic">
+                                           "{quote}"
+                                       </blockquote>
+                                   ))}
+                               </div>
+                          </div>
+                      )}
+                      
+                      {Array.isArray(data.politicalWorks) && data.politicalWorks.length > 0 && (
+                          <div className="bg-white dark:bg-stone-900 p-8 rounded-2xl border border-stone-200 dark:border-stone-800">
+                              <h4 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-6 flex items-center gap-2"><Target className="w-4 h-4" /> Political Works</h4>
+                              <div className="space-y-3">
+                                  {data.politicalWorks.map((work, i) => (
+                                      <div key={i} className="flex items-center justify-between p-3 bg-stone-50 dark:bg-stone-800 rounded-lg cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-700 group" onClick={() => setReadingDoc({title: work, author: data.name})}>
+                                          <span className="font-serif font-bold text-sm text-stone-800 dark:text-stone-200">{work}</span>
+                                          <BookOpen className="w-4 h-4 text-stone-400 group-hover:text-academic-gold" />
+                                      </div>
+                                  ))}
                               </div>
-                          ))}
-                      </div>
+                          </div>
+                      )}
                   </div>
-              </div>
+              )}
               
-
-
           </div>
       </div>
     </div>

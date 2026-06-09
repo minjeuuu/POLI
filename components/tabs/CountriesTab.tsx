@@ -295,24 +295,22 @@ const CountriesTab: React.FC<CountriesTabProps> = ({ onNavigate, onAddToCompare,
                     </span>
                   </div>
               </div>
-              <div className="flex items-center gap-2 sm:gap-3 justify-between sm:justify-end w-full sm:w-auto">
-                  <div className="text-[10px] font-mono text-stone-400 dark:text-stone-500 uppercase tracking-widest bg-stone-100 dark:bg-stone-900 px-3 py-1.5 rounded-md border border-stone-200 dark:border-stone-800 flex items-center gap-2">
-                      <Globe className="w-3 h-3" /> {Object.values(groupedCountries || {}).flat().length || filteredList.length} <span className="hidden xs:inline">Records</span>
+              <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-auto hidden sm:flex">
+                  <div className="text-[10px] font-mono text-stone-400 dark:text-stone-500 uppercase tracking-widest bg-stone-100 dark:bg-stone-900 px-3 py-1.5 rounded-md border border-stone-200 dark:border-stone-800 hidden sm:flex items-center gap-2">
+                      <Globe className="w-3 h-3" /> {Object.values(groupedCountries || {}).flat().length || filteredList.length} Records
                   </div>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                      <button 
-                        onClick={handleRandomDiscovery}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-academic-gold text-white text-[10px] font-bold uppercase tracking-widest rounded-md hover:bg-yellow-600 transition-colors shadow-sm active:scale-95"
-                      >
-                          <Shuffle className="w-3 h-3" /> Discover
-                      </button>
-                      
-                      {/* View Toggle */}
-                      <div className="flex bg-stone-100 dark:bg-stone-900 rounded-lg p-1 border border-stone-200 dark:border-stone-800">
-                          <button onClick={() => setViewMode('grid')} title="Grid View" className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-stone-800 shadow-sm text-academic-accent dark:text-white ring-1 ring-black/5' : 'text-stone-400 hover:text-stone-600'}`}><LayoutGrid className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => setViewMode('list')} title="List View" className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-stone-800 shadow-sm text-academic-accent dark:text-white ring-1 ring-black/5' : 'text-stone-400 hover:text-stone-600'}`}><List className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => setViewMode('table')} title="Table View" className={`p-1.5 rounded-md transition-all ${viewMode === 'table' ? 'bg-white dark:bg-stone-800 shadow-sm text-academic-accent dark:text-white ring-1 ring-black/5' : 'text-stone-400 hover:text-stone-600'}`}><TableIcon className="w-3.5 h-3.5" /></button>
-                      </div>
+                  <button 
+                    onClick={handleRandomDiscovery}
+                    className="flex items-center gap-2 px-4 py-1.5 bg-academic-gold text-white text-[10px] font-bold uppercase tracking-widest rounded-md hover:bg-yellow-600 transition-colors shadow-sm active:scale-95"
+                  >
+                      <Shuffle className="w-3 h-3" /> Discover
+                  </button>
+                  
+                  {/* View Toggle */}
+                  <div className="flex bg-stone-100 dark:bg-stone-900 rounded-lg p-1 border border-stone-200 dark:border-stone-800">
+                      <button onClick={() => setViewMode('grid')} title="Grid View" className={`p-1.5 sm:p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-stone-800 shadow-sm text-academic-accent dark:text-white ring-1 ring-black/5' : 'text-stone-400 hover:text-stone-600'}`}><LayoutGrid className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
+                      <button onClick={() => setViewMode('list')} title="List View" className={`p-1.5 sm:p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-stone-800 shadow-sm text-academic-accent dark:text-white ring-1 ring-black/5' : 'text-stone-400 hover:text-stone-600'}`}><List className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
+                      <button onClick={() => setViewMode('table')} title="Table View" className={`p-1.5 sm:p-2 rounded-md transition-all ${viewMode === 'table' ? 'bg-white dark:bg-stone-800 shadow-sm text-academic-accent dark:text-white ring-1 ring-black/5' : 'text-stone-400 hover:text-stone-600'}`}><TableIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
                   </div>
               </div>
           </div>

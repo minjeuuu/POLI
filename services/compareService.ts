@@ -51,7 +51,7 @@ export const fetchComparison = async (item1: {name: string, type: string}, item2
             `;
 
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: prompt,
                 config: { 
                     responseMimeType: "application/json",

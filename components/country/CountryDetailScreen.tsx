@@ -39,7 +39,28 @@ import { TourismProfile } from './tourism/TourismProfile';
 import { CultureProfile } from './culture/CultureProfile';
 import { HealthProfile } from './health/HealthProfile';
 import { EducationProfile } from './education/EducationProfile';
-
+import { WorldBankWidget } from './economy/WorldBankWidget';
+import { RestCountriesWidget } from './external/RestCountriesWidget';
+import { OpenStreetMapWidget } from './external/OpenStreetMapWidget';
+import { OpenMeteoWidget } from '../external/OpenMeteoWidget';
+import { UniversitiesWidget } from '../external/UniversitiesWidget';
+import { PublicHolidaysWidget } from '../external/PublicHolidaysWidget';
+import { WikipediaWidget } from '../external/WikipediaWidget';
+import { FrankfurterWidget } from '../external/FrankfurterWidget';
+import { MetMuseumWidget } from '../external/MetMuseumWidget';
+import { OpenAlexWidget } from '../external/OpenAlexWidget';
+import { ReliefWebWidget } from '../external/ReliefWebWidget';
+import { WikiquoteWidget } from '../external/WikiquoteWidget';
+import { InternetArchiveWidget } from '../external/InternetArchiveWidget';
+import { OpenAQWidget } from '../external/OpenAQWidget';
+import { HackerNewsWidget } from '../external/HackerNewsWidget';
+import { WorldBankIndicatorsWidget } from '../external/WorldBankIndicatorsWidget';
+import { USASpendingWidget } from '../external/USASpendingWidget';
+import { GDELTWidget } from '../external/GDELTWidget';
+import { ArtInstituteChicagoWidget } from '../external/ArtInstituteChicagoWidget';
+import { DOAJWidget } from '../external/DOAJWidget';
+import { SemanticScholarWidget } from '../external/SemanticScholarWidget';
+import { LibraryOfCongressWidget } from '../external/LibraryOfCongressWidget';
 
 import { generateAestheticPDF } from '../../utils/pdfGenerator';
 
@@ -132,7 +153,7 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
   ].filter(s => s.required !== undefined ? hasData(s.required) || (Array.isArray(s.required) && s.required.length > 0) : true);
 
   if (loading) return (
-      <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex items-center justify-center">
+      <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex items-center justify-center">
           <LoadingScreen message={`Reconstructing ${countryName} via Poli Archive V1...`} />
       </div>
   );
@@ -415,7 +436,7 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
                   <div className="bg-stone-900 text-white p-6 rounded-xl">
                        <div className="flex justify-between items-center mb-4">
                            <h4 className="font-bold uppercase tracking-widest text-sm">Active Personnel</h4>
-                           <span className="font-mono text-xl">{data.militaryComplex?.totalActive || "N/A"}</span>
+                           <span className="font-mono text-xl">{data.militaryComplex?.totalActive }</span>
                        </div>
                        <div className="grid grid-cols-2 gap-4 text-xs font-mono text-stone-400">
                            <div>Budget: {data.militaryComplex?.budget}</div>
@@ -448,7 +469,35 @@ const CountryDetailScreen: React.FC<CountryDetailScreenProps> = ({ countryName, 
                    <ImageArchiveGrid images={data.imageArchive || []} />
                </SectionWrapper>
 
-
+               {/* EXTERNAL NEWS & RESOURCES MULTI-GRID */}
+               <SectionWrapper id="news" title="External Repositories & Data" icon={Globe} isVisible={true}>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
+                        <div className="space-y-6">
+                            <FrankfurterWidget />
+                            <RestCountriesWidget countryName={countryName} />
+                            <WorldBankWidget countryName={countryName} />
+                            <OpenStreetMapWidget countryName={countryName} />
+                            <OpenMeteoWidget locationName={data.capital || countryName} />
+                            <MetMuseumWidget queryText={countryName} />
+                        </div>
+                        <div className="space-y-6">
+                            <WorldBankIndicatorsWidget countryName={countryName} />
+                            <OpenAQWidget countryName={countryName} />
+                            <ReliefWebWidget queryText={countryName} />
+                            <OpenAlexWidget queryText={countryName} />
+                            <WikipediaWidget title={countryName} description="country nation politics" />
+                            <UniversitiesWidget countryName={countryName} />
+                        </div>
+                        <div className="space-y-6">
+                            <GDELTWidget queryText={countryName} />
+                            <LibraryOfCongressWidget queryText={countryName} />
+                            <SemanticScholarWidget queryText={countryName} />
+                            <DOAJWidget queryText={countryName} />
+                            <ArtInstituteChicagoWidget queryText={countryName} />
+                            <PublicHolidaysWidget countryName={countryName} />
+                        </div>
+                    </div>
+               </SectionWrapper>
 
           </div>
       </div>

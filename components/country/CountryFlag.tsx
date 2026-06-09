@@ -31,7 +31,7 @@ export const CountryFlag: React.FC<CountryFlagProps> = ({
             return `https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_${baseName}.png`;
         } else if (fallbackAttempt === 3) {
              // Ultimate fallback: Web Search Thumbnail (Bing Image Search hack) to get ANY flag (fictional, historical, micronation)
-             return `https://tse1.mm.bing.net/th?q=${encodeURIComponent(countryName + " flag official")}&w=300&h=200&c=7`;
+             return `https://tse1.mm.bing.net/th?q=${encodeURIComponent(countryName + " national flag vector official clear")}&w=400&h=300&c=7&pid=Api`;
         }
         return null;
     };

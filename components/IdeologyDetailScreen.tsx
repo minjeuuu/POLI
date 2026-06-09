@@ -1,6 +1,7 @@
 
 
 
+import { ImageWithFallback } from './atoms/ImageWithFallback';
 import React, { useEffect, useState, useRef } from 'react';
 import { ArrowLeft, Bookmark, Library, Download, Map, BarChart2, Brain, ChevronRight, BookOpen, Clock, Users, Globe, LayoutGrid, Check, X, FileText, Search, Lightbulb, AlertTriangle, Layers, GitMerge, Zap, Printer, ArrowRightLeft } from 'lucide-react';
 import { IdeologyDetail, DisciplineWork } from '../types';
@@ -12,7 +13,6 @@ import ReaderView from './ReaderView';
 import QuizView from './QuizView';
 import FlashcardView from './FlashcardView';
 import { IconRenderer } from './IconMap';
-
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -120,12 +120,64 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
       });
   };
 
-  if (loading) return <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><LoadingScreen message={`Analyzing ${ideologyName}...`} /></div>;
-  if (!data) return <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><p className="text-stone-500">Data unavailable.</p></div>;
+  
+  const handleDownload = () => {
+      if (typeof playSFX === 'function') playSFX('click');
+      if (!data) return;
+      try {
+          const sections = [];
+          
+          if (data.bio) sections.push({ title: "Biography", content: data.bio });
+          if (data.biography) sections.push({ title: "Biography", content: data.biography });
+          if (data.overview) sections.push({ title: "Overview", content: data.overview });
+          if (data.historicalImpact) sections.push({ title: "Historical Impact", content: data.historicalImpact });
+          if (data.context) sections.push({ title: "Context", content: data.context });
+          if (data.earlyLife) sections.push({ title: "Early Life", content: data.earlyLife });
+          if (data.ideology) sections.push({ title: "Ideology", content: data.ideology });
+          if (data.legacy) sections.push({ title: "Legacy", content: data.legacy });
+          
+          Object.entries(data).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
+
+          generateAestheticPDF(
+              data.name || "Dossier",
+              data.type || data.role || data.country || "Intelligence Record",
+              data.shortBio || data.bio?.substring(0, 100) || data.overview?.substring(0, 100) || "Fact Sheet",
+              sections,
+              `${(data.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
+          );
+      } catch (err) {
+          console.error("PDF generation failed:", err);
+      }
+  };
+
+    if (loading) return <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><LoadingScreen message={`Analyzing ${ideologyName}...`} /></div>;
+  if (!data) return <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><p className="text-stone-500">Data unavailable.</p></div>;
 
   return (
     <>
-    <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
+    <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
       
       {/* HEADER */}
       <div className="flex-none h-16 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 flex items-center justify-between px-6 z-50 shadow-sm print:hidden">
@@ -137,7 +189,7 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
              </div>
          </div>
          <div className="flex items-center gap-2">
-             <button onClick={() => window.print()} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
+             <button onClick={handleDownload} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
              <button onClick={handleDownloadDossier} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Download Dossier"><Download className="w-4 h-4" /></button>
              <button onClick={onToggleSave} className={`p-2 rounded-full transition-colors ${isSaved ? 'text-academic-gold bg-stone-50 dark:bg-stone-800' : 'text-stone-400 hover:text-academic-accent hover:bg-stone-100 dark:hover:bg-stone-800'}`}><Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} /></button>
          </div>
@@ -166,7 +218,12 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
                       <Lightbulb className="w-12 h-12" />
                   </div>
                   <div>
-                       <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 leading-tight">{data.name}</h1>
+                       {data.imageUrl && (
+                        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-stone-200 dark:border-stone-800 shadow-md mb-6">
+                            <ImageWithFallback src={data.imageUrl} alt={data.name} className="w-full h-full object-cover" />
+                        </div>
+                    )}
+                    <h1 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100 leading-tight">{data.name}</h1>
                   </div>
               </div>
               <div className="mb-8 font-serif text-lg leading-loose text-justify text-stone-700 dark:text-stone-200">{renderProse(data.definition)}</div>
@@ -184,7 +241,7 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
                   {renderProse(data.historyNarrative)}
                   
                   <div className="mt-8 border-l-2 border-stone-200 dark:border-stone-700 ml-3 pl-8 space-y-8">
-                      {data.timeline?.map((evt, i) => (
+                      {(Array.isArray(data.timeline) ? data.timeline : []).map((evt, i) => (
                           <div key={i} className="relative group cursor-pointer" onClick={() => onNavigate && onNavigate('Event', evt.event)}>
                               <div className="absolute -left-[41px] top-1.5 w-4 h-4 bg-white dark:bg-stone-900 border-2 border-academic-gold rounded-full group-hover:scale-125 transition-transform shadow-sm"></div>
                               <span className="text-xs font-mono font-bold text-academic-gold block mb-1">{evt.year}</span>
@@ -200,7 +257,7 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
           <div id="branches" ref={el => { sectionRefs.current['branches'] = el; }}>
               <SectionTitle title="Schools & Branches" icon={GitMerge} subtitle="Variations in Thought" />
               <div className="flex flex-wrap gap-3">
-                  {data.branches?.map((branch, i) => (
+                  {(Array.isArray(data.branches) ? data.branches : []).map((branch, i) => (
                       <button 
                         key={i} 
                         onClick={() => setSelectedConcept(branch)}
@@ -216,7 +273,7 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
           <div id="tenets" ref={el => { sectionRefs.current['tenets'] = el; }}>
                <SectionTitle title="Core Tenets" icon={Zap} subtitle="Foundational Principles" />
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   {data.coreTenets?.map((tenet, i) => (
+                   {(Array.isArray(data.coreTenets) ? data.coreTenets : []).map((tenet, i) => (
                        <div key={i} className="bg-white dark:bg-stone-900 p-6 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer group" onClick={() => setSelectedConcept(tenet.concept)}>
                            <div className="flex items-start gap-4">
                                <div className="mt-1 p-1.5 bg-academic-gold/10 rounded-full text-academic-gold group-hover:scale-110 transition-transform"><Check className="w-3 h-3" /></div>
@@ -234,7 +291,7 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
           <div id="thinkers" ref={el => { sectionRefs.current['thinkers'] = el; }}>
                <SectionTitle title="Key Thinkers" icon={Users} subtitle="Intellectual Architects" />
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                   {data.keyThinkers?.map((thinker, i) => (
+                   {(Array.isArray(data.keyThinkers) ? data.keyThinkers : []).map((thinker, i) => (
                        <button 
                         key={i} 
                         onClick={() => onNavigate && onNavigate('Person', thinker.name)}
@@ -326,26 +383,23 @@ const IdeologyDetailScreen: React.FC<IdeologyDetailScreenProps> = ({ ideologyNam
                     </div>
                 </div>
             </div>
-            
-
-
           </div>
       </div>
     </div>
 
-    {/* OVERLAYS */}
-    {selectedConcept && <ConceptDetailModal term={selectedConcept} context={ideologyName} onClose={() => setSelectedConcept(null)} />}
-    
-    {activeBook && (
-        <ReaderView 
-           title={activeBook.title}
-           author={activeBook.author}
-           onClose={() => setActiveBook(null)}
-        />
-    )}
+      {/* OVERLAYS */}
+      {selectedConcept && <ConceptDetailModal term={selectedConcept} context={ideologyName} onClose={() => setSelectedConcept(null)} />}
+      
+      {activeBook && (
+          <ReaderView 
+             title={activeBook.title}
+             author={activeBook.author}
+             onClose={() => setActiveBook(null)}
+          />
+      )}
 
-    {showQuiz && <QuizView topic={ideologyName} onClose={() => setShowQuiz(false)} />}
-    {showFlashcards && <FlashcardView topic={ideologyName} onClose={() => setShowFlashcards(false)} />}
+      {showQuiz && <QuizView topic={ideologyName} onClose={() => setShowQuiz(false)} />}
+      {showFlashcards && <FlashcardView topic={ideologyName} onClose={() => setShowFlashcards(false)} />}
     </>
   );
 };

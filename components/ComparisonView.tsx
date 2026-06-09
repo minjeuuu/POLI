@@ -279,7 +279,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({ item1, item2, onClose, 
   );
 
   return (
-    <div className="fixed inset-0 top-16 z-40 bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-bottom duration-500 overflow-hidden transition-colors">
+    <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-bottom duration-500 overflow-hidden transition-colors">
         
         {/* SUB HEADER - Comparison Specific */}
         <div className="flex-none h-16 border-b border-academic-line dark:border-stone-800 bg-academic-paper dark:bg-stone-900 flex justify-between items-center px-6 shadow-sm z-30">

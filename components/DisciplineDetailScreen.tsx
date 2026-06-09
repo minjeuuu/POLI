@@ -16,7 +16,6 @@ import FlashcardView from './FlashcardView';
 import RegionalDetailScreen from './RegionalDetailScreen';
 import ConceptDetailModal from './ConceptDetailModal';
 import PersonDetailScreen from './PersonDetailScreen';
-
 import { generateAestheticPDF } from '../utils/pdfGenerator';
 import { playSFX } from '../services/soundService';
 
@@ -124,9 +123,9 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
                sections.push({ 
                    title: "1. OVERVIEW", 
                    content: [
-                       `Definition: ${data.overview.definition || 'N/A'}`,
-                       `Scope: ${data.overview.scope || 'N/A'}`,
-                       `Importance: ${data.overview.importance || 'N/A'}`,
+                       `Definition: ${data.overview.definition }`,
+                       `Scope: ${data.overview.scope }`,
+                       `Importance: ${data.overview.importance }`,
                        "",
                        "Key Questions:",
                        ...(data.overview.keyQuestions || []).map((q: string) => `  - ${q}`)
@@ -174,14 +173,66 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
       }
   };
 
-  if (loading) return <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><LoadingScreen message={`Structuring ${disciplineName}...`} /></div>;
+  
+  const handleDownload = () => {
+      if (typeof playSFX === 'function') playSFX('click');
+      if (!data) return;
+      try {
+          const sections = [];
+          
+          if (data.bio) sections.push({ title: "Biography", content: data.bio });
+          if (data.biography) sections.push({ title: "Biography", content: data.biography });
+          if (data.overview) sections.push({ title: "Overview", content: data.overview });
+          if (data.historicalImpact) sections.push({ title: "Historical Impact", content: data.historicalImpact });
+          if (data.context) sections.push({ title: "Context", content: data.context });
+          if (data.earlyLife) sections.push({ title: "Early Life", content: data.earlyLife });
+          if (data.ideology) sections.push({ title: "Ideology", content: data.ideology });
+          if (data.legacy) sections.push({ title: "Legacy", content: data.legacy });
+          
+          Object.entries(data).forEach(([key, val]) => {
+              const ignoreKeys = ["name", "type", "imageUrl", "bio", "biography", "overview", "historicalImpact", "context", "earlyLife", "ideology", "legacy", "role", "country", "era", "year", "location"];
+              if (ignoreKeys.includes(key) || !val) return;
+              
+              const title = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+              
+              if (typeof val === 'string' && val.length > 20) {
+                  sections.push({ title, content: val });
+              } else if (Array.isArray(val) && val.length > 0) {
+                  if (typeof val[0] === 'string') {
+                      sections.push({ title, content: val });
+                  } else if (typeof val[0] === 'object') {
+                      sections.push({ title, content: val.map(v => JSON.stringify(v).replace(/[{}"]/g, '').replace(/:/g, ': ')) });
+                  }
+              } else if (typeof val === 'object' && !Array.isArray(val)) {
+                  const arr = [];
+                  Object.entries(val).forEach(([k, v]) => {
+                      if (typeof v === 'string') arr.push(`${k.toUpperCase()}: ${v}`);
+                      else if (Array.isArray(v)) arr.push(`${k.toUpperCase()}: ${v.join(', ')}`);
+                  });
+                  if (arr.length > 0) sections.push({ title, content: arr });
+              }
+          });
+
+          generateAestheticPDF(
+              data.name || "Dossier",
+              data.type || data.role || data.country || "Intelligence Record",
+              data.shortBio || data.bio?.substring(0, 100) || data.overview?.substring(0, 100) || "Fact Sheet",
+              sections,
+              `${(data.name || "Document").replace(/\s+/g, '_')}_Dossier.pdf`
+          );
+      } catch (err) {
+          console.error("PDF generation failed:", err);
+      }
+  };
+
+    if (loading) return <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex items-center justify-center"><LoadingScreen message={`Structuring ${disciplineName}...`} /></div>;
   if (!data) return null;
 
   const currentIconName = data.iconName || iconName;
 
   return (
     <>
-    <div className="fixed inset-0 top-16 z-[60] bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
+    <div className="h-full w-full relative bg-academic-bg dark:bg-stone-950 flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
       
       {/* HEADER */}
       <div className="flex-none h-16 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 flex items-center justify-between px-6 z-50 shadow-sm print:hidden">
@@ -193,7 +244,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
              </div>
           </div>
           <div className="flex items-center gap-2">
-             <button onClick={handlePrint} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
+             <button onClick={handleDownload} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-academic-accent dark:hover:text-indigo-400 transition-colors" title="Print Dossier"><Printer className="w-4 h-4" /></button>
              <button onClick={onToggleSave} className={`p-2 rounded-full transition-colors ${isSaved ? 'text-academic-gold bg-stone-50 dark:bg-stone-800' : 'text-stone-400 hover:text-academic-accent hover:bg-stone-100 dark:hover:bg-stone-800'}`}><Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} /></button>
           </div>
       </div>
@@ -223,7 +274,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
                         <IconRenderer name={currentIconName} className="w-10 h-10" />
                     </div>
                     <div className="flex-1">
-                        <h1 className="text-5xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 leading-tight">{data.name}</h1>
+                        <h1 className="text-3xl font-serif font-bold text-academic-text dark:text-stone-100 mb-4 leading-tight">{data.name}</h1>
                         <p className="text-lg font-serif text-stone-600 dark:text-stone-300 leading-relaxed text-justify mb-6">
                             {data.overview?.definition || "Definition currently unavailable."}
                         </p>
@@ -260,7 +311,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
                 {/* TIMELINE */}
                 <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8">
                     <div className="border-l-2 border-stone-200 dark:border-stone-700 ml-4 pl-8 space-y-8 py-2 mb-12">
-                        {data.history?.map((h, i) => (
+                        {(Array.isArray(data.history) ? data.history : []).map((h, i) => (
                             <button key={i} className="relative group cursor-pointer hover:opacity-80 transition-opacity text-left w-full" onClick={() => setSelectedConcept(h.event)}>
                                 <div className="absolute -left-[41px] top-1.5 w-4 h-4 bg-white dark:bg-stone-900 border-2 border-stone-300 dark:border-stone-600 rounded-full group-hover:border-academic-gold transition-colors"></div>
                                 <span className="text-xs font-mono font-bold text-academic-gold block mb-1">{h.year}</span>
@@ -284,7 +335,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
             <div id="subfields" ref={el => { sectionRefs.current['subfields'] = el; }}>
                 <SectionTitle title="Sub-Disciplines" icon={LayoutGrid} subtitle="Fields of Study" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {data.subDisciplines?.map((sub, i) => (
+                    {(Array.isArray(data.subDisciplines) ? data.subDisciplines : []).map((sub, i) => (
                         <button 
                             key={i} 
                             onClick={() => onNavigate(sub, "Brain")}
@@ -303,7 +354,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
             <div id="theories" ref={el => { sectionRefs.current['theories'] = el; }}>
                 <SectionTitle title="Core Theories" icon={Brain} subtitle="Theoretical Frameworks" />
                 <div className="space-y-4">
-                    {data.coreTheories?.map((theory, i) => (
+                    {(Array.isArray(data.coreTheories) ? data.coreTheories : []).map((theory, i) => (
                         <div key={i} className="bg-white dark:bg-stone-900 p-6 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm cursor-pointer hover:shadow-md transition-all hover:border-academic-gold dark:hover:border-indigo-500" onClick={() => setSelectedConcept(theory.name)}>
                             <div className="flex justify-between items-start mb-2">
                                 <h4 className="font-bold text-academic-text dark:text-stone-100 font-serif text-lg">{theory.name}</h4>
@@ -319,7 +370,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
             <div id="methods" ref={el => { sectionRefs.current['methods'] = el; }}>
                 <SectionTitle title="Research Methods" icon={BarChart2} subtitle="Analysis Tools" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {data.methods?.map((method, i) => (
+                    {(Array.isArray(data.methods) ? data.methods : []).map((method, i) => (
                         <div key={i} className="border-l-4 border-academic-accent dark:border-indigo-500 pl-4 py-2 bg-white dark:bg-stone-900 rounded-r-xl shadow-sm pr-4">
                             <h4 className="font-bold text-sm text-stone-800 dark:text-stone-200 mb-1">{method.name}</h4>
                             <p className="text-xs text-stone-500 dark:text-stone-400 mb-2 leading-relaxed text-justify">{method.description}</p>
@@ -335,7 +386,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
             <div id="scholars" ref={el => { sectionRefs.current['scholars'] = el; }}>
                 <SectionTitle title="Key Scholars" icon={Users} subtitle="Intellectual Giants" />
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {data.scholars?.map((scholar, i) => (
+                    {(Array.isArray(data.scholars) ? data.scholars : []).map((scholar, i) => (
                         <button key={i} onClick={() => setSelectedScholar(scholar.name)} className="flex items-center gap-3 p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-academic-accent dark:hover:border-indigo-500 transition-colors text-left group shadow-sm hover:shadow-md hover:-translate-y-1">
                             <div className="w-10 h-10 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center text-stone-500 dark:text-stone-400 font-serif font-bold group-hover:bg-academic-accent dark:group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                                 {(scholar.name || '').charAt(0)}
@@ -353,7 +404,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
             <div id="regions" ref={el => { sectionRefs.current['regions'] = el; }}>
                 <SectionTitle title="Regional Focus" icon={Map} subtitle="Geographic Application" />
                 <div className="flex flex-wrap gap-3 mb-6">
-                    {data.regionalFocus?.map((reg, i) => (
+                    {(Array.isArray(data.regionalFocus) ? data.regionalFocus : []).map((reg, i) => (
                         <button key={i} onClick={() => setActiveRegion(reg.region)} className={`px-4 py-2 border rounded-full text-xs font-bold transition-all shadow-sm
                         ${activeRegion === reg.region ? 'bg-academic-text dark:bg-stone-100 text-white dark:text-stone-900 border-transparent' : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-academic-accent'}`}>
                             {reg.region}
@@ -376,7 +427,7 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
                     <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-6 shadow-sm">
                         <h4 className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-4">Foundational Texts</h4>
                         <div className="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
-                            {data.foundationalWorks?.map((work, i) => (
+                            {(Array.isArray(data.foundationalWorks) ? data.foundationalWorks : []).map((work, i) => (
                                 <button 
                                   key={i} 
                                   onClick={() => setActiveBook({...work, type: 'Book'})}
@@ -419,8 +470,6 @@ const DisciplineDetailScreen: React.FC<DisciplineDetailScreenProps> = ({
                     </div>
                 </div>
             </div>
-
-
 
          </div>
       </div>

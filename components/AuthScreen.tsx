@@ -62,97 +62,42 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin, onGuest }) => {
     
     try {
         if (mode === 'signup') {
-            let newUser: any = null;
-            try {
-                // Try Firebase Auth Sign Up
-                const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
-                const credential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-                await updateProfile(credential.user, { displayName: formData.username || 'Scholar' });
-                
-                newUser = {
-                    id: credential.user.uid,
-                    username: formData.username || 'Scholar',
-                    email: formData.email,
-                    level: 1,
-                    xp: 0,
-                    coins: 100,
-                    joinedDate: new Date().toISOString(),
-                    stats: { ...DEFAULT_STATS },
-                    preferences: { ...DEFAULT_PREFS }
-                };
-                await db.saveItem('users', newUser);
-            } catch (fbErr: any) {
-                console.warn("Firebase Auth SignUp failed/offline, creating local profile:", fbErr);
-                
-                // Check local DB first to prevent duplicates
-                const existing = await db.execute(`SELECT * FROM users WHERE email = '${formData.email}'`);
-                if (existing.rows.length > 0) {
-                    alert("User already exists locally!");
-                    setLoading(false);
-                    return;
-                }
-                
-                newUser = {
-                    id: Date.now().toString(),
-                    username: formData.username || 'Scholar',
-                    email: formData.email,
-                    password: formData.password, // Saved locally for offline access only
-                    level: 1,
-                    xp: 0,
-                    coins: 100,
-                    joinedDate: new Date().toISOString(),
-                    stats: { ...DEFAULT_STATS },
-                    preferences: { ...DEFAULT_PREFS }
-                };
-                await db.saveItem('users', newUser);
+            const existing = await db.execute(`SELECT * FROM users WHERE email = '${formData.email}'`);
+            if (existing.rows.length > 0) {
+                alert("User already exists!");
+                setLoading(false);
+                return;
             }
             
+            const newUser = {
+                id: Date.now().toString(),
+                username: formData.username || 'Scholar',
+                email: formData.email,
+                password: formData.password, 
+                level: 1,
+                xp: 0,
+                coins: 100,
+                joinedDate: new Date().toISOString(),
+                stats: { ...DEFAULT_STATS },
+                preferences: { ...DEFAULT_PREFS }
+            };
+            
+            await db.saveItem('users', newUser);
             playSFX('success');
             onLogin(newUser);
         } else {
-            let loggedInUser: any = null;
-            try {
-                // Try Firebase Auth Login
-                const { signInWithEmailAndPassword } = await import('firebase/auth');
-                const credential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-                
-                // Fetch profile
-                const res = await db.execute(`SELECT * FROM users WHERE id = '${credential.user.uid}'`);
-                if (res.rows.length > 0) {
-                    loggedInUser = res.rows[0];
-                } else {
-                    loggedInUser = {
-                        id: credential.user.uid,
-                        username: credential.user.displayName || 'Scholar',
-                        email: credential.user.email || formData.email,
-                        level: 1,
-                        xp: 0,
-                        coins: 100,
-                        joinedDate: new Date().toISOString(),
-                        stats: { ...DEFAULT_STATS },
-                        preferences: { ...DEFAULT_PREFS }
-                    };
-                    await db.saveItem('users', loggedInUser);
-                }
-            } catch (fbErr: any) {
-                console.warn("Firebase Auth Login failed/offline, checking local DB:", fbErr);
-                
-                // Fallback to local SQL login
-                const result = await db.execute(`SELECT * FROM users WHERE email = '${formData.email}' AND password = '${formData.password}'`);
-                if (result.rows.length > 0) {
-                    loggedInUser = result.rows[0];
-                } else {
-                    throw new Error("Invalid credentials or network is offline");
-                }
+            const result = await db.execute(`SELECT * FROM users WHERE email = '${formData.email}' AND password = '${formData.password}'`);
+            if (result.rows.length > 0) {
+                playSFX('success');
+                onLogin(result.rows[0]);
+            } else {
+                alert("Invalid credentials");
+                playSFX('error');
             }
-            
-            playSFX('success');
-            onLogin(loggedInUser);
         }
-    } catch (err: any) {
+    } catch (err) {
         console.error(err);
-        alert(err.message || "Authentication Failed");
-        playSFX('error');
+        alert("Database Error");
     } finally {
         setLoading(false);
     }

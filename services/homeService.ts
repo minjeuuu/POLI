@@ -53,14 +53,14 @@ export const fetchDailyContext = async (date: Date, userCountry?: string): Promi
                 contents: contents,
                 config: { 
                     tools: [{ googleSearch: {} }],
-                    responseMimeType: "application/json",
+                    
                     maxOutputTokens: 8192
                 }
             });
         };
 
         try {
-            let response = await attemptFetch('gemini-3-flash-preview');
+            let response = await attemptFetch('gemini-2.5-flash');
             const parsed = safeParse(response.text || '{}', FALLBACK_DAILY_CONTEXT) as any;
             
             // FETCH REAL NEWS
@@ -151,14 +151,14 @@ export const fetchHighlightDetail = async (highlight: HighlightedEntity): Promis
                 model: model,
                 contents: contents,
                 config: { 
-                    responseMimeType: "application/json",
+                    
                     maxOutputTokens: 4096
                 }
             });
         };
 
         try {
-            let response = await attemptFetch('gemini-3-flash-preview');
+            let response = await attemptFetch('gemini-2.5-flash');
             const parsed = safeParse(response.text || '{}', {}) as any;
             return {
                 title: parsed.title || highlight.title,

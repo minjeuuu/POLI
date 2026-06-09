@@ -14,7 +14,7 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     return withCache(cacheKey, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: `
                 ACT AS: UNIVERSAL TRANSLATOR & POLITICAL LINGUIST.
                 TASK: Translate the following text into ${targetLanguage}.

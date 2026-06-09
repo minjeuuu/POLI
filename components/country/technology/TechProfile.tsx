@@ -10,8 +10,8 @@ export const TechProfile: React.FC<{ data: any }> = ({ data }) => {
             <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4 flex items-center gap-2"><Cpu className="w-4 h-4 text-blue-500" /> Digital & Tech Landscape</h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <DetailCard label="Internet Access" value={data.internetPenetration || "N/A"} icon={Wifi} subValue="Population Penetration" />
-                <DetailCard label="Cyber Capabilities" value={data.cyberRank || "N/A"} icon={Shield} subValue="Global Ranking" />
+                <DetailCard label="Internet Access" value={data.internetPenetration } icon={Wifi} subValue="Population Penetration" />
+                <DetailCard label="Cyber Capabilities" value={data.cyberRank } icon={Shield} subValue="Global Ranking" />
             </div>
 
             <div className="bg-stone-900 text-white p-6 rounded-xl border border-stone-800">

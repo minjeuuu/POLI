@@ -305,20 +305,20 @@ const TheoryTab: React.FC<TheoryTabProps> = ({ onNavigate, onAddToCompare, onTog
                             <div className="flex flex-col gap-2 mt-auto">
                                 <div className="flex flex-wrap gap-2">
                                     {cat.items.slice(0, 4).map((item, i) => (
-                                        <span key={i} className="text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-700 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-stone-800/50">
+                                        <span key={i} onClick={(e) => { e.stopPropagation(); setSelectedItem(item); }} className="cursor-pointer hover:bg-stone-200 dark:hover:bg-stone-700 text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-700 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-stone-800/50">
                                             {item.name}
                                         </span>
                                     ))}
                                 </div>
                                 {cat.items.length > 4 && (
-                                    <details className="group/details">
+                                    <details className="group/details" onClick={(e) => e.stopPropagation()}>
                                         <summary className="text-[10px] font-bold text-academic-gold cursor-pointer inline-flex items-center gap-1 hover:text-orange-500 transition-colors list-none">
                                             <span className="group-open/details:hidden">+{cat.items.length - 4} more</span>
                                             <span className="hidden group-open/details:inline">Hide</span>
                                         </summary>
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {cat.items.slice(4).map((item, i) => (
-                                                <span key={i + 4} className="text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-700 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-stone-800/50">
+                                                <span key={i + 4} onClick={(e) => { e.stopPropagation(); setSelectedItem(item); }} className="cursor-pointer hover:bg-stone-200 dark:hover:bg-stone-700 text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-700 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-stone-800/50">
                                                     {item.name}
                                                 </span>
                                             ))}

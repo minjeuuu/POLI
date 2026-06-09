@@ -39,7 +39,7 @@ export const fetchExchangeRates = async (): Promise<ExchangeRate[]> => {
 
          try {
             const response = await generateWithRetry({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.5-flash',
                 contents: `Generate a JSON array of major exchange rates relative to USD.
                 JSON: [{currencyCode: string, currencyName: string, rate: number, symbol: string, category: 'Fiat' | 'Crypto' | 'Historical' | 'Fictional'}].
                 Include major fiat, top 5 crypto, and 2 historical (e.g., Roman Denarius), 2 fictional.`,
@@ -68,7 +68,7 @@ export const fetchCurrencyAnalysis = async (currency: string): Promise<{history:
     return withCache(`currency_analysis_pro_v2_${currency}`, async () => {
         try {
             const response = await generateWithRetry({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-2.5-pro',
                 contents: `Analyze currency: ${currency}. Provide detailed history and economic profile in political science context. JSON: {history: string, economics: string}.`,
                 config: { responseMimeType: "application/json" }
             });
